@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report10_subreportJumlahBulanLaporan" language="groovy" pageWidth="894" pageHeight="609" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="894" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="sumber" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="terbilang" class="java.lang.String"/>
+	<parameter name="SUBREPORT" class="java.lang.Object" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[SELECT rj.sumber,
+  mc.name,
+  mc.address,
+  rj.keterangan,
+  COUNT(*)              AS nota,
+  SUM(rjd.jumlah_debit) AS debet_buku_jurnal
+FROM ((recap_jurnal rj
+JOIN recap_jurnal_invoice rji
+ON (rj.sumber=rji.sumber))
+JOIN m_customer mc
+ON (rj.cust_code=mc.cust_code))
+JOIN recap_jurnal_detail rjd
+ON (rj.sumber   =rjd.sumber)
+WHERE rj.sumber = $P{sumber}
+GROUP BY rj.sumber,
+  mc.name,
+  mc.address,
+  rj.keterangan]]>
+	</queryString>
+	<field name="sumber" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="keterangan" class="java.lang.String"/>
+	<field name="nota" class="java.lang.Long"/>
+	<field name="debet_buku_jurnal" class="java.math.BigDecimal"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="38" splitType="Stretch">
+			<textField>
+				<reportElement x="443" y="11" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{sumber}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="388" splitType="Stretch">
+			<textField>
+				<reportElement x="97" y="40" width="446" height="31"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{terbilang}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="97" y="71" width="446" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="97" y="91" width="446" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{keterangan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="97" y="111" width="195" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Rincian Nota: " + $F{nota} + " Rangkap"]]></textFieldExpression>
+			</textField>
+			<subreport isUsingCache="false">
+				<reportElement x="15" y="171" width="260" height="148"/>
+				<subreportParameter name="sumber">
+					<subreportParameterExpression><![CDATA[$F{sumber}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT}]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="443" y="19" width="100" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{debet_buku_jurnal}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+</jasperReport>

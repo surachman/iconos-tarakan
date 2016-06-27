@@ -1,0 +1,402 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_cancel_loading']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_cancel_loading']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">
+            <h:panelGrid columns="4" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <h:outputLabel value=" : " />
+                <h:inputText onkeypress="dlgReg.show();" value="#{entryCancelLoadingBean.registration.noReg}" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryCancelLoadingBean.registration.masterCustomer.custCode}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryCancelLoadingBean.registration.planningVessel.noPpkb}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryCancelLoadingBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryCancelLoadingBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryCancelLoadingBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryCancelLoadingBean.registration.statusService}" size="30"/>
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+        </h:form>
+
+        <h:form id="deliveryServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{entryCancelLoadingBean.cancelLoadings}"
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="deliveryServiceTable"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty entryCancelLoadingBean.registration.noReg or not entryCancelLoadingBean.registration.statusService.equals('registrasi')}" update="dsFormDialog:jb dsFormDialog:servContD" oncomplete="dlg.show();" actionListener="#{entryCancelLoadingBean.handleAdd}" onclick="genTitle('dialog','#{msg['application.operation.add']} Cancel Loading');"/>
+                    </div>
+                </f:facet>
+                <p:column sortBy="#{item[9]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Jobslip" />
+                    </f:facet>
+                    <h:outputText value="#{item[9]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[0]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont No" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Status" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Seal No" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Gros" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Pull Out" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Category" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[13]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Ket." />
+                    </f:facet>
+                    <h:outputText value="#{item[13]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Charge" />
+                    </f:facet>
+                    <div style="float: left">
+                        <h:outputText value="#{item[10]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[8]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryCancelLoadingBean.handleEditDelete}" disabled="#{empty entryCancelLoadingBean.registration.noReg or not entryCancelLoadingBean.registration.statusService.equals('registrasi')}" oncomplete="dlgg.show();" update="EditDialog" image="ui-icon-pencil" title="Edit" onclick="genTitle('dialogg','#{msg['application.operation.edit']} Cancel Loading');">
+                            <f:attribute name="jobSlip" value="#{item[9]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryCancelLoadingBean.handleEditDelete}" disabled="#{empty entryCancelLoadingBean.registration.noReg or not entryCancelLoadingBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete">
+                            <f:attribute name="jobSlip" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{entryCancelLoadingBean.handleDelete}" update="deliveryServiceForm:deliveryServiceTable serviceContDiscForm:serviceContDisc growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+
+        <p:dialog header="Entry Cancel Loading Service"  widgetVar="dlg" modal="true" minWidth="500" id="dialog">
+            <h:form id="dsFormDialog">
+                <p:panel>
+                    <h:panelGrid id="delServ">
+                        <h:panelGrid columns="5" id="servContD">
+                            <h:outputLabel value="Container No *" />
+                            <h:outputLabel value=" : " />
+                            <p:autoComplete required="true" id="acSimple" value="#{entryCancelLoadingBean.cancelLoadingService.contNo}"
+                                            completeMethod="#{entryCancelLoadingBean.setListAutoComplete}" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:this.value=this.value.toUpperCase();" />
+                            <p:commandButton onstart="freeze();" image="ui-icon-search" value="Find" style="font-size: x-small" actionListener="#{entryCancelLoadingBean.ambilContNo}" update="dsFormDialog:delServ growl">
+                                <f:attribute name="jobSlip" value="#{entryCancelLoadingBean.cancelLoadingService.contNo}"/>
+                            </p:commandButton>
+                            <p:message for="acSimple" display="icon"/>
+
+                            <h:outputLabel value="MLO" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.mlo.name}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contSize}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.masterContainerType.masterContainerTypeInGeneral.id}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contStatus}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.sealNo}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contGross}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.overSize}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Cont Gross"/>:
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contGross}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Position"/>:
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.position}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Pull Out *"/>:
+                            <h:selectOneMenu value="#{entryCancelLoadingBean.cancelLoadingService.pullOut}" disabled="#{entryCancelLoadingBean.visible}">
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />                                
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryCancelLoadingBean.handleConfirm}" update="deliveryServiceForm:deliveryServiceTable serviceContDiscForm:serviceContDisc growl dsFormDialog" oncomplete="handleLoginRequest(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <script type="text/javascript">
+             function handleLoginRequest(xhr, status, args) {
+                     if(args.validationFailed || !args.loggedIn) {
+                             jQuery('#dialog').show();
+                     } else {
+                             dlg.hide();
+                     }
+             }
+        </script>
+
+        <p:dialog header="Edit Cancel Loading Service"  widgetVar="dlgg" modal="true" minWidth="400" id="dialogg">
+            <h:form id="EditDialog">
+                <p:panel>
+                    <h:panelGrid id="delServ">
+                        <h:panelGrid columns="3" id="servContD">
+                            <h:outputLabel value="Container No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contNo}" size="25" requiredMessage="#{msg['application.validation.required']}"/>
+
+
+                            <h:outputLabel value="MLO" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.mlo.name}"/>
+
+                            
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contSize}" size="25"/>
+
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.masterContainerType.masterContainerTypeInGeneral.id}" size="25"/>
+
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contStatus}" size="25"/>
+
+
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.sealNo}" size="25"/>
+
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contGross}" size="25"/>
+
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.overSize}" size="25"/>
+
+
+                            <h:outputText value="Cont Gross"/>:
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.contGross}"/>
+
+
+                            <h:outputText value="Position"/>:
+                            <h:inputText disabled="true" value="#{entryCancelLoadingBean.cancelLoadingService.position}"/>
+
+
+                            <h:outputText value="Pull Out"/>:
+                            <h:selectOneMenu value="#{entryCancelLoadingBean.cancelLoadingService.pullOut}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryCancelLoadingBean.handleConfirm}" update="deliveryServiceForm:deliveryServiceTable serviceContDiscForm:serviceContDisc growl dsFormDialog" oncomplete="handleLoginRequest(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{entryCancelLoadingBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{entryCancelLoadingBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail deliveryServiceForm:deliveryServiceTable serviceContDiscForm:serviceContDisc" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

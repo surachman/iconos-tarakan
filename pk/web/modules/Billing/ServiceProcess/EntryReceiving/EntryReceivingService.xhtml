@@ -1,0 +1,760 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_receiving.entry_receiving_service']}" />
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_receiving.entry_receiving_service']}" />
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="bookingCodeForm">
+            <p:dialog  widgetVar="lovBc" header="Select Planning Vessel" width="850" modal="true">
+                <p:dataTable var="item" paginator="true"
+                             value="#{entryReceivingServiceBean.registrationList}"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="No Reg." />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Service" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{entryReceivingServiceBean.handleOnSelect}" disabled="#{item[6].equals('PLUGGING ONLY')}"
+                                             value="select" update="bookingCodeForm:preserviceDetail bookingCodeForm:tabelReg baplie contForm list"
+                                             oncomplete="lovBc.hide();">
+                                <f:attribute name="no_reg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+            <h:panelGrid columns="4" id="preserviceDetail">
+                <h:outputLabel value="No Reg" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingServiceBean.registrationObjek[0]}" id="noPpkb" onkeypress="lovBc.show()" readonly="true" size="30"/>
+                <p:commandButton onstart="freeze();" type="button" onclick="lovBc.show()" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" style="font-size: x-small">
+                </p:commandButton>
+
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingServiceBean.registrationObjek[1]}" disabled="true" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingServiceBean.registrationObjek[2]}" disabled="true" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Voy In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingServiceBean.registrationObjek[3]}" disabled="true" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Voy Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingServiceBean.registrationObjek[4]}" disabled="true" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Customer Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingServiceBean.registrationObjek[5]}" disabled="true" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Status" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingServiceBean.registrationObjek[6]}" disabled="true" size="30"/>
+                <h:outputText />
+
+            </h:panelGrid>
+            <br />
+            <br />
+            <p:dataTable id="tabelReg" var="item" value="#{entryReceivingServiceBean.receivingServicesList}"
+                         paginator="true" rows="10"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" dynamic="true" >
+
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty entryReceivingServiceBean.registrationObjek[1] or not entryReceivingServiceBean.registrationObjek[6].equals('registrasi')}" action="#{entryReceivingServiceBean.handleAdd}" image="ui-icon-plusthick" title="Add" update="fmAddYard" oncomplete="dlg.show()"/>
+                        <p:commandButton onstart="freeze();" value="Add From Baplie" onclick="bapli.show()" disabled="#{empty entryReceivingServiceBean.registrationObjek[1] or not entryReceivingServiceBean.registrationObjek[6].equals('registrasi')}" image="ui-icon-plusthick" title="Add Form Baplie" actionListener="#{entryReceivingServiceBean.handleAdd}" update="baplie"/>
+                    </div>
+                </f:facet>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Job Slip" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="OH/OW/OL" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryReceivingServiceBean.handleEditDeleteButton}" disabled="#{empty entryReceivingServiceBean.registrationObjek[1] or not entryReceivingServiceBean.registrationObjek[6].equals('registrasi')}" update="fmEditYard:receiving fmEditYard:gross fmEditYard:opt" oncomplete="dlgEdit.show();"
+                                         image="ui-icon-pencil" title="Edit">
+                            <f:attribute name="job_slip" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryReceivingServiceBean.handleEditDeleteButton}" disabled="#{empty entryReceivingServiceBean.registrationObjek[1] or not entryReceivingServiceBean.registrationObjek[6].equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete">
+                            <f:attribute name="job_slip" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>               
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation" minWidth="370">
+            <h:form>
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{entryReceivingServiceBean.delete}"  update="bookingCodeForm:tabelReg fmEditYard baplie list contForm bookingCodeForm baplie list" onclick="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="List Add Form Baplie"  widgetVar="bapli" width="850" modal="true" >
+
+            <p:panel>
+                <h:form id="baplie">
+                    <p:panel header="Add Form Baplie">
+                        <h:panelGrid columns="5" id="receiving" >
+                            <h:outputLabel value="Container No *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText required="true" onkeypress="cont.show()" id="cont" value="#{entryReceivingServiceBean.receivingService.contNo}" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton onstart="freeze();" onclick="cont.show()" value="..." image="ui-icon-folder-open" title="Browse for Container no" style="font-size: x-small"/>
+                            <p:message for="cont" display="icon"/>
+                            
+                            <h:outputLabel value="MLO" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryReceivingServiceBean.receivingService.mlo.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Container Type" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.masterContainerType.contType}" required="true">
+                                <f:selectItems var="item" value="#{entryReceivingServiceBean.masterContainerTypes}"
+                                               itemValue="#{item.contType}"
+                                               itemLabel="#{item.name}" />
+                            </h:selectOneMenu>
+                            <h:outputLabel value="" />
+                            <h:outputLabel value="" />
+
+
+                            <h:outputLabel value="Container Size" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.contSize}">
+                                <f:selectItems value="#{containerAttributesBean.containerSizes}"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel value="" />
+                            <h:outputLabel value="" />
+
+                            <h:outputLabel value="Container Status" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.contStatus}">
+                                <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                                <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                                <f:selectItem itemValue="MTY" itemLabel="EMPTY" />
+                            </h:selectOneMenu>
+                            <h:outputLabel value="" />
+                            <h:outputLabel value="" />
+
+
+                            <h:outputLabel value="Container Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryReceivingServiceBean.receivingService.contGross}"/>
+                            <h:outputLabel value="" />
+                            <h:outputLabel value="" />
+
+
+                            <h:outputLabel value="Dg Label" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{entryReceivingServiceBean.receivingService.dg}"/>
+                            <h:outputLabel value="" />
+                            <h:outputLabel value="" />
+
+
+                        </h:panelGrid>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryReceivingServiceBean.saveBaplie}" disabled="#{empty entryReceivingServiceBean.planningContReceivingListGenerate}" image="ui-icon-plusthick" title="Add" update="bookingCodeForm:tabelReg baplie:receiving baplie:listGenerate growl contForm list"/>
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </h:form>
+                <h:form id="list">
+                    <p:spacer height="20"/>
+
+                    <p:dataTable var="item" value="#{entryReceivingServiceBean.planningContReceivingListGenerate}"
+                                 paginator="true" rows="10" id="listGenerate"
+                                 paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15">
+
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;"/>
+                        </f:facet>
+
+                        <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}" >
+                            <f:facet name="header">
+                                <h:outputText value="cont no" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="size" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[6]}" filterMatchMode="contains" filterBy="#{item[6]}" >
+                            <f:facet name="header">
+                                <h:outputText value="status" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[7]}">
+                            <f:facet name="header">
+                                <h:outputText value="cont gros" />
+                            </f:facet>
+                            <h:outputText value="#{item[7]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[8]}" filterMatchMode="contains" filterBy="#{item[8]}" >
+                            <f:facet name="header">
+                                <h:outputText value="seal no" />
+                            </f:facet>
+                            <h:outputText value="#{item[8]}" />
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" oncomplete="selectAll.show()" value="#{msg['application.operation.select_all']}" disabled="#{empty entryReceivingServiceBean.planningContReceivingListGenerate}" image="ui-icon-plusthick" title="Add" update="bookingCodeForm:tabelReg baplie contForm  list"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="bapli.hide()" disabled="#{entryReceivingServiceBean.visible}" image="ui-icon-plusthick" type="reset" update="baplie"/>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </p:panel>
+
+        </p:dialog>
+
+        <!--SELECT ALL-->
+
+        <p:dialog header="#{msg['application.header.confirm.select_all']}"  widgetVar="selectAll" minWidth="370">
+            <h:form>
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.select_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{entryReceivingServiceBean.careateEntryGenerate}"  update="bookingCodeForm:tabelReg baplie list bookingCodeForm" onsuccess="selectAll.hide() " />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onsuccess="selectAll.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOg PILIH CONT-->
+        <p:dialog  widgetVar="cont" header="Select Service Get Out Receiving" width="700" modal="true">
+            <h:form id="contForm">
+                <p:dataTable var="item" paginator="true" id="planCont"
+                             value="#{entryReceivingServiceBean.planningContReceivingListGenerate}"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}" >
+                        <f:facet name="header">
+                            <h:outputText value="cont no" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}" filterMatchMode="contains" filterBy="#{item[3]}" >
+                        <f:facet name="header">
+                            <h:outputText value="no ppkb" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}" filterMatchMode="contains" filterBy="#{item[5]}" >
+                        <f:facet name="header">
+                            <h:outputText value="size" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}" filterMatchMode="contains" filterBy="#{item[6]}" >
+                        <f:facet name="header">
+                            <h:outputText value="status" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" value="select" oncomplete="cont.hide();" actionListener="#{entryReceivingServiceBean.handleSelectNoCont}" update="baplie:receiving">
+                                <f:attribute name="cont_no" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+
+
+        <p:dialog header="Add Receiving Service"  widgetVar="dlg" modal="true" width="600" id="dialog" >
+            <h:form id="fmAddYard">
+                <p:panel>
+                    <h:panelGrid columns="4" id="receiving" columnClasses="first-td">
+
+                        <h:outputLabel value="Bl No " />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="blNo" value="#{entryReceivingServiceBean.receivingService.blNo}" maxlength="20"/>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Container No *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="2">
+                            <h:inputText required="true" id="cont" value="#{entryReceivingServiceBean.receivingService.contNo}" requiredMessage="#{msg['application.validation.required']}" maxlength="11"/>
+                            <p:message for="cont" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Container Type *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.masterContainerType.contType}"
+                                             valueChangeListener="#{entryReceivingServiceBean.onChangeConstraintType}" immediate="true">
+                                <f:selectItems value="#{entryReceivingServiceBean.masterContainerTypes}" var="item" itemValue="#{item.contType}" itemLabel="#{item.name}" />
+                                <f:ajax execute="@this" event="change" render="containerSize"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Size"/>
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:inputText id="containerSize" value="#{entryReceivingServiceBean.receivingService.contSize}" disabled="true" style="width: 20px;" readonly="false"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Container Status *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.contStatus}">
+                                <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                                <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                                <f:selectItem itemValue="MTY" itemLabel="EMPTY" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />                       
+
+                        <h:outputLabel value="Container Gross *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="gross">
+                            <h:inputText id="Gross" maxlength="10" required="true" value="#{entryReceivingServiceBean.receivingService.contGross}" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message for="Gross" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="&nbsp;" />
+
+                        <h:outputLabel value="Seal No *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="2">
+                            <h:inputText id="SealNo" required="true" value="#{entryReceivingServiceBean.receivingService.sealNo}" requiredMessage="#{msg['application.validation.required']}" maxlength="10">
+
+                            </h:inputText>
+                            <p:message for="SealNo" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="OH/OW/OL" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.overSize}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Dangerous" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" >
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.dg}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>                            
+
+                            <h:outputLabel value="Label" />
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.dgLabel}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Load Port *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.masterPort.portCode}">
+                                <f:selectItems value="#{entryReceivingServiceBean.masterPorts}" var="item" itemValue="#{item.portCode}" itemLabel="#{item.name}" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Discharge Port *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.masterPort1.portCode}">
+                                <f:selectItems value="#{entryReceivingServiceBean.masterPorts}" var="item" itemValue="#{item.portCode}" itemLabel="#{item.name}" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="opt">
+                            <h:inputText onkeypress="dlgOperatorCrane.show();" onmousedown="dlgOperatorCrane.show()" id="commodity" value="#{entryReceivingServiceBean.receivingService.masterCommodity.name}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="dlgOperatorCrane.show();" style="font-size: x-small"/>
+                            <p:message for="commodity" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryReceivingServiceBean.saveEdit}"
+                                                 oncomplete="handleLoginRequest(xhr, status, args)" image="ui-icon-check" update="bookingCodeForm:tabelReg fmAddYard:receiving growl fmAddYard:gross bookingCodeForm"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="Edit Receiving Service"  widgetVar="dlgEdit" modal="true" width="600" id="dialogEdit">
+            <h:form id="fmEditYard">
+                <p:panel>
+                    <h:panelGrid columns="4" id="receiving" columnClasses="first-td">
+                        <h:outputLabel value="Bl No " />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="blN" value="#{entryReceivingServiceBean.receivingService.blNo}" maxlength="20"/>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Container No *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:inputText required="true" disabled="true" value="#{entryReceivingServiceBean.receivingService.contNo}" requiredMessage="#{msg['application.validation.required']}"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+                            
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryReceivingServiceBean.receivingService.mlo.name}"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Container Type *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.masterContainerType.contType}">
+                                <f:selectItems var="item" value="#{entryReceivingServiceBean.masterContainerTypes}"
+                                               itemValue="#{item.contType}"
+                                               itemLabel="#{item.name}" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Container Size" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.contSize}">
+                                <f:selectItems value="#{containerAttributesBean.containerSizes}"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Container Status *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.contStatus}">
+                                <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                                <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                                <f:selectItem itemValue="MTY" itemLabel="EMPTY" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />                      
+
+                        <h:outputLabel value="Container Gross *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="gross">
+                            <h:inputText disabled="true" id="Gross" maxlength="10" required="true" value="#{entryReceivingServiceBean.receivingService.contGross}" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message for="Gross" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+
+                        <h:outputLabel value="Seal No *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="2">
+                            <h:inputText id="SealNo" required="true" value="#{entryReceivingServiceBean.receivingService.sealNo}" requiredMessage="#{msg['application.validation.required']}" >
+
+                            </h:inputText>
+                            <p:message for="SealNo" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="OH/OW/OL" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.overSize}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Dangerous " />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" >
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.dg}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+
+                            <h:outputLabel value="Label " />
+                            <h:selectOneMenu disabled="true" value="#{entryReceivingServiceBean.receivingService.dgLabel}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Load Port *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.masterPort.portCode}">
+                                <f:selectItems value="#{entryReceivingServiceBean.masterPorts}" var="item" itemValue="#{item.portCode}" itemLabel="#{item.name}" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Discharge Port *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{entryReceivingServiceBean.receivingService.masterPort1.portCode}">
+                                <f:selectItems value="#{entryReceivingServiceBean.masterPorts}" var="item" itemValue="#{item.portCode}" itemLabel="#{item.name}" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="2" id="opt">
+                            <h:inputText disabled="true" value="#{entryReceivingServiceBean.receivingService.masterCommodity.name}" />
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="dlgOperatorCrane.show();" style="font-size: x-small"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="" />
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryReceivingServiceBean.submit}"
+                                                 image="ui-icon-check" update="bookingCodeForm:tabelReg fmEditYard:receiving growl fmEditYard:gross" oncomplete="dlgEdit.hide()"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgEdit.hide()" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="Select Commodity Code"  widgetVar="dlgOperatorCrane" modal="true" minWidth="600">
+            <h:form>
+                <p:dataTable var="item" value="#{entryReceivingServiceBean.masterCommodityList}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryReceivingServiceBean.handleSelectCommodity}" value="select" update="fmAddYard:opt fmEditYard:opt" oncomplete="dlgOperatorCrane.hide();">
+                            <f:attribute name="idOperatorCrane" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+             function handleLoginRequest(xhr, status, args) {
+                     if(args.validationFailed || !args.loggedIn) {
+                             jQuery('#dialog').show();
+                     } else {
+                             dlg.hide();
+                     }
+             }
+
+             function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>

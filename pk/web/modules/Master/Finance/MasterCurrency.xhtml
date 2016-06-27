@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.finance.master_currency']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.finance.master_currency']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl showDetail="true" life="3000" id="growl" globalOnly="true"/>
+        
+        <h:form id="currencyForm">            
+            <p:dataTable paginatorPosition="bottom" value="#{masterCurrencyBean.currencyList}" var="item"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <!--                        <p:commandButton value="{msg['application.operation.add']}" image="ui-icon-plusthick" immediate="true" actionListener="{masterCurrencyBean.handleAdd}" update="currencyForm2" onclick="dialogAddEdit.show()"/>-->
+                        &nbsp;
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.currCode}" filterMatchMode="contains" filterBy="#{item.currCode}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Currency Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item.currCode}"/>
+                </p:column>
+                <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+                <p:column sortBy="#{item.symbol}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Symbol"/>
+                    </f:facet>
+                    <h:outputText value="#{item.symbol}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton image="ui-icon-pencil" actionListener="#{masterCurrencyBean.handleSelectTable}" update="currencyForm2" onclick="dialogAddEdit.show();" title="Edit">
+                            <f:attribute name="curr_code" value="#{item.currCode}"/>
+                        </p:commandButton>                        
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="600" header="Edit Master Currency">
+            <h:form id="currencyForm2">
+                <p:panel>                    
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Currency Code *" for="currCode" />:
+                        <h:inputText id="currCode" disabled="#{masterCurrencyBean.cekId}" value="#{masterCurrencyBean.currency.currCode}" title="CurrCode" required="true" requiredMessage="Currency Code Field #{msg['application.validation.required']}"/>
+                        <h:message for="currCode" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Name *" for="name" />:
+                        <h:inputText id="name" value="#{masterCurrencyBean.currency.name}" required="true" title="Name" requiredMessage="Name field #{msg['application.validation.required']}" />
+                        <h:message for="name" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Symbol *" for="symbol" />:
+                        <h:inputText id="symbol" value="#{masterCurrencyBean.currency.symbol}" required="true" title="Symbol" requiredMessage="Symbol field #{msg['application.validation.required']}"/>
+                        <h:message for="symbol" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Language *" for="language" />:
+                        <h:inputText id="language" value="#{masterCurrencyBean.currency.language}" required="true" title="Language" requiredMessage="Language field #{msg['application.validation.required']}"/>
+                        <h:message for="language" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Country *" for="country" />:
+                        <h:inputText id="country" value="#{masterCurrencyBean.currency.country}" required="true" title="Country" requiredMessage="Country field #{msg['application.validation.required']}"/>
+                        <h:message for="country" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Trade Type *" for="tradeType" />:
+                        <h:selectOneMenu id="tradeType" value="#{masterCurrencyBean.currency.tradeType}" title="Trade Type" >
+                            <f:selectItem itemValue="d" itemLabel="Domestic"/>
+                            <f:selectItem itemValue="i" itemLabel="International"/>
+                        </h:selectOneMenu>
+                        <h:message for="tradeType" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Locale *" for="locale" />:
+                        <h:inputText id="locale" value="#{masterCurrencyBean.currency.locale}" required="true" title="Locale" requiredMessage="Locale field #{msg['application.validation.required']}"/>
+                        <h:message for="locale" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Default Fraction Digits *" for="defaultFractionDigits" />:
+                        <h:inputText id="defaultFractionDigits" value="#{masterCurrencyBean.currency.defaultFractionDigits}" required="true" title="Default Fraction Digits" requiredMessage="Default Fraction Digits field #{msg['application.validation.required']}"/>
+                        <h:message for="defaultFractionDigits" styleClass="msg-error"/>
+
+                        <h:outputLabel value="SIMPAT Currency ID *" for="simpatCurrId" />:
+                        <h:inputText id="simpatCurrId" value="#{masterCurrencyBean.currency.mataUangId}" required="true" title="SIMPAT Currency ID" requiredMessage="SIMPAT Currency ID field #{msg['application.validation.required']}"/>
+                        <h:message for="simpatCurrId" styleClass="msg-error"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" image="ui-icon-check" actionListener="#{masterCurrencyBean.handleSaveEdit}" update="currencyForm currencyForm2 growl" onsuccess="dialogAddEdit.hide()" oncomplete="validateForm(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="currencyForm3">                
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterCurrencyBean.handleDelete}" update="currencyForm currencyForm3 growl" onsuccess="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

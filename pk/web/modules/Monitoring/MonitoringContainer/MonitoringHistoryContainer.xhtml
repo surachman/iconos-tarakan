@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+ 
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.container.container_his']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="contForm">
+            <h:panelGrid columns="5" id="noContainer">
+                <h:outputLabel value="Container No"/>:
+                <h:inputText size="30" value="#{monitoringHistoryContainerBean.cont_no}" title="Container No"/>
+                <p:commandButton onstart="freeze();" actionListener="#{monitoringHistoryContainerBean.handleSearch}" value="#{msg['application.operation.search']}" style="font-size: x-small" update="dialogContForm:contTable growl"/>
+                <p:commandButton onstart="freeze();" actionListener="#{monitoringHistoryContainerBean.handleClear}" value="#{msg['application.operation.clear']}" style="font-size: x-small" update="dialogContForm:contTable contForm:noContainer growl"/>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="dialogContForm">
+            <p:dataTable var="item" value="#{monitoringHistoryContainerBean.containerList}" id="contTable"
+                         paginator="true" rows="10" paginatorPosition="bottom" rowIndexVar="No"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;"/>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center" />
+                        <p:column sortBy="#{item[1]}" rowspan="2" headerText="Container No" filterMatchMode="contains" filterBy="#{item[0]}"/>
+                        <p:column sortBy="#{item[2]}" rowspan="2" headerText="No PPKB" filterMatchMode="contains" filterBy="#{item[1]}"/>
+                        <p:column sortBy="#{item[3]}" rowspan="2" headerText="Vessel Name" filterMatchMode="contains" filterBy="#{item[2]}"/>
+                        <p:column sortBy="#{item[4]}" rowspan="2" headerText="Waktu Daftar"/>
+                        <p:column sortBy="#{item[20]}" rowspan="2" headerText="Cont. Size"/>
+                        <p:column sortBy="#{item[19]}" rowspan="2" headerText="Cont. Type"/>
+                        <p:column sortBy="#{item[21]}" rowspan="2" headerText="Cont. Status"/>
+                        <p:column sortBy="#{item[5]}" rowspan="2" headerText="Status" />
+                        <p:column sortBy="#{item[22]}" rowspan="2" headerText="Customer" />
+                        <p:column colspan="2" headerText="Stevedoring"/>
+                        <p:column colspan="2" headerText="H/T" />
+                        <p:column colspan="2" headerText="Lift Off/On" />
+                        <p:column colspan="3" headerText="Billing"/>
+                        <p:column headerText="Gate In" />
+                        <p:column colspan="2" headerText="Delivery/Receiving" />
+                        <p:column headerText="Gate Out" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[6]}" headerText="Kode Alat" />
+                        <p:column sortBy="#{item[7]}" headerText="Time"/>
+                        <p:column sortBy="#{item[8]}" headerText="Kode Alat" />
+                        <p:column sortBy="#{item[9]}" headerText="Time"/>
+                        <p:column sortBy="#{item[10]}" headerText="Kode Alat" />
+                        <p:column sortBy="#{item[11]}" headerText="Time"/>
+                        <p:column sortBy="#{item[12]}" headerText="Time"/>
+                        <p:column sortBy="#{item[17]}" headerText="No Invoice"/>
+                        <p:column sortBy="#{item[18]}" headerText="User"/>
+                        <p:column sortBy="#{item[13]}" headerText="Time"/>
+                        <p:column sortBy="#{item[14]}" headerText="Kode Alat" />
+                        <p:column sortBy="#{item[15]}" headerText="Time"/>
+                        <p:column sortBy="#{item[16]}" headerText="Time"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[20]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[19]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[21]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                  <p:column>
+                    <h:outputText value="#{item[22]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[7]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[9]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[11]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[12]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[17]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[18]}" rendered="#{not empty item[17]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[13]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[14]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[15]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[16]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                    </h:outputText>
+                </p:column>
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" disabled="#{empty monitoringHistoryContainerBean.containerList}" id="buttonPreview" value="#{msg['application.operation.preview']}" actionListener="#{monitoringHistoryContainerBean.handleDownload}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" update="dialogContForm:buttonPreview"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

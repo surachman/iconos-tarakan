@@ -1,0 +1,383 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.vessel_operation.insert_idle_time']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.vessel_operation.insert_idle_time']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+
+        </script>
+
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="selectPpkb">
+            <p:dialog  widgetVar="lovBc" header="Select Vessel" width="700" modal="true">
+                <p:dataTable var="item" paginator="true"
+                             value="#{insertIdleTimeBean.serviceVessels}"
+                             paginatorPosition="bottom" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             id="serviceVessel">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{insertIdleTimeBean.handleOnSelect}"
+                                             value="select" update="hatch:moves hatch:service"
+                                             oncomplete="lovBc.hide();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="hatch">
+            <h:panelGrid columns="4" id="moves">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{insertIdleTimeBean.serviceVessel[0]}" size="30"/>
+                <p:commandButton onstart="freeze();" oncomplete="lovBc.show()" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" actionListener="#{insertIdleTimeBean.handleViewPpkb}" style="font-size: x-small" update="selectPpkb:serviceVessel"/>
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{insertIdleTimeBean.serviceVessel[1]}" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{insertIdleTimeBean.serviceVessel[2]}" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{insertIdleTimeBean.serviceVessel[3]}" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br />
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{insertIdleTimeBean.insertIdleTimes}"
+                         paginator="true" rows="10" id="service" rowIndexVar="no"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" oncomplete="dlg.show();" disabled="#{empty insertIdleTimeBean.serviceVessel[0]}" actionListener="#{insertIdleTimeBean.handleAdd}" onclick="genTitle('dialog','#{msg['application.operation.add']} Idle Time');" update="formAddEdit"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" image="ui-icon-refresh" value="#{msg['application.operation.refresh']}" disabled="#{empty insertIdleTimeBean.serviceVessel[0]}" actionListener="#{insertIdleTimeBean.handleRefresh}" update="hatch:service"/>
+                    </div>
+                </f:facet>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{no+1}." />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Idle Time Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Idle Time Name" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Description" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Start Time" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="End Time" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{insertIdleTimeBean.handleEditDeleteButton}" update="formAddEdit:serviceMoves formAddEdit:crane formAddEdit:operator formAddEdit:st formAddEdit:et" oncomplete="dlg.show();" onclick="genTitle('dialog','#{msg['application.operation.edit']} Idle Time');"
+                                         image="ui-icon-pencil" title="Edit">
+                            <f:attribute name="idIdl" value="#{item[5]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{insertIdleTimeBean.handleEditDeleteButton}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete">
+                            <f:attribute name="idIdl" value="#{item[5]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton image="ui-icon ui-icon-print" disabled="#{empty insertIdleTimeBean.serviceVessel[0]}" value="berita acara" oncomplete="dlgCetak.show()"/>
+                        <p:commandButton image="ui-icon ui-icon-print" disabled="#{empty insertIdleTimeBean.serviceVessel[0]}" value="Produktivitas Alat" oncomplete="dlgProduk.show()"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{insertIdleTimeBean.handleDelete}" update="hatch:service growl" oncomplete="confirmation.hide();"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+        <p:spacer height="20"/>
+
+        <p:dialog  widgetVar="dlgCetak" width="400" modal="true" position="center" header="Print Berita Acara">
+            <h:form id="printBerita">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="Tanggal"/>
+                        <h:outputLabel value=":"/>
+                        <p:calendar value="#{insertIdleTimeBean.tgl}" id="tgl" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="tgl" display="icon"/>
+
+                        <h:outputLabel value="Nama Foreman"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{insertIdleTimeBean.foreman}" id="foreman" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="foreman" display="icon"/>
+
+                        <h:outputLabel value="Pelayaran"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{insertIdleTimeBean.agen}" id="pel" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="pel" display="icon"/>
+
+                        <h:outputLabel value="Tipe"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneRadio value="#{insertIdleTimeBean.tipe}" id="tipe" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItem itemValue="b" itemLabel="Bongkaran"/>
+                            <f:selectItem itemValue="m" itemLabel="Muatan"/>
+                        </h:selectOneRadio>
+                        <p:message for="tipe" display="icon"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <dycode:directPrint id="printNota" onstart="freeze();" value="#{msg['application.operation.print']}" actionListener="#{insertIdleTimeBean.handlePrintBeritaAcara}" update="printBerita"/>
+                        <p:commandButton value="#{msg['application.operation.exit']}" oncomplete="dlgCetak.hide()"/>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!-- dlg produk-->
+        <p:dialog  widgetVar="dlgProduk" width="400" modal="true" position="center" header="Print Produktivitas Container Crane">
+            <h:form id="printProduk">
+                <p:panel>
+                    <h:panelGrid columns="4">
+
+                        <h:outputLabel value="Nama Foreman"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{insertIdleTimeBean.foreman}" id="foreman" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="foreman" display="icon"/>
+
+                        <h:outputLabel value="Pelayaran"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{insertIdleTimeBean.agen}" id="pel" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="pel" display="icon"/>
+
+                        <h:outputLabel value="Tipe"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu value="#{insertIdleTimeBean.equip}" id="tipe" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItem itemValue="" itemLabel="---Pilih---"/>
+                            <f:selectItems value="#{insertIdleTimeBean.eqForCrane}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} || #{i[1]}"/>
+                        </h:selectOneMenu>
+                        <p:message for="tipe" display="icon"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <dycode:directPrint id="printNota" onstart="freeze();" value="#{msg['application.operation.print']}" actionListener="#{insertIdleTimeBean.handlePrintBeritaAcaraP}" update="printProduk"/>
+                        <p:commandButton value="#{msg['application.operation.exit']}" oncomplete="dlgProduk.hide()"/>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <p:dialog header="Insert Idle Time"  widgetVar="dlg" minWidth="450" modal="true" id="dialog">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:panelGrid columns="3" id="serviceMoves">
+
+                        <h:outputLabel value="Idle Time Type *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{insertIdleTimeBean.serviceIdleTime.masterIdletimetype.idType}"
+                                         valueChangeListener="#{insertIdleTimeBean.onChangeEvent}" immediate="true">
+                            <f:selectItems value="#{insertIdleTimeBean.masterIdleTimeTypes}" var="item" itemValue="#{item.idType}" itemLabel="#{item.name}" />
+                            <f:ajax execute="@this" event="change" render="formAddEdit"/>
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Idle Time Name *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{insertIdleTimeBean.serviceIdleTime.masterIdletime.idleTimeCode}">
+                            <f:selectItems value="#{insertIdleTimeBean.masterIdleTimes}" var="item" itemValue="#{item[0]}" itemLabel="#{item[1]}" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Tanggal Aktivitas *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="etv">
+                            <h:inputText styleClass="cal" id="actv" required="true" value="#{insertIdleTimeBean.serviceIdleTime.etTanggal}" requiredMessage="#{msg['application.validation.required']}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                            <p:message for="actv" display="icon"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Description" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea value="#{insertIdleTimeBean.serviceIdleTime.description}"/>
+
+                        <h:outputLabel value="Equipment" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{insertIdleTimeBean.serviceIdleTime.equipCode}" >
+                            <f:selectItems value="#{insertIdleTimeBean.eqForCrane}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} || #{i[1]}"/>
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Start Time *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="st">
+                            <h:inputText styleClass="cal" id="start" required="true" value="#{insertIdleTimeBean.serviceIdleTime.startTime}" requiredMessage="#{msg['application.validation.required']}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                            <p:message for="start" display="icon"/>
+                        </h:panelGrid>
+
+
+                        <h:outputLabel value="End Time *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="et">
+                            <h:inputText styleClass="cal" id="end" required="true" value="#{insertIdleTimeBean.serviceIdleTime.endTime}" requiredMessage="#{msg['application.validation.required']}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                            <p:message for="end" display="icon"/>
+                        </h:panelGrid>
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.submit']}" actionListener="#{insertIdleTimeBean.handleSubmit}" update="hatch:service growl formAddEdit formAddEdit:st formAddEdit:et" oncomplete="handleLoginRequest(xhr, status, args)"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" update="formAddEdit formAddEdit:st formAddEdit:et" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+        function handleLoginRequest(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog').show();
+                } else {
+                        dlg.hide();
+                }
+        }
+        </script>
+
+    </ui:define>
+
+</ui:composition>

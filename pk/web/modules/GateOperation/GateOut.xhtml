@@ -1,0 +1,381 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.gate_operation.gate_operation_out']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.gate_operation.gate_operation_out']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.qtasnim.weighing.js" />
+        <script type="text/javascript" src="./../../resources/scripts/modules/GateOut.js" />
+        <script type="text/javascript"  src="./../../resources/scripts/deployJava.js"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                   param.value = "";
+                else if(regexLetter.test(param.value))
+                   param.value = "";
+            }
+
+            function calc(){
+                var one = jQuery('[id=gateInUc:weightUc]').val();
+                var two = jQuery('[id=gateInUc:tonageUc]').val();
+                var three = one-two;
+                jQuery('[id=gateInUc:contWeightUc]').val(three);
+            }
+
+            function handleRequestValidation(xhr, status, args) {
+                if(args.loggedIn == false) {
+                    messageDialog.show();
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <div style="right: 50px; position: absolute;">
+            <script type="text/javascript">
+                var attributes = {
+                    code:       "com.qtasnim.weighing.Main",
+                    archive:    "ebtos-digital-weighing.jar, lib/jssc.jar",
+                    width:      280,
+                    height:     90
+                };
+                var parameters = {separate_jvm:"true", draggable:"true", jnlp_href:"./../../resources/applet/launch.jnlp"}; <!-- Applet Parameters -->
+                var version = "1.5"; <!-- Required Java Version -->
+
+                if (deployJava.getJREs().length > 0) {
+                    deployJava.runApplet(attributes, parameters, version);
+                } else {
+                    alert('Harap install Java Runtime (JRE) terbaru untuk mengaktifkan fitur Timbangan!');
+                }
+            </script>
+        </div>
+        <div align="center">
+            <p:tabView  widgetVar="gateOutTabView_var">
+                <p:tab title="Delivery">
+                    <h:form id="gateIn">
+                        <p:panel>
+                            <h:panelGrid columns="1">
+                                <h:panelGrid columns="3" rowClasses="first-td">
+                                    <p:fieldset legend="Detail Container" style="min-width: 300px; min-height: 180px;">
+                                        <h:panelGrid columns="5" id="container">
+
+                                            <h:outputText value="Cont. Type"/>:
+                                            <h:selectOneRadio value="#{gateOutDeliveryBean.contNumber}" id="contNumber" disabled="#{gateOutDeliveryBean.isSecond}" >
+                                                <f:selectItem itemValue="1" itemLabel="1 Cont." />
+                                                <f:selectItem itemValue="2" itemLabel="2 Cont." />
+                                                <f:ajax execute="@this" event="change" listener="#{gateOutDeliveryBean.onChangeContCount}" render="gateIn:weight gateIn:contWeight"/>
+                                            </h:selectOneRadio>
+                                            <h:outputText/>
+                                            <h:outputText/>
+
+                                            <h:outputText value="Container No *"/>:
+                                            <p:autoComplete required="true" id="acSimple" value="#{gateOutDeliveryBean.serviceGateDelivery.contNo}"
+                                                            completeMethod="#{gateOutDeliveryBean.setListAutoComplete2}" requiredMessage="Container No #{msg['application.validation.required']}" maxlength="15"/>
+                                            <p:commandButton image="ui-icon-search" value="Find" style="font-size: x-small" actionListener="#{gateOutDeliveryBean.ambilContNo2}" process="@this acSimple" update="gateIn:container gateIn:truk growl gateIn" oncomplete="deliveryForm.calculate();">
+                                                <f:attribute name="contNo" value="#{gateOutDeliveryBean.serviceGateDelivery.contNo}"/>
+                                            </p:commandButton>
+                                            <p:message for="acSimple" display="icon"/>
+
+                                            <h:outputText value="No Jobslip"/>:
+                                            <h:inputText disabled="true" id="jobSlip" value="#{gateOutDeliveryBean.serviceGateDelivery.jobSlip}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputLabel value="MLO" />:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryBean.serviceGateDelivery.mlo.name}"/>
+                                            <h:outputLabel/>
+                                            <h:outputLabel/>
+
+                                            <h:outputText value="Container Type"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryBean.contType}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputText value="Container Status"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryBean.contStatus}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputText value="Seal No"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryBean.serviceGateDelivery.sealNo}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputText value="No Polisi"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryBean.serviceGateDelivery.masterVehicle.vehicleCode}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputText />
+                                            <h:inputHidden value="#{gateOutDeliveryBean.serviceGateDelivery.cont_type}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                        </h:panelGrid>
+                                    </p:fieldset>
+
+                                    <p:spacer height="20"/>
+
+                                    <p:fieldset legend="Timbangan" style="min-width: 270px; min-height: 180px;">
+                                        <h:panelGrid columns="4" id="truk">
+
+                                            <h:outputText value="Truck Type"/>:
+                                            <h:inputText disabled="true" id="truckType" value="#{gateOutDeliveryBean.serviceGateDelivery.masterVehicle.vehicleCode}"/>
+                                            <h:outputText />
+
+                                            <h:outputText value="Truck (Kg)"/>
+                                            <h:outputText value=":"/>
+                                            <h:inputText readonly="true" value="#{gateOutDeliveryBean.tonage}" id="tonage"/>
+                                            <h:outputText />
+
+                                            
+                                            <h:outputText value="Weight (Kg)"/>:
+                                            <h:inputText value="#{gateOutDeliveryBean.serviceGateDelivery.weight}" id="weight" requiredMessage="Weight #{msg['application.validation.required']}" maxlength="10"/>
+                                            <p:message for="weight" display="icon"/>
+
+                                            <h:outputText value="Cont. #{gateOutDeliveryBean.contNumber} Weight (Kg)"/>:
+                                            <h:inputText value="#{gateOutDeliveryBean.serviceGateDelivery.contWeight}" id="contWeight" requiredMessage="Container Weight #{msg['application.validation.required']}" maxlength="10"/>
+                                            <p:message for="contWeight" display="icon"/>
+
+                                        </h:panelGrid>
+                                    </p:fieldset>
+
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <p:fieldset legend="Container Damage" style="min-width: 650px; min-height: auto;">
+                                    <h:panelGrid columns="3">
+
+                                        <h:outputText value="Container Damage"/>:
+                                        <h:selectOneMenu value="#{gateOutDeliveryBean.serviceGateDelivery.masterContDamage}">
+                                            <f:selectItems value="#{gateOutDeliveryBean.masterContDamages}" var="item" itemValue="#{item}" itemLabel="#{item.name}"/>
+                                        </h:selectOneMenu>
+
+                                        <h:outputText value="Remark"/>:
+                                        <h:inputTextarea value="#{gateOutDeliveryBean.serviceGateDelivery.remark}" cols="80" rows="5"/>
+
+                                    </h:panelGrid>
+                                </p:fieldset>
+                            </h:panelGrid>
+
+                            <f:facet name="footer">
+                                <div class="header-panel-single-center">
+                                    <p:commandButton value="#{msg['application.operation.confirm']}" id="deliveryConfirm"  widgetVar="deliveryConfirm_var" actionListener="#{gateOutDeliveryBean.saveEdit}" update="gateIn messageForm growl report" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                </div>
+                            </f:facet>
+                        </p:panel>
+                        <br/>
+                    </h:form>                   
+                </p:tab>
+
+                <!--RECEIVING GATE OUT-->
+
+                <p:tab title="Receiving">
+                    <h:form id="getOut">
+                        <p:panel style="min-width: 400px;">
+                            <h:panelGrid columns="4" id="out">
+
+                                <h:outputText value="No Jobslip"/>
+                                <h:outputText value=":"/>
+                                <p:autoComplete required="true" maxlength="15" id="acSimple2" value="#{gateOutReceivingBean.serviceGateReceiving.jobSlip}"
+                                                completeMethod="#{gateOutReceivingBean.setListAutoComplete}" requiredMessage="Job Slip #{msg['application.validation.required']}" />
+                                <p:commandButton image="ui-icon-search" value="Find" style="font-size: x-small" actionListener="#{gateOutReceivingBean.ambilContNo}" update="getOut:out contForm:planCont growl getOut">
+                                    <f:attribute name="jobSlip" value="#{gateOutReceivingBean.serviceGateReceiving.jobSlip}"/>
+                                </p:commandButton>
+
+                                <h:outputText />
+                                <h:outputText />
+                                <h:message for="acSimple2" styleClass="msg-error"/>
+                                <h:outputText />
+
+                                <h:outputText value="No Polisi"/>
+                                <h:outputText value=":"/>
+                                <h:inputText disabled="true" value="#{gateOutReceivingBean.serviceGateReceiving.masterVehicle.vehicleCode}"/>
+                                <h:outputText />
+
+                                <h:outputText value="Truck Type"/>
+                                <h:outputText value=":"/>
+                                <h:inputText disabled="true" value="#{gateOutReceivingBean.serviceGateReceiving.masterVehicle.masterVehicleType.name}"/>
+                                <h:outputText />
+
+                                <h:outputText value="Cont No"/>
+                                <h:outputText value=":"/>
+                                <h:inputText disabled="true" value="#{gateOutReceivingBean.serviceGateReceiving.contNo}"/>
+                                <h:outputText />
+
+                                <h:outputLabel value="MLO" />:
+                                <h:inputText disabled="true" value="#{gateOutReceivingBean.serviceGateReceiving.mlo.name}"/>
+                                <h:outputLabel/>
+                                <h:outputLabel/>
+
+                            </h:panelGrid>
+                            <f:facet name="footer">
+                                <div class="header-panel-single-center">
+                                    <p:commandButton value="#{msg['application.operation.confirm']}" actionListener="#{gateOutReceivingBean.submit}" update="getOut:out contForm:planCont growl" onstart="freeze();"/>
+                                    <p:commandButton value="#{msg['application.operation.clear']}" update="getOut:out" actionListener="#{gateOutReceivingBean.clear}"/>
+                                </div>
+                            </f:facet>
+                        </p:panel>
+                    </h:form>
+                </p:tab>
+
+                <!--GATE OUT DELIVERY UC-->
+
+                <p:tab title="Delivery Uncontainerized">
+                    <h:form id="gateInUc">
+                        <p:panel>
+                            <h:panelGrid columns="1">
+                                <h:panelGrid columns="3">
+                                    <p:fieldset legend="Detail Container" style="min-width: 300px; min-height: 180px;">
+                                        <h:panelGrid columns="5" id="containerUc">
+                                            <h:outputText value="No Jobslip *"/>:
+                                            <p:autoComplete required="true" maxlength="15" id="acSimpleUc" value="#{gateOutDeliveryUcBean.ucGatedeliveryService.jobslip}"
+                                                            completeMethod="#{gateOutDeliveryUcBean.setListAutoComplete}" requiredMessage="Job Slip #{msg['application.validation.required']}" />
+                                            <p:commandButton image="ui-icon-search" value="Find" style="font-size: x-small" actionListener="#{gateOutDeliveryUcBean.ambilContNo}" update="gateInUc:containerUc gateInUc:trukUc growl gateInUc">
+                                                <f:attribute name="jobSlip" value="#{gateOutDeliveryUcBean.ucGatedeliveryService.jobslip}"/>
+                                            </p:commandButton>
+                                            <p:message for="acSimpleUc" display="icon"/>
+
+                                            <h:outputText value="Bl No"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryUcBean.uncontainerizedService.blNo}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputText value="Weight"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryUcBean.uncontainerizedService.weight}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputText value="Truck Lossing"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryUcBean.uncontainerizedService.truckLoosing}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                            <h:outputText value="Commodity"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryUcBean.masterCommodity.name}"/>
+                                            <h:outputText />
+                                            <h:outputText />
+
+                                        </h:panelGrid>
+                                    </p:fieldset>
+
+                                    <p:spacer height="20"/>
+
+                                    <p:fieldset legend="Timbangan" style="min-width: 270px; min-height: 180px;">
+                                        <h:panelGrid columns="4" id="trukUc">
+
+                                            <h:outputText value="No Polisi"/>:
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryUcBean.ucGatedeliveryService.vehicleCode}"/>
+                                            <h:outputText />
+
+                                            <h:outputText value="Truck (Kg)"/>
+                                            <h:outputText value=":"/>
+                                            <h:inputText disabled="true" value="#{gateOutDeliveryUcBean.ucGatedeliveryService.vehicleWeight}" id="tonageUc" onchange="calc();"/>
+                                            <h:outputText />
+
+                                            <h:outputText value="Weight (Kg) *"/>:
+                                            <h:inputText value="#{gateOutDeliveryUcBean.ucGatedeliveryService.weight}" id="weightUc" onkeyup="calc(); javascript:cekAlphabet(this);" required="true" requiredMessage="Weight #{msg['application.validation.required']}" maxlength="10" disabled="#{empty gateOutDeliveryUcBean.ucGatedeliveryService.jobslip}"/>
+                                            <p:message for="weightUc" display="icon"/>
+
+                                            <h:outputText value="Uc Weight (Kg) *"/>:
+                                            <h:inputText value="#{gateOutDeliveryUcBean.ucGatedeliveryService.ucWeight}" id="contWeightUc" onkeyup="javascript:cekAlphabet(this);" required="true" requiredMessage="Container Weight #{msg['application.validation.required']}" maxlength="10" disabled="#{empty gateOutDeliveryUcBean.ucGatedeliveryService.jobslip}"/>
+                                            <p:message for="contWeightUc" display="icon"/>
+
+                                        </h:panelGrid>
+                                    </p:fieldset>
+
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <f:facet name="footer">
+                                <div class="header-panel-single-center">
+                                    <p:commandButton value="#{msg['application.operation.confirm']}" actionListener="#{gateOutDeliveryUcBean.saveEdit}" update="gateInUc growl reportUc"/>
+                                    <p:commandButton value="#{msg['application.operation.clear']}" actionListener="#{gateOutDeliveryUcBean.clear}" update="gateInUc growl reportUc"/>
+
+                                </div>
+                            </f:facet>
+                        </p:panel>
+                        <br/>
+                    </h:form>
+                </p:tab>
+
+                <!--RECEIVING GATE OUT-->
+
+                <p:tab title="Receiving Uncontainerized">
+                    <h:form id="getOutUc">
+                        <p:panel style="min-width: 400px;">
+                            <h:panelGrid columns="5" id="outUc">
+
+                                <h:outputText value="No Jobslip"/>
+                                <h:outputText value=":"/>
+                                <p:autoComplete required="true" maxlength="15" id="acSimpleUc2" value="#{gateOutReceivingUcBean.ucGatereceivingService.jobslip}"
+                                                completeMethod="#{gateOutReceivingUcBean.setListAutoComplete}" requiredMessage="Job Slip #{msg['application.validation.required']}" />
+                                <p:commandButton image="ui-icon-search" value="Find" style="font-size: x-small" actionListener="#{gateOutReceivingUcBean.ambilContNo}" update="getOutUc:outUc contFormUc:planContUc growl getOutUc">
+                                    <f:attribute name="jobSlip" value="#{gateOutReceivingUcBean.ucGatereceivingService.jobslip}"/>
+                                </p:commandButton>
+                                <p:message for="acSimpleUc2" display="icon"/>
+
+                                <h:outputText value="No Polisi"/>
+                                <h:outputText value=":"/>
+                                <h:inputText disabled="true" value="#{gateOutReceivingUcBean.ucGatereceivingService.vehicleCode}"/>
+                                <h:outputText />
+                                <h:outputText />
+
+                                <h:outputText value="Bl No"/>
+                                <h:outputText value=":"/>
+                                <h:inputText disabled="true" value="#{gateOutReceivingUcBean.uncontainerizedService.blNo}"/>
+                                <h:outputText />
+                                <h:outputText />
+
+                            </h:panelGrid>
+                            <f:facet name="footer">
+                                <div class="header-panel-single-center">
+                                    <p:commandButton value="#{msg['application.operation.confirm']}" actionListener="#{gateOutReceivingUcBean.saveEdit}" update="getOutUc:outUc contFormUc:planContUc growl"/>
+                                    <p:commandButton value="#{msg['application.operation.clear']}" update="getOutUc:outUc" actionListener="#{gateOutReceivingUcBean.clear2}"/>
+                                </div>
+                            </f:facet>
+                        </p:panel>
+                    </h:form>
+                </p:tab>
+
+            </p:tabView>
+        </div>
+
+        <p:dialog header="Warning"  widgetVar="messageDialog" id="dialogGrowlRec" modal="true" width="450" resizable="false" >
+            <h:form id="messageForm">
+                <p:panel rendered="#{not empty facesContext.maximumSeverity}">
+                    <p:messages showDetail="true"/>
+                    <br/>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton type="button" onclick="messageDialog.hide()" value="#{msg['application.operation.exit']}" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

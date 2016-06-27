@@ -1,0 +1,135 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.idletime.master_idletime_type']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.others.idletime.master_idletime_type']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function validation(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                    jQuery('#dialogAddEdit').show();
+                } else {
+                    dialogAddEdit.hide();
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl showDetail="true" life="3000" id="growl" globalOnly="true"/>
+        <h:form id="idletimeForm">
+            <p:dataTable id="dataTbl" paginatorPosition="bottom" value="#{masterIdleTimeTypeBean.mis}" var="item"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick"
+                                         oncomplete="dialogAddEdit.show()" update="formAdd" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Idle Time Type');" />
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.idType}" filterMatchMode="contains" filterBy="#{item.idType}" style="width: 80px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Id"/>
+                    </f:facet>
+                    <h:outputText value="#{item.idType}"/>
+                </p:column>
+                <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+                <p:column sortBy="#{item.type}" filterMatchMode="contains" filterBy="#{item.type}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item.type}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton image="ui-icon-pencil" update="formAdd" actionListener="#{masterIdleTimeTypeBean.handleClick}"
+                                         oncomplete="dialogAddEdit.show();" title="Edit" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Idle Time Type');" >
+                            <f:attribute name="code" value="#{item.idType}"/>
+                        </p:commandButton>
+                        <p:commandButton image="ui-icon-trash" oncomplete="confirmation.show();" title="Delete" actionListener="#{masterIdleTimeTypeBean.handleClick}" update="deleteForm">
+                            <f:attribute name="code" value="#{item.idType}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>        
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="400" header="Master Idle Time">
+            <h:form id="formAdd">
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="ID*" for="idIdle" />:
+                        <h:inputText id="idIdle" value="#{masterIdleTimeTypeBean.mi.idType}" title="Id" required="true" requiredMessage="Id Idle Time Type #{msg['application.validation.required']}">
+                            <f:validateLength maximum="5"/>
+                        </h:inputText>
+                        <p:message for="idIdle" display="icon"/>
+
+                        <h:outputLabel value="Type*" for="type" />:
+                        <h:selectOneMenu id="type" value="#{masterIdleTimeTypeBean.mi.type}">
+                            <f:selectItems value="#{masterIdleTimeTypeBean.idleTimeTypes}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel />
+
+                        <h:outputLabel value="Name" for="name" />:
+                        <h:inputText id="name" value="#{masterIdleTimeTypeBean.mi.name}" title="Name" />
+                        <h:outputLabel />
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" image="ui-icon-check" actionListener="#{masterIdleTimeTypeBean.handleSaveEdit}"
+                                             update="idletimeForm formAdd growl" oncomplete="validation(xhr, status, args);" />
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" oncomplete="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:growl id="growle" showDetail="true" life="3000"/>
+        <h:form id="deleteForm">            
+            <h:inputHidden value="#{masterIdleTimeTypeBean.mi.idType}"/>
+            <h:inputHidden value="#{masterIdleTimeTypeBean.mi.name}"/>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{masterIdleTimeTypeBean.handleOnDelete}"  update="idletimeForm:dataTbl growle" oncomplete="confirmation.hide();"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

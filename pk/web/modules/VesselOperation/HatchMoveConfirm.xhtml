@@ -1,0 +1,426 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.vessel_operation.hatch_moves_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.vessel_operation.hatch_moves_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        function handleLoginRequest(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog').show();
+                } else {
+                        dlg.hide();
+                }
+        }
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form>
+            <!--            handle select crane-->
+            <p:dialog header="Select Crane"  widgetVar="dlgcrane" modal="true" minWidth="550">
+                <p:dataTable id="tableCraneSelect" var="item" value="#{hatchMoveConfirmBean.masterCranes}"
+                             paginator="true" rows="10" rowIndexVar="no"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Equipment Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Capacity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{hatchMoveConfirmBean.handleSelectCrane}" value="select" update="formAddEdit:crane formAddEdit:operator" oncomplete="dlgcrane.hide();">
+                            <f:attribute name="idCrane" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+            <p:dialog  widgetVar="lovBc" header="Select Planning Vessel" width="750" modal="true">
+                <p:dataTable var="item" paginator="true"
+                             value="#{hatchMoveConfirmBean.serviceVessels}"
+                             paginatorPosition="bottom" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{hatchMoveConfirmBean.handleOnSelect}"
+                                             value="select" update="hatch:moves hatch:service formAddEdit"
+                                             oncomplete="lovBc.hide();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+
+            <!--            untuk memilih operator Crane-->
+            <p:dialog header="Select Operator Crane"  widgetVar="dlgOperatorCrane" modal="true" minWidth="600">
+                <p:dataTable var="item" value="#{hatchMoveConfirmBean.masterOperators}"
+                             paginator="true" rows="10" rowIndexVar="no"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item.optCode}" sortBy="#{item.optCode}">
+                        <f:facet name="header">
+                            <h:outputText value="Operator Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.optCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.isOutsource}">
+                        <f:facet name="header">
+                            <h:outputText value="is Out Source" />
+                        </f:facet>
+                        <h:outputText value="#{item.isOutsource}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{hatchMoveConfirmBean.handleSelectOperatorCrane}" value="select" update="formAddEdit:operator" oncomplete="dlgOperatorCrane.hide();">
+                            <f:attribute name="idOperatorCrane" value="#{item.optCode}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="hatch">
+            <h:panelGrid columns="4" id="moves">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{hatchMoveConfirmBean.serviceVessel[0]}" size="30"/>
+                <p:commandButton onstart="freeze();" onclick="lovBc.show()" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" style="font-size: x-small"/>
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{hatchMoveConfirmBean.serviceVessel[1]}" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{hatchMoveConfirmBean.serviceVessel[2]}" size="30"/>
+                <h:outputText />
+
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{hatchMoveConfirmBean.serviceVessel[3]}" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br />
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{hatchMoveConfirmBean.serviceHatchMoves}"
+                         paginator="true" rows="10" id="service" rowIndexVar="no"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty hatchMoveConfirmBean.serviceVessel[0]}" onsuccess="dlg.show();" actionListener="#{hatchMoveConfirmBean.handleAdd}" onclick="genTitle('dialog','#{msg['application.operation.add']} Hatch Move Confirm');" update="formAddEdit"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" image="ui-icon-refresh" value="#{msg['application.operation.refresh']}" disabled="#{empty hatchMoveConfirmBean.serviceHatchMoves}" actionListener="#{hatchMoveConfirmBean.handleRefreshUc}" update="hatch:service" />
+                    </div>
+                </f:facet>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{no+1}." />
+                </p:column>
+
+                <p:column sortBy="#{item[0]}" style="text-align: center" filterMatchMode="contains" filterBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="Palka" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" style="text-align: center" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Crane" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" style="text-align: center" filterMatchMode="contains" filterBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Operation" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}" style="text-align: center" filterMatchMode="contains" filterBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Open/Close" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Crane Code" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Start Time" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" style="text-align: center">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[6]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="End Time" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{hatchMoveConfirmBean.handleEditDeleteButton}" update="formAddEdit" oncomplete="dlg.show();" onclick="genTitle('dialog','#{msg['application.operation.edit']} Hatch Move Confirm');"
+                                         image="ui-icon-pencil" title="Edit">
+                            <f:attribute name="idBay" value="#{item[7]}"/>
+                            <f:attribute name="idEquip" value="#{item[8]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{hatchMoveConfirmBean.handleEditDeleteButton}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete">
+                            <f:attribute name="idBay" value="#{item[7]}"/>
+                            <f:attribute name="idEquip" value="#{item[8]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{hatchMoveConfirmBean.handleDeleteButton}" update="hatch:service growl" oncomplete="confirmation.hide();"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <p:dialog header="Hatch Cover Moves"  widgetVar="dlg" modal="true" minWidth="500" id="dialog">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:panelGrid columns="4" id="serviceMoves">
+                        <h:outputLabel value="Palka *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu id="bay" value="#{hatchMoveConfirmBean.serviceHatchMove.bay}" requiredMessage="#{msg['application.validation.required']}" required="true">
+                            <f:selectItems var="block" value="#{hatchMoveConfirmBean.masterVesselProfile}"/>
+                        </h:selectOneMenu>
+                        <p:message for="bay" display="icon"/>
+
+                        <h:outputLabel value="Load/Disch *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" >
+                            <h:selectOneRadio value="#{hatchMoveConfirmBean.serviceHatchMove.operation}" id="loaddisc" requiredMessage="#{msg['application.validation.required']}" required="true">
+                                <f:selectItem itemLabel="Load" itemValue="LOAD" />
+                                <f:selectItem itemLabel="Disch" itemValue="DISCHARGE" />
+                            </h:selectOneRadio>
+                            <p:message for="loaddisc" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Open/Close *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" >
+                            <h:selectOneRadio value="#{hatchMoveConfirmBean.serviceHatchMove.hatchMoves}" id="open" requiredMessage="#{msg['application.validation.required']}" required="true">
+                                <f:selectItem itemLabel="Open" itemValue="OPEN" />
+                                <f:selectItem itemLabel="Close" itemValue="CLOSE" />
+                            </h:selectOneRadio>
+                            <p:message for="open" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Crane *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" >
+                            <h:selectOneRadio value="#{hatchMoveConfirmBean.serviceHatchMove.crane}" id="cra" requiredMessage="#{msg['application.validation.required']}" valueChangeListener="#{hatchMoveConfirmBean.onChangeCrane}" immediate="true" required="true">
+                                <f:selectItem itemLabel="Land" itemValue="L" />
+                                <f:selectItem itemLabel="Ship" itemValue="S" />
+                                <f:ajax execute="@this" event="change" render="crane operator" />
+                            </h:selectOneRadio>
+                            <p:message for="cra" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Crane Code *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="crane">
+                            <h:inputText onkeypress="dlgcrane.show()" onmousedown="dlgcrane.show()" id="cran" value="#{hatchMoveConfirmBean.equipment.masterEquipment.name}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton image="ui-icon-folder-open" value="..." type="button" onclick="dlgcrane.show();" style="font-size: x-small" />
+                            <p:message for="cran" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Operator *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="operator">
+                            <h:inputText onkeypress="dlgOperatorCrane.show()" onmousedown="dlgOperatorCrane.show()" id="opt" value="#{hatchMoveConfirmBean.equipment.masterOperator.name}" required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{empty hatchMoveConfirmBean.equipment.masterEquipment.name}"/>
+                            <p:commandButton image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgOperatorCrane.show();" disabled="#{empty hatchMoveConfirmBean.equipment.masterEquipment.name}"/>
+                            <p:message for="opt" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Start Time *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="st">
+                            <h:inputText styleClass="cal" id="start" value="#{hatchMoveConfirmBean.equipment.startTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                            <p:message for="start" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value="&nbsp;"/>
+
+
+                        <h:outputLabel value="End Time *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="3" id="et">
+                            <h:inputText styleClass="cal" id="end" value="#{hatchMoveConfirmBean.equipment.endTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                            <p:message for="end" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value="&nbsp;"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{hatchMoveConfirmBean.handleSubmit}" disabled="#{empty hatchMoveConfirmBean.masterVesselProfile}" update="hatch:service growl formAddEdit formAddEdit:st formAddEdit:et" oncomplete="handleLoginRequest(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" actionListener="#{hatchMoveConfirmBean.handleAdd}" update="formAddEdit formAddEdit:st formAddEdit:et" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

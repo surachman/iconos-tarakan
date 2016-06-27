@@ -1,0 +1,74 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.update_print_invoice']}"/>
+    </ui:define>
+
+     <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true" />
+
+        <h:form id="formContainers">
+            <h:panelGrid columns="2" id="findPanel">
+                <h:panelGrid columns="1">
+                    <p:panel style="width: 300px;">
+                        <h:panelGrid columns="4">
+
+                            <h:outputLabel value="No. Registration" />
+                            <h:outputLabel value=":" />
+                            <p:autoComplete id="reg" value="#{updatePrintInvoice.reg}"
+                                            completeMethod="#{registrationtSelector.handleFilterByReg}" size="20" />
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="reset" action="#{updatePrintInvoice.handleClear}" update="formContainers"/>
+                                <p:commandButton value="search" action="#{updatePrintInvoice.handleCariReg}" update="formContainers:objPanel" />
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                    <p:spacer height="17" width="0" />
+                </h:panelGrid>
+
+                <p:panel id="objPanel">
+                    <h:panelGrid columns="3" >
+                        <h:outputLabel value="No. Invoice" />
+                        <h:outputLabel value=":" />
+                        <h:inputText readonly="true" value="#{updatePrintInvoice.invoice.noInvoice}"/>
+
+                        <h:outputLabel value="Print Number" />
+                        <h:outputLabel value=":" />
+                        <h:inputText readonly="true" value="#{updatePrintInvoice.invoice.printed}" style="width: 50px"/>
+                    </h:panelGrid>
+
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="Update Print Number" action="#{updatePrintInvoice.handleUpdatePrint}" update="formContainers:objPanel"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+
+            </h:panelGrid>
+
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

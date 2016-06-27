@@ -1,0 +1,305 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.cfs_operation.goods_receiving']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.cfs_operation.goods_receiving']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <h:form id="listData">
+            <p:panel>
+                <p:dataTable paginatorPosition="bottom" var="item" value="#{goodsReceivingConfirm.listServiceCfs}"
+                             paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="deliveryServiceTable" rowIndexVar="number"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" oncomplete="fromBaplie.show();" actionListener="#{goodsReceivingConfirm.handleAdd}" update="multipleSelect listData2" onclick="genTitle('dialog','#{msg['application.operation.add']} Goods Receiving Confirm');"/>
+                        </div>
+                    </f:facet>
+
+                    <p:column >
+                        <f:facet name="header">
+                            <h:outputText value="No. "/>
+                        </f:facet>
+                        <h:outputText value="#{number+1}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Job Slip" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[9]}" filterMatchMode="contains" filterBy="#{item[9]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[9]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont No" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}" filterMatchMode="contains" filterBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Bl No" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Commodity" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>                   
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Unit" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Volume" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[8]}">
+                        <f:facet name="header">
+                            <h:outputText value="Count By" />
+                        </f:facet>
+                        <h:outputText value="#{item[8]}">
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column sortBy="#{item[10]}" filterMatchMode="contains" filterBy="#{item[10]}">
+                        <f:facet name="header">
+                            <h:outputText value="Is Stuffing" />
+                        </f:facet>
+                        <h:outputText value="#{item[10]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{goodsReceivingConfirm.handleEditDelete}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete">
+                                <f:attribute name="job" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <h:form id="formAdd">
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation" minWidth="370">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{goodsReceivingConfirm.handleDelete}" update="deliveryServiceForm:deliveryServiceTable serviceContDiscForm:serviceContDisc growl listData FormDialog" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog header="Entry Goods Receiving Service"  widgetVar="dlg" modal="true" minWidth="400" id="dialog">
+            <h:form id="FormDialog">
+                <p:panel>
+                    <h:panelGrid id="delServ">
+                        <h:panelGrid columns="4" id="servContD">
+
+                            <h:outputLabel value="Jobslip" />
+                            <h:outputLabel value=" : " />                           
+                            <p:autoComplete required="true" id="acSimple" value="#{goodsReceivingConfirm.serviceCfsStuffing.jobslip}"
+                                            completeMethod="#{goodsReceivingConfirm.setListAutoComplete}" size="25" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-search" value="Find" style="font-size: x-small" actionListener="#{goodsReceivingConfirm.ambilContNo}" update="FormDialog growl">
+                                <f:attribute name="jobSlip" value="#{goodsReceivingConfirm.serviceCfsStuffing.jobslip}"/>
+                            </p:commandButton>
+
+                            <h:outputLabel value="Container No" />
+                            <h:outputLabel value=" : " />
+                            <p:inputText disabled="true" value="#{goodsReceivingConfirm.serviceCfsStuffing.contNo}" size="25" />
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="MLO" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{goodsReceivingConfirm.serviceCfsStuffing.mlo.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Bl No" />
+                            <h:outputLabel value=" : " />
+                            <p:inputText disabled="true" value="#{goodsReceivingConfirm.serviceCfsStuffing.blNo}" size="25" />
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Volume" />
+                            <h:outputLabel value=" : " />
+                            <p:inputText disabled="true" value="#{goodsReceivingConfirm.serviceCfsStuffing.volume}" onkeyup="javascript:cekAlphabet(this);" size="25" />
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Weight" />
+                            <h:outputLabel value=" : " />
+                            <p:inputText disabled="true" value="#{goodsReceivingConfirm.serviceCfsStuffing.weight}" onkeyup="javascript:cekAlphabet(this);" size="25" />
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Unit" />
+                            <h:outputLabel value=" : " />
+                            <p:inputText disabled="true" value="#{goodsReceivingConfirm.serviceCfsStuffing.unit}" onkeyup="javascript:cekAlphabet(this);" size="25" />
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Commodity" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="2" id="opt">
+                                <p:inputText disabled="true" value="#{goodsReceivingConfirm.masterCommodity.name}" />
+                                <h:inputHidden value="#{goodsReceivingConfirm.masterCommodity.commodityCode}" />
+                            </h:panelGrid>
+                            <h:outputLabel value="" />
+
+                            <h:outputText value="Count By"/>:
+                            <h:selectOneRadio disabled="true" value="#{goodsReceivingConfirm.serviceCfsStuffing.countBy}">
+                                <f:selectItem itemValue="VOLUME"
+                                              itemLabel="Volume" />
+                                <f:selectItem itemValue="WEIGHT" itemLabel="Weight" />
+                            </h:selectOneRadio>
+                            <h:outputLabel/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{goodsReceivingConfirm.handleConfirm}" update="deliveryServiceForm:deliveryServiceTable serviceContDiscForm:serviceContDisc growl FormDialog listData" oncomplete="handleRequestValidation(xhr, status, args)" disabled="#{empty goodsReceivingConfirm.serviceCfsStuffing.contNo}"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" update="FormDialog" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="List Good Receiving"  widgetVar="fromBaplie" minWidth="750" modal="true">
+            <h:form id="multipleSelect">
+                <p:panel >
+                    <h:panelGrid columns="5" id="cari">
+                        <h:outputLabel value="Masukan Bl No *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{goodsReceivingConfirm.receivingBarangService.blNo}" requiredMessage="#{msg['application.validation.required']}" size="35"/>
+                        <p:commandButton onstart="freeze();" image="ui-icon-search" value="#{msg['application.operation.search']}" style="font-size: x-small" actionListener="#{goodsReceivingConfirm.cariBlNo}" update="multipleSelect growl listData2">
+                            <f:attribute name="blNo" value="#{goodsReceivingConfirm.receivingBarangService.blNo}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" image="ui-icon-search" value="#{msg['application.operation.show_all']}" style="font-size: x-small" actionListener="#{goodsReceivingConfirm.cariBlNo2}" update="multipleSelect growl listData2">
+                            <f:attribute name="blNo" value="#{goodsReceivingConfirm.receivingBarangService.blNo}"/>
+                        </p:commandButton>
+                    </h:panelGrid>
+                    <br/>
+                </p:panel>
+            </h:form>
+            <br/>
+            <h:form id="listData2">
+                <p:panel>
+                    <div style="height: 300px; overflow: scroll;" >
+                        <p:dataTable var="item" value="#{goodsReceivingConfirm.goodsReceivings}" rowIndexVar="No" selection="#{goodsReceivingConfirm.receivingBarang}">
+
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;"/>
+                            </f:facet>
+
+                            <p:column selectionMode="multiple"/>
+
+                            <p:column headerText="No" >
+                                <h:outputText value="#{No+1}" />
+                            </p:column>
+
+                            <p:column filterMatchMode="contains" filterBy="#{item[0]}" headerText="Jobslip">
+                                <h:outputText value="#{item[0]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[1]}" headerText="No PPKB">
+
+                                <h:outputText value="#{item[1]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[3]}" headerText="Bl No" >
+
+                                <h:outputText value="#{item[3]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[6]}" headerText="Cont No">
+
+                                <h:outputText value="#{item[2]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}" headerText="Commodity">
+
+                                <h:outputText value="#{item[4]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{goodsReceivingConfirm.handleSelectClik}"
+                                                 image="ui-icon-check" update="listData2 listData growl" disabled="#{empty goodsReceivingConfirm.goodsReceivings}"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="fromBaplie.hide()" type="reset" />                                
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+
+        </p:dialog>
+
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+
+            }
+             function cekAlphabet(param) {
+                var regexNum = /^-?[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+
+    </ui:define>
+
+</ui:composition>

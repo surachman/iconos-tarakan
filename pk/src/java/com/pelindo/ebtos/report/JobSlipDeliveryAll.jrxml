@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JobSlipDeliveryAll" language="groovy" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_reg" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object"/>
+	<parameter name="user" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT r.no_reg FROM registration r WHERE r.no_reg = $P{no_reg} ]]>
+	</queryString>
+	<field name="no_reg" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="91" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="612" height="91"/>
+				<subreportParameter name="no_reg">
+					<subreportParameterExpression><![CDATA[$P{no_reg}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="user">
+					<subreportParameterExpression><![CDATA[$P{user}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

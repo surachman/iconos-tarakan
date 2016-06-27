@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="title">
+        #{msg['menu.home']}
+    </ui:define>
+
+    <ui:define name="header">
+        #{msg['menu.home']}
+    </ui:define>
+
+    <ui:define name="content">
+        <p:outputPanel>
+            <div style="width:38%;float: left;margin:5px 5px 5px 5px;">
+                <div style="margin-bottom:10px">
+                    <p:panel id="vesselsOnPort" style="width:100%;min-height:70px;">
+                        <strong>Vessels currently in Port:</strong>
+                        <p:outputPanel>
+                            <div style="width:90%;padding-top:10px;margin:5px auto 20px auto;">
+                                <ui:fragment rendered="#{not empty dashboardBean.vesselsOnPort}">#{dashboardBean.vesselsOnPort}</ui:fragment>
+                                <ui:fragment rendered="#{empty dashboardBean.vesselsOnPort}"><span style="color:gray;font: 11px/18px Verdana, Arial, Helvetica, sans-serif;">Currently there is no Vessels in Port</span></ui:fragment>
+                            </div>
+                        </p:outputPanel>
+                    </p:panel>
+                </div>
+                <div style="margin-bottom:5px">
+                    <p:panel id="recentArrivalsAndDepartures" style="width:100%;">
+                        <strong>Recent Arrivals and Departures:</strong><br/>
+                        <table class="table-style-1" style="width:90%;padding-top:20px;margin:5px auto 20px auto;">
+                            <tr class="yellow" style="font-weight:bold;">
+                                <td>Vessel Name's</td>
+                                <td style="width:30%;">Arrival</td>
+                                <td style="width:30%;">Departure</td>
+                            </tr>
+                            <ui:fragment rendered="#{fn:length(dashboardBean.recentArrivalsAndDepartures) > 0}">
+                                <ui:repeat value="#{dashboardBean.recentArrivalsAndDepartures}" var="vessel">
+                                    <tr style="font-size:10px;">
+                                        <td>#{vessel[0]}</td>
+                                        <td>#{vessel[1]}</td>
+                                        <td>#{vessel[2]}</td>
+                                    </tr>
+                                </ui:repeat>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{fn:length(dashboardBean.recentArrivalsAndDepartures) == 0}">
+                                <tr>
+                                    <td style="text-align:center;" colspan="3">
+                                        Currently no arrival or departure of vessels
+                                    </td>
+                                </tr>
+                            </ui:fragment>
+                        </table>
+                    </p:panel>
+                </div>
+                <div style="margin-top:10px">
+                    <p:panel id="vesselsActivity" style="width:100%;">
+                        <strong>Vessels Service Today:</strong><br/>
+                        <table class="table-style-1" style="width:90%;padding-top:20px;margin:5px auto 20px auto;">
+                            <tr class="yellow"  style="font-weight:bold;">
+                                <td>Statuses</td>
+                                <td>Vessels</td>
+                            </tr>
+                            <tr>
+                                <td>Booked</td>
+                                <td>#{dashboardBean.vesselActivities[0]}</td>
+                            </tr>
+                            <tr>
+                                <td>Confirmed</td>
+                                <td>#{dashboardBean.vesselActivities[1]}</td>
+                            </tr>
+                            <tr>
+                                <td>Approved</td>
+                                <td>#{dashboardBean.vesselActivities[2]}</td>
+                            </tr>
+                            <tr>
+                                <td>Ready to Service</td>
+                                <td>#{dashboardBean.vesselActivities[3]}</td>
+                            </tr>
+                            <tr>
+                                <td>Servicing</td>
+                                <td>#{dashboardBean.vesselActivities[4]}</td>
+                            </tr>
+                            <tr>
+                                <td>End Service</td>
+                                <td>#{dashboardBean.vesselActivities[5]}</td>
+                            </tr>
+                        </table>
+                    </p:panel>
+                </div>
+            </div>
+            <div style="width:60%;float: right;margin:5px 5px 5px 5px;">
+                <p:panel id="chart" style="width:100%;">
+                    <strong>Vessels Traffic Last Month:</strong><br/>
+                    <p:graphicImage style="padding-top:20px;" value="#{dashboardBean.chart}" />
+                </p:panel>
+            </div>
+        </p:outputPanel>
+    </ui:define>
+</ui:composition>

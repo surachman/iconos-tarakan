@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_equipment_type']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_equipment_type']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();                
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">       
+        <h:form id="equipmentForm">
+            <p:growl showDetail="true" globalOnly="true"/>
+            <p:dataTable value="#{masterEquipmentTypeBean.equipmentLists}" var="item"
+                         paginatorPosition="bottom" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" actionListener="#{masterEquipmentTypeBean.handleAdd}" update="equipmentForm2" oncomplete="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Equipment Type');"/>
+                    </div>
+                </f:facet>
+                <p:column style="width:60px">
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" style="width: 100px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Equipment Type Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton title="Edit" image="ui-icon-pencil" actionListener="#{masterEquipmentTypeBean.handleSelectTable}" update="equipmentForm2" oncomplete="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Equipment');">
+                            <f:attribute name="equipCode" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton title="Delete" image="ui-icon-trash" actionListener="#{masterEquipmentTypeBean.handleSelectTable}" update="equipmentForm3" oncomplete="dialogDel.show()">
+                            <f:attribute name="equipCode" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                
+                
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="500" header="Master Equipment Type">
+            <h:form id="equipmentForm2">
+                <p:panel>
+                    <h:inputHidden value="#{masterEquipmentTypeBean.equipmentType.equipmentTypeCode}" />
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Equipment Type Code*" for="equipCode" />
+                        <h:outputText value=" : "/>
+                        <h:inputText id="equipCode" disabled="#{not empty masterEquipmentTypeBean.equipmentType.equipmentTypeCode}" value="#{masterEquipmentTypeBean.equipmentType.equipmentTypeCode}" title="EquipCode" required="true" requiredMessage="Equipment Code field #{msg['application.validation.required']}" size="10" maxlength="5"/>
+                        <p:message for="equipCode" display="icon"/>
+
+                        <h:outputLabel value="Name*" for="name" />
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="name" value="#{masterEquipmentTypeBean.equipmentType.name}" title="Name" required="true" requiredMessage="Name field #{msg['application.validation.required']}" size="30"/>
+                        <p:message for="name" display="icon"/>
+
+                        
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" image="ui-icon-check" actionListener="#{masterEquipmentTypeBean.handleSaveEdit}" update="equipmentForm equipmentForm2" oncomplete="validateForm(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+        
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="equipmentForm3">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterEquipmentTypeBean.handleDelete}" update="equipmentForm equipmentForm3" onsuccess="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+        
+
+    </ui:define>
+
+</ui:composition>

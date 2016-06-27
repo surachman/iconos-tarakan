@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="perhitunganPenumpukanBongkaran" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="curr_code" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["IDR"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\iKerja\\Project\\PELINDO4\\Aplikasi\\Source\\e-BTOS\\Kariangau\\ebtos-ear\\ebtos\\src\\java\\com\\pelindo\\ebtos\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="penumpukanSubreport" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA["perhitunganPenumpukanBongkaran_penumpukanSubreport.jasper"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="penumpukanSummarySubreport" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA["perhitunganPenumpukanBongkaran_penumpukanSummarySubreport.jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+  (SELECT description FROM m_setting_app WHERE id='ebtos.cabang.kota'
+  ) kota,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.nama.cabang'
+  ) AS cabang,
+  (SELECT description
+  FROM m_setting_app
+  WHERE id='ttd_ebtos_asmen_adm_perencanaan'
+  ) description,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id='ttd_ebtos_asmen_adm_perencanaan'
+  ) nama_ttd,
+  (SELECT value_nip
+  FROM m_setting_app
+  WHERE id='ttd_ebtos_asmen_adm_perencanaan'
+  ) nip_ttd,
+  mv.vessel_code,
+  mv.name vessel_name,
+  mcc.name nama_debitur,
+  prv.voy_in,
+  prv.voy_out,
+  sv.berhting_time,
+  sv.departure_time,
+  asman.value_string asman,
+  mc.default_fraction_digits,
+  mc.language,
+  mc.country,
+  ppn.value_float ppn,
+  pbt.no_registrasi bentuk_tiga
+FROM service_vessel sv
+JOIN planning_vessel pv
+ON (sv.no_ppkb = pv.no_ppkb)
+JOIN no_perhitungan_bentuk_tiga pbt
+ON (pv.no_ppkb = pbt.no_ppkb)
+JOIN m_vessel mv
+ON (pv.vessel_code = mv.vessel_code)
+join m_customer mcc
+on (mv.cust_code = mcc.cust_code)
+JOIN preservice_vessel prv
+ON (pv.booking_code = prv.booking_code),
+  m_currency mc,
+  (SELECT * FROM m_setting_app WHERE id = 'ebtos.supervisor_operasional.nama'
+  ) asman ,
+  (SELECT * FROM m_setting_app WHERE id = 'ppn'
+  ) ppn
+WHERE sv.no_ppkb = $P{no_ppkb}
+AND mc.curr_code = $P{curr_code}]]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="cabang" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="nama_ttd" class="java.lang.String"/>
+	<field name="nip_ttd" class="java.lang.String"/>
+	<field name="vessel_code" class="java.lang.String"/>
+	<field name="vessel_name" class="java.lang.String"/>
+	<field name="nama_debitur" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="berhting_time" class="java.sql.Timestamp"/>
+	<field name="departure_time" class="java.sql.Timestamp"/>
+	<field name="asman" class="java.lang.String"/>
+	<field name="default_fraction_digits" class="java.lang.Integer"/>
+	<field name="language" class="java.lang.String"/>
+	<field name="country" class="java.lang.String"/>
+        <field name="bentuk_tiga" class="java.lang.String"/>
+	<field name="ppn" class="java.math.BigDecimal"/>
+	<variable name="now" class="java.util.Date" resetType="None">
+		<variableExpression><![CDATA[new java.util.Date()]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="112" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="30" width="555" height="35"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DAFTAR BUKTI PELAYANAN PETIKEMAS
+BONGKAR DAN PENUMPUKAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="42" y="0" width="263" height="15"/>
+				<textElement verticalAlignment="Middle"/>
+				<text><![CDATA[PT PELABUHAN INDONESIA IV (PERSERO)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="65" width="90" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[VESSEL ID  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="80" width="90" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[VESSEL NAME  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="95" width="90" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[VOY NO  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="341" y="65" width="122" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[PRINT DATE  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="341" y="80" width="122" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[OPERATION  :]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="91" y="65" width="172" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vessel_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="91" y="80" width="172" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vessel_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="91" y="95" width="172" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{voy_in} + "/" + $F{voy_out}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH.mm" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="463" y="65" width="92" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{now}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="463" y="80" width="92" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["DISC"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="42" y="15" width="262" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cabang}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="1" y="0" width="51" height="30"/>
+				<imageExpression><![CDATA["./../../resources/images/logo_report.png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="341" y="0" width="122" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[Nama Debitur :]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="463" y="0" width="92" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_debitur}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="341" y="95" width="122" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[NO. NOTA 3E   :]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="463" y="95" width="92" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bentuk_tiga}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="77" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="554" height="77"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ppn">
+					<subreportParameterExpression><![CDATA[$F{ppn}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="language">
+					<subreportParameterExpression><![CDATA[$F{language}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="fraction_digits">
+					<subreportParameterExpression><![CDATA[$F{default_fraction_digits}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="curr_code">
+					<subreportParameterExpression><![CDATA[$P{curr_code}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="country">
+					<subreportParameterExpression><![CDATA[$F{country}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{penumpukanSubreport}]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="144" splitType="Prevent">
+			<subreport>
+				<reportElement x="1" y="0" width="330" height="50"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="curr_code">
+					<subreportParameterExpression><![CDATA[$P{curr_code}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{penumpukanSummarySubreport}]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="331" y="30" width="224" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Transparent" x="376" y="0" width="179" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kota}.substring(0, 1)+$F{kota}.substring(1, $F{kota}.length()).toLowerCase() + ", " + new java.text.SimpleDateFormat("dd-MM-yyyy").format($V{now})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="331" y="50" width="224" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[MANAGER PELY. BARANG & ANEKA USAHA]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="331" y="107" width="224" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_ttd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="331" y="107" width="224" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_ttd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="331" y="124" width="224" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nip_ttd}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

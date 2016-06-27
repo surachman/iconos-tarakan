@@ -1,0 +1,1364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report20kkt" language="groovy" pageWidth="935" pageHeight="609" orientation="Landscape" columnWidth="904" leftMargin="19" rightMargin="12" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.366026910730141"/>
+	<property name="ireport.x" value="573"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="bulan" class="java.lang.Integer"/>
+	<parameter name="tahun" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[select
+distinct(sv.no_ppkb), mv.name vesselname, cust.name costumer, mv.loa, sv.berhting_time, sv.start_work_time, sv.end_work_time, sv.departure_time,
+(select description from m_setting_app where id='ebtos.nama.cabang') kota,
+(SELECT EXTRACT(epoch FROM (sv.departure_time::timestamp - sv.berhting_time::timestamp ))* INTERVAL '1 second' )::text bt_ext,
+
+(SELECT EXTRACT(epoch FROM ((sv.departure_time::timestamp - sv.berhting_time::timestamp) - ((sv.start_work_time::timestamp-sv.berhting_time::timestamp)+(sv.departure_time::timestamp-sv.end_work_time::timestamp)) -
+(select sum(end_time::timestamp-start_time::timestamp)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)))* INTERVAL '1 second' )::text bt_in,
+
+(SELECT EXTRACT(epoch FROM ((sv.departure_time - sv.berhting_time) - ((sv.start_work_time-sv.berhting_time)+(sv.departure_time-sv.end_work_time)) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)-(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type where itt.name='IT Internal' and no_ppkb=sv.no_ppkb)-(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT Internal' and no_ppkb=sv.no_ppkb)))* INTERVAL '1 second' )::text et,
+
+((SELECT EXTRACT(epoch FROM (sv.start_work_time-sv.berhting_time)+(sv.departure_time-sv.end_work_time)))* INTERVAL '1 second')::text it_ext,
+
+((SELECT EXTRACT(epoch FROM (select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='IT Internal' and no_ppkb=sv.no_ppkb)))* INTERVAL '1 second')::text it_in,
+
+((SELECT EXTRACT(epoch FROM (select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)))* INTERVAL '1 second')::text not_ext,
+
+(SELECT EXTRACT(epoch FROM (select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT Internal' and no_ppkb=sv.no_ppkb))* INTERVAL '1 second' )::text not_int,
+
+(
+(SELECT EXTRACT(epoch FROM ((sv.departure_time - sv.berhting_time) - ((sv.start_work_time-sv.berhting_time)+(sv.departure_time-sv.end_work_time)) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)-(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type where itt.name='IT Internal' and no_ppkb=sv.no_ppkb)-(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT Internal' and no_ppkb=sv.no_ppkb)))) /
+(SELECT EXTRACT(epoch FROM ((sv.departure_time::timestamp - sv.berhting_time::timestamp) - ((sv.start_work_time::timestamp-sv.berhting_time::timestamp)+(sv.departure_time::timestamp-sv.end_work_time::timestamp)) -
+(select sum(end_time::timestamp-start_time::timestamp)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb))))
+)*100 rasio,
+
+(select coalesce(sum(amount),0) from recap_handling_discharge where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_transhipment where no_ppkb=sv.no_ppkb and operation='DISCHARGE') +
+ (select coalesce(sum(amount),0) from recap_shifting where no_ppkb=sv.no_ppkb and operation='DISCHARGE' and shift_to='TOCY') bkr,
+
+(select coalesce(sum(amount),0) from recap_handling_load where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_transhipment where no_ppkb=sv.no_ppkb and operation='LOAD') +
+ (select coalesce(sum(amount),0) from recap_shifting where no_ppkb=sv.no_ppkb and operation='LOAD' and shift_to='TOCY') muat,
+
+((select coalesce(sum(amount),0) from recap_handling_discharge where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_transhipment where no_ppkb=sv.no_ppkb and operation='DISCHARGE') +
+ (select coalesce(sum(amount),0) from recap_shifting where no_ppkb=sv.no_ppkb and operation='DISCHARGE' and shift_to='TOCY')) +
+ ((select coalesce(sum(amount),0) from recap_handling_load where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_transhipment where no_ppkb=sv.no_ppkb and operation='LOAD') +
+ (select coalesce(sum(amount),0) from recap_shifting where no_ppkb=sv.no_ppkb and operation='LOAD' and shift_to='TOCY')) box,
+
+coalesce(cc.jumlah_cc,0) jumlah_cc,
+
+--(         jml_box        / (            et         /3600) ) / jml_cc
+--( (box_bongkar+box_muat) / ((bt_int-it_int-not_int)/3600) ) / jml_cc
+(
+((select coalesce(sum(amount),0) from recap_handling_discharge where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_handling_load where no_ppkb=sv.no_ppkb)) /
+(
+(SELECT EXTRACT(epoch FROM ((sv.departure_time - sv.berhting_time) - ((sv.start_work_time-sv.berhting_time)+(sv.departure_time-sv.end_work_time)) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type where itt.name='IT Internal' and no_ppkb=sv.no_ppkb) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT Internal' and no_ppkb=sv.no_ppkb) )) )/3600
+)
+)/ cc.jumlah_cc pro_bch_et,
+
+--(         jml_box        / (           bt_int      /3600) ) / jml_cc
+--( (box_bongkar+box_muat) / ((bt_ext-it_ext-not_ext)/3600) ) / jml_cc
+(
+((select coalesce(sum(amount),0) from recap_handling_discharge where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_handling_load where no_ppkb=sv.no_ppkb)) /
+(
+(SELECT EXTRACT(epoch FROM ((sv.departure_time::timestamp - sv.berhting_time::timestamp) - ((sv.start_work_time::timestamp-sv.berhting_time::timestamp)+(sv.departure_time::timestamp-sv.end_work_time::timestamp)) -
+(select sum(end_time::timestamp-start_time::timestamp)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)))) /3600 )
+) / cc.jumlah_cc pro_bch_bt,
+
+--         jml_box        / (           et      /3600)
+--( (box_bongkar+box_muat) / ((bt_int-it_int-not_int)/3600)
+((select coalesce(sum(amount),0) from recap_handling_discharge where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_handling_load where no_ppkb=sv.no_ppkb)) /
+(
+(SELECT EXTRACT(epoch FROM ((sv.departure_time - sv.berhting_time) - ((sv.start_work_time-sv.berhting_time)+(sv.departure_time-sv.end_work_time)) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type where itt.name='IT Internal' and no_ppkb=sv.no_ppkb) -
+(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT Internal' and no_ppkb=sv.no_ppkb) )) )/3600)pro_bsh_et,
+
+
+--         jml_box        / (           bt_int      /3600)
+-- (box_bongkar+box_muat) / ((bt_ext-it_ext-not_ext) /3600)
+(
+((select coalesce(sum(amount),0) from recap_handling_discharge where no_ppkb=sv.no_ppkb) +
+(select coalesce(sum(amount),0) from recap_handling_load where no_ppkb=sv.no_ppkb)) /
+(
+(SELECT EXTRACT(epoch FROM ((sv.departure_time::timestamp - sv.berhting_time::timestamp) - ((sv.start_work_time::timestamp-sv.berhting_time::timestamp)+(sv.departure_time::timestamp-sv.end_work_time::timestamp)) -
+(select sum(end_time::timestamp-start_time::timestamp)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)))) /3600 )
+) pro_bsh_bt,
+
+
+
+(select description from m_setting_app where id='ebtos.manager.operasional.nama') manager_name,
+(select description from m_setting_app where id='ttd_gm_tpb') gm_name
+
+from service_vessel sv
+inner join planning_vessel pv on sv.no_ppkb=pv.no_ppkb
+inner join preservice_vessel psv on pv.vessel_code=psv.vessel_code
+inner join m_vessel mv on mv.vessel_code=pv.vessel_code
+inner join m_customer cust on cust.cust_code=mv.cust_code
+left join (select no_ppkb, sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type group by no_ppkb) sit on sit.no_ppkb=sv.no_ppkb
+
+left join (
+---Hitung Jumlah CC per ppkb
+SELECT b.no_ppkb, sum(b.et), max(b.et), sum(b.et)/ max(b.et)  as jumlah_cc
+FROM (
+
+--Hitung BT INT = BT EXT - (IT EXT + NOT EXT) dan Hitung ET = BT INT - (IT INT + NOT INT) per CC
+SELECT y.no_ppkb,y.equip_code,y.bt_ext, (y.bt_ext) - SUM (y.idle_time) as bt_int, ((y.bt_ext) - SUM (y.idle_time) - (z.tot_int)) as et
+FROM (
+
+SELECT r.no_ppkb,r.equip_code,r.id_type,r.name,EXTRACT (EPOCH FROM (bt_ext)) as bt_ext, SUM( EXTRACT (EPOCH FROM (r.idle_time)) ) as idle_time
+FROM (SELECT s.no_ppkb,s.equip_code,s.id_type,it.name,s.start_time,s.end_time, (s.end_time - s.start_time) as idle_time,(sv.departure_time - sv.berhting_time) as bt_ext
+FROM service_idle_time s
+LEFT JOIN service_vessel sv ON sv.no_ppkb = s.no_ppkb LEFT JOIN m_idletimetype it ON it.id_type = s.id_type ORDER BY s.id_type ) r
+GROUP BY r.no_ppkb,r.equip_code,r.id_type,r.name,bt_ext
+
+) y
+
+JOIN (
+SELECT y.no_ppkb,y.equip_code,coalesce(SUM ( EXTRACT (EPOCH FROM (y.idle_time)) ),0) as tot_int
+FROM (SELECT r.no_ppkb,r.equip_code,r.id_type,r.name,bt_ext,SUM(r.idle_time) as idle_time
+FROM (SELECT s.no_ppkb,s.equip_code,s.id_type,it.name,s.start_time,s.end_time, (s.end_time - s.start_time) as idle_time,(sv.departure_time - sv.berhting_time) as bt_ext
+FROM service_idle_time s
+
+LEFT JOIN service_vessel sv ON sv.no_ppkb = s.no_ppkb
+LEFT JOIN m_idletimetype it ON it.id_type = s.id_type ORDER BY s.id_type ) r
+
+GROUP BY r.no_ppkb,r.equip_code,r.id_type,r.name,bt_ext) y
+WHERE y.id_type IN (1,3)
+GROUP BY y.no_ppkb,y.equip_code,y.bt_ext
+
+) z ON z.no_ppkb = y.no_ppkb AND z.equip_code = y.equip_code
+
+WHERE y.id_type IN (4,2)
+GROUP BY y.no_ppkb,y.equip_code,y.bt_ext,z.tot_int
+
+) b
+
+GROUP BY b.no_ppkb) cc on cc.no_ppkb=sv.no_ppkb
+
+where sv.status='Served' and date_part('MONTH', sv.departure_time)=$P{bulan}
+AND date_part('YEAR', sv.departure_time)=$P{tahun}
+order by sv.no_ppkb;]]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="vesselname" class="java.lang.String"/>
+	<field name="costumer" class="java.lang.String"/>
+	<field name="loa" class="java.lang.Integer"/>
+	<field name="berhting_time" class="java.sql.Timestamp"/>
+	<field name="start_work_time" class="java.sql.Timestamp"/>
+	<field name="end_work_time" class="java.sql.Timestamp"/>
+	<field name="departure_time" class="java.sql.Timestamp"/>
+	<field name="bt_ext" class="java.lang.String"/>
+	<field name="bt_in" class="java.lang.String"/>
+	<field name="et" class="java.lang.String"/>
+	<field name="it_ext" class="java.lang.String"/>
+	<field name="it_in" class="java.lang.String"/>
+	<field name="not_ext" class="java.lang.String"/>
+	<field name="not_int" class="java.lang.String"/>
+	<field name="rasio" class="java.lang.Double"/>
+	<field name="bkr" class="java.lang.Long"/>
+	<field name="muat" class="java.lang.Long"/>
+	<field name="box" class="java.lang.Long"/>
+	<field name="jumlah_cc" class="java.lang.Double"/>
+	<field name="pro_bch_et" class="java.lang.Double"/>
+	<field name="pro_bch_bt" class="java.lang.Double"/>
+	<field name="pro_bsh_et" class="java.lang.Double"/>
+	<field name="pro_bsh_bt" class="java.lang.Double"/>
+	<field name="manager_name" class="java.lang.String"/>
+	<field name="gm_name" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="52" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="900" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REKAPITULASI PRODUKTIVITAS KEGIATAN BONGKAR MUAT PETIKEMAS]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="28" width="900" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["LAPORAN BULAN : " + ($P{bulan} == 1 ? "JANUARI" : $P{bulan} == 2 ? "FEBRUARI" : $P{bulan} == 3 ? "MARET" : $P{bulan} == 4 ? "APRIL" : $P{bulan} == 5 ? "MEI" : $P{bulan} == 6 ? "JUNI" : $P{bulan} == 7 ? "JULI" : $P{bulan} == 8 ? "AGUSTUS" : $P{bulan} == 9 ? "SEPTEMBER" : $P{bulan} == 10 ? "OKTOBER" : $P{bulan} == 11 ? "NOVEMBER" : "DESEMBER") + " " +$P{tahun}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="15" width="904" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["DI PT PELINDO IV (PERSERO) CABANG "+$F{kota}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement x="649" y="33" width="25" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[17]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="291" y="33" width="45" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[7]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="0" width="80" height="33"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NAMA KAPAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="336" y="12" width="45" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SELESAI
+TAMBAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="649" y="0" width="75" height="12"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH B/M (BOX)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="674" y="33" width="25" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[18]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="246" y="33" width="45" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[6]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="33" width="80" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="0" width="70" height="22"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NOT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="674" y="12" width="25" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MUAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="0" width="70" height="22"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="484" y="33" width="35" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[12]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="624" y="0" width="25" height="33"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RASIO
+ET/BT
+%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="33" width="35" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[14]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="699" y="33" width="25" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[19=17+18]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="699" y="12" width="25" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JML]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="336" y="33" width="45" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[8]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="0" width="103" height="12"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[B W T (JAM)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="12" width="33" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ET]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="12" width="45" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MULAI
+TAMBAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="291" y="12" width="45" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[SELESAI
+KEGIATAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="649" y="12" width="25" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BKR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="33" width="15" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="484" y="12" width="70" height="10"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="519" y="33" width="35" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[13]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="33" width="45" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="33" width="35" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[9 = 8 - 5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="15" height="33"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="624" y="33" width="25" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[16=11/10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="246" y="12" width="45" height="21"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MULAI
+KEGIATAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="22" width="35" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EXT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="416" y="22" width="35" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="416" y="33" width="35" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[10 = 9-12-14]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="451" y="33" width="33" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[11=10-13-15]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="519" y="22" width="35" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="484" y="22" width="35" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EXT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="589" y="22" width="35" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[INT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="22" width="35" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EXT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="589" y="33" width="35" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[15]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="724" y="33" width="20" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[20]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="724" y="0" width="20" height="33"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JML
+CC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="866" y="33" width="38" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[24=19/(10*24)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="828" y="12" width="76" height="10"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX / SHIP / HOUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="866" y="22" width="38" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="786" y="22" width="42" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="33" width="42" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[21=19/(11*24)/20]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="786" y="33" width="42" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[22=19/(10*24)/20]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="828" y="22" width="38" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ET]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="12" width="84" height="10"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX / CRANE / HOUR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="22" width="42" height="11"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ET]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="828" y="33" width="38" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[23=19/(11*24)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="0" width="160" height="12"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PRODUKTIVITAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="201" y="0" width="180" height="12"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TANGGAL / JAM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="171" y="0" width="30" height="33"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[L O A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="95" y="0" width="76" height="33"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERUSAHAAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="95" y="33" width="76" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="171" y="33" width="30" height="9"/>
+				<box leftPadding="0" rightPadding="0">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="5" isBold="false"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="14" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="15" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="15" y="0" width="80" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{vesselname}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="95" y="0" width="76" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{costumer}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="171" y="0" width="30" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{loa}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH.mm.ss" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="201" y="0" width="45" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{berhting_time}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH.mm.ss" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="246" y="0" width="45" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{start_work_time}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH.mm.ss" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="291" y="0" width="45" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{end_work_time}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="dd/MM/yyyy HH.mm.ss" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="336" y="0" width="45" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{departure_time}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="381" y="0" width="35" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{bt_ext}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="416" y="0" width="35" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{bt_in}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="451" y="0" width="33" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{et}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="484" y="0" width="35" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{it_ext}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="519" y="0" width="35" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{it_in}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="554" y="0" width="35" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{not_ext}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="589" y="0" width="35" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{not_int}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="624" y="0" width="25" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{rasio}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="649" y="0" width="25" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bkr}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="674" y="0" width="25" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muat}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="699" y="0" width="25" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{box}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="724" y="0" width="20" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{jumlah_cc}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="744" y="0" width="42" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{pro_bch_et}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="786" y="0" width="42" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Double"><![CDATA[$F{pro_bch_bt}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="828" y="0" width="38" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{pro_bsh_et}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="866" y="0" width="38" height="14" isPrintWhenDetailOverflows="true"/>
+				<box leftPadding="2" rightPadding="2">
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="6"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{pro_bsh_bt}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="81">
+			<staticText>
+				<reportElement x="626" y="25" width="118" height="15"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MANAGER OPERASIONAL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="626" y="10" width="118" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{kota}.substring(0, 1)+$F{kota}.substring(1, $F{kota}.length()).toLowerCase()+", "+ new SimpleDateFormat("dd MMMM yyyy").format(new java.util.Date())]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="626" y="69" width="118" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{manager_name}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="111" y="69" width="134" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{gm_name}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="111" y="11" width="134" height="26"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GENERAL MANAGER]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

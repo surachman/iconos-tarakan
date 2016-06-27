@@ -1,0 +1,379 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode"
+                xmlns:qt="http://www.qtasnim.com/currency">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.invoice.handling_invoice']}" />
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.invoice.handling_invoice']}" />
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl id="growl" showDetail="true" globalOnly="true" />
+
+        <h:form id="handlingInvoice">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{handlingInvoiceBean.serviceVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" rowIndexVar="number"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{handlingInvoiceBean.handleSelectNoPPKB}" onstart="freeze();" value="select" update="handlingInvoice:serviceVesselDetail handlingInvoice:view handlingInvoice:printButton shippingCalculation" oncomplete="dlgVessel.hide();">
+                            <f:attribute name="noPPKB" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{handlingInvoiceBean.serviceVessel[0]}" readonly="true" size="30" onmousedown="dlgVessel.show();"/>
+                <p:commandButton image="ui-icon-folder-open" value="..." type="button" onclick="dlgVessel.show();"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{handlingInvoiceBean.serviceVessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{handlingInvoiceBean.serviceVessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{handlingInvoiceBean.serviceVessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br/>
+            <p:fieldset legend="Handling Invoice" id="view">
+                <p:panel visible="#{!empty handlingInvoiceBean.serviceVessel}" style="#{handlingInvoiceBean.totalChargeUsd gt 0 ? '' : 'width: 625px;'}">
+                    <h:panelGrid columns="2">
+                        <p:outputPanel>
+                            <table style="text-align: left; width: 600px;" border="0"
+                                   cellpadding="5" cellspacing="0">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);">I</td>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);" colspan="2" rowspan="1">PENDAPATAN (IDR)</td>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);">1.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">PAKET HANDLING</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.containerServicesChargeDetail[0], false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);">2.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">PENUMPUKAN PETI KEMAS</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.containerServicesChargeDetail[1], false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);">3.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">BUKA TUTUP PALKA</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.containerServicesChargeDetail[2], false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);">4.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">TRANSHIPMENT</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.containerServicesChargeDetail[3], false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);">5.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">SHIFTING</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.containerServicesChargeDetail[4], false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);">6.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">AIR KAPAL</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.containerServicesChargeDetail[6], false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);">JUMLAH 1</td>
+                                        <td style="background-color: rgb(242, 245, 247); font-weight: bold; text-align: right;"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, (handlingInvoiceBean.totalCharge), false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);">II</td>
+                                        <td style="background-color: rgb(215, 235, 249);">1.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">PPN</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.ppn, false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);">2.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">MATERAI</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.materai, false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);">3.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">BIAYA HANDLING</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, handlingInvoiceBean.upahBuruhCharge, false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);">JUMLAH 2</td>
+                                        <td style="background-color: rgb(242, 245, 247); font-weight: bold; text-align: right;"><br/></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, (handlingInvoiceBean.ppn.add(handlingInvoiceBean.materai)).add(handlingInvoiceBean.upahBuruhCharge), false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);">JUMLAH 1 + JUMLAH 2</td>
+                                        <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: right;"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.masterCurrency.language, handlingInvoiceBean.masterCurrency.country, (handlingInvoiceBean.ppn.add(handlingInvoiceBean.materai).add(handlingInvoiceBean.totalCharge).add(handlingInvoiceBean.upahBuruhCharge)), false, handlingInvoiceBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"></td>
+                                        <td style="background-color: rgb(242, 245, 247); font-weight: bold; text-align: right;"><br/></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"><div style="float: left"></div><div style="float: right">
+                                            <h:panelGrid columns="2">
+                                                <dycode:directPrint id="buttonPreview" value="#{msg['application.operation.print_nota']} IDR" disabled="#{handlingInvoiceBean.invoice.validasiPrint and not handlingInvoiceBean.loginSessionBean.supervisor}" actionListener="#{handlingInvoiceBean.handleDownloadInvoice}" update="handlingInvoice:view" />
+                                            </h:panelGrid>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </p:outputPanel>
+                        <p:outputPanel rendered="#{handlingInvoiceBean.totalChargeUsd gt 0}">
+                            <table style="text-align: left; width: 600px;" border="0"
+                                   cellpadding="5" cellspacing="0">
+                                <tbody>
+                                    <tr>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);">I</td>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);" colspan="2" rowspan="1">PENDAPATAN (USD)</td>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);">1.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">PAKET HANDLING</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.containerServicesChargeDetailUsd[0], false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);">2.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">BUKA TUTUP PALKA</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.containerServicesChargeDetailUsd[2], false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);">3.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">TRANSHIPMENT</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.containerServicesChargeDetailUsd[3], false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);">4.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">SHIFTING</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.containerServicesChargeDetailUsd[4], false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);">5.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">AIR KAPAL</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.containerServicesChargeDetailUsd[6], false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);">JUMLAH 1</td>
+                                        <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: right;"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, (handlingInvoiceBean.totalChargeUsd), false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="font-weight: bold; background-color: rgb(59, 170, 227);">II</td>
+                                        <td style="background-color: rgb(242, 245, 247);">1.</td>
+                                        <td style="background-color: rgb(242, 245, 247);">PPN</td>
+                                        <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.ppnUsd, false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(242, 245, 247);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);">2.</td>
+                                        <td style="background-color: rgb(215, 235, 249);">MATERAI</td>
+                                        <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.materaiUsd, false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                        <td style="text-align: right; background-color: rgb(215, 235, 249);"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);">JUMLAH 2</td>
+                                        <td style="background-color: rgb(242, 245, 247); font-weight: bold; text-align: right;"><br/></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, handlingInvoiceBean.ppnUsd.add(handlingInvoiceBean.materaiUsd), false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(215, 235, 249);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);">JUMLAH 1 + JUMLAH 2</td>
+                                        <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: right;"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{qt:getCurrencySymbol(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country)}"/></div><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(handlingInvoiceBean.usdMasterCurrency.language, handlingInvoiceBean.usdMasterCurrency.country, (handlingInvoiceBean.ppnUsd.add(handlingInvoiceBean.materaiUsd).add(handlingInvoiceBean.totalChargeUsd)), false, handlingInvoiceBean.usdMasterCurrency.defaultFractionDigits)}"/></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"></td>
+                                        <td style="background-color: rgb(242, 245, 247); font-weight: bold; text-align: right;"><br/></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"></td>
+                                        <td style="background-color: rgb(242, 245, 247); font-weight: bold; text-align: right;"><br/></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="background-color: rgb(59, 170, 227);"></td>
+                                        <td style="background-color: rgb(242, 245, 247);"></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"></td>
+                                        <td style="background-color: rgb(242, 245, 247); font-weight: bold; text-align: right;"><br/></td>
+                                        <td style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"><div style="float: left"></div><div style="float: right">
+                                            <h:panelGrid columns="2">
+                                                <dycode:directPrint id="buttonPreviewUsd" value="#{msg['application.operation.print_nota']} USD" disabled="#{handlingInvoiceBean.invoiceUsd.validasiPrint and not handlingInvoiceBean.loginSessionBean.supervisor}" actionListener="#{handlingInvoiceBean.handleDownloadInvoiceUsd}" update="handlingInvoice:view" />
+                                            </h:panelGrid>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <h:panelGrid id="printButton" columns="1">
+                                <p:commandButton onstart="freeze();" value="Print Calculation" disabled="#{empty handlingInvoiceBean.serviceVessel}" style="font-size: x-small" immediate="true" process="@this" oncomplete="shippingCalculationDialog.show();" update="shippingCalculation"/>
+                            </h:panelGrid>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:fieldset>
+        </h:form>
+        <p:dialog modal="true" resizable="false" header="Recap" width="350"  widgetVar="shippingCalculationDialog">
+            <h:form id="shippingCalculation">
+                <p:panel>
+                    <h:panelGrid rendered="#{not empty handlingInvoiceBean.serviceVessel}" columns="3">
+                        <h:outputLabel for="reportTypeSelection"  value="Report type"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="reportTypeSelection" value="#{handlingInvoiceBean.selectedReport}">
+                            <f:selectItem itemLabel="Handling Calculation" itemValue="perhitunganHandlingPetikemas"/>
+                            <f:selectItem itemLabel="Handling Charge Calculation" itemValue="perhitunganBiayaHandlingPetikemas"/>
+                            <f:selectItem itemLabel="Handling UC Calculation" itemValue="perhitunganHandlingUc"/>
+                            <f:selectItem itemLabel="Handling Charge UC Calculation" itemValue="perhitunganBiayaHandlingUc"/>
+                            <f:selectItem itemLabel="Discharge Stacking Calculation" itemValue="perhitunganPenumpukanBongkaran"/>
+                            <f:selectItem itemLabel="Discharge Stacking UC Calculation" itemValue="perhitunganPenumpukanBongkaranUc"/>
+                            <f:selectItem itemLabel="Load Stacking Calculation" itemValue="perhitunganPenumpukanMuatan"/>
+                            <f:selectItem itemLabel="Load Stacking UC Calculation" itemValue="perhitunganPenumpukanMuatanUc"/>
+                            <p:ajax process="@this" event="change" onstart="freeze();" update="currencySelection"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel for="currencySelection" value="Currency"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="currencySelection" value="#{handlingInvoiceBean.selectedReportCurrency}">
+                            <f:selectItem itemLabel="IDR" itemValue="IDR"/>
+                            <f:selectItem itemLabel="USD" itemValue="USD" itemDisabled="#{handlingInvoiceBean.totalChargeUsd eq 0 or (not handlingInvoiceBean.selectedReport.equals('perhitunganHandlingPetikemas') and not handlingInvoiceBean.selectedReport.equals('perhitunganHandlingUc'))}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <f:facet name="footer" >
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="Download" actionListener="#{handlingInvoiceBean.handleBentukTiga}" onstart="freeze()" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

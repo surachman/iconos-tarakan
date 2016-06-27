@@ -1,0 +1,548 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:qt="http://www.qtasnim.com/currency"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_behandle']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_behandle']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                            jQuery('#idBatalNota').show();
+
+                    } else {
+                            dlg.hide();
+                            dlgBatalNota.hide();
+                    }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">           
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" onkeypress="showRegistrations();" onmousedown="showRegistrations();" value="#{behandleBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showRegistrations();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{behandleBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{behandleBean.registration.planningVessel.noPpkb}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{behandleBean.registration.planningVessel.preserviceVessel.masterVessel.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{behandleBean.registration.planningVessel.preserviceVessel.voyIn}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{behandleBean.registration.planningVessel.preserviceVessel.voyOut}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{behandleBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="behandleServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{behandleBean.perhitunganBehandles}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="behandleServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty behandleBean.registration.noReg or not behandleBean.registration.statusService.equals('registrasi')}" actionListener="#{behandleBean.handleAdd}" update="dsFormDialog" oncomplete="dlg.show();"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{behandleBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor)}" oncomplete="dlgBatalNota.show()"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center" />
+                        <p:column sortBy="#{item.behandleService.jobSlip}" rowspan="2" headerText="Job Slip" filterMatchMode="contains" filterBy="#{item.behandleService.jobSlip}"/>
+                        <p:column sortBy="#{item.behandleService.contNo}" rowspan="2" headerText="Container No" filterMatchMode="contains" filterBy="#{item.behandleService.contNo}"/>
+                        <p:column sortBy="#{item.behandleService.contSize}" rowspan="2" headerText="Size" />
+                        <p:column sortBy="#{item.behandleService.masterContainerType.masterContainerTypeInGeneral.id}" rowspan="2" headerText="Type" />
+                        <p:column sortBy="#{item.behandleService.contStatus}" rowspan="2" headerText="Status" filterMatchMode="contains" filterBy="#{item.behandleService.contStatus}"/>
+                        <p:column sortBy="#{item.behandleService.overSize}" rowspan="2" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column colspan="2" headerText="Charge &nbsp;(#{qt:getCurrencySymbol(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country)})" />
+                        <p:column sortBy="#{item.totalCharge}" rowspan="2" headerText="Total &nbsp;(#{qt:getCurrencySymbol(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country)})" />
+                        <p:column rowspan="2" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item.behandleService.dg}" headerText="Dg" />
+                        <p:column sortBy="#{item.behandleService.dgLabel}" headerText="Label"/>
+                        <p:column headerText="Stripping"/>
+                        <p:column headerText="Sewa Alat" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.jobSlip}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.contNo}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.contSize}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.contStatus}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.overSize}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.dg ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.behandleService.dgLabel ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, item.charge.add(item.perhitunganSupervisi.totalCharge), false, behandleBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, item.perhitunganSewaAlat.charge, false, behandleBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, item.totalCharge, false, behandleBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" disabled="#{not behandleBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Delivery Service">
+                            <f:setPropertyActionListener target="#{behandleBean.perhitunganBehandle}" value="#{item}" />
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="11" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, behandleBean.total, false, behandleBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, behandleBean.total.multiply(behandleBean.ppnPrint), false, behandleBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, behandleBean.materaiPrint, false, behandleBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Biaya Handling " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, behandleBean.upahBuruh, false, behandleBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(behandleBean.masterCurrency.language, behandleBean.masterCurrency.country, behandleBean.total.add((behandleBean.total.multiply(behandleBean.ppnPrint))).add(behandleBean.materaiPrint).add(behandleBean.upahBuruh), false, behandleBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{not behandleBean.registration.statusService.equals('registrasi') or empty behandleBean.perhitunganBehandles}" update="registrationForm:registrationDetail registrationForm:cek behandleServiceForm:behandleServiceTable growl" actionListener="#{behandleBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty behandleBean.perhitunganBehandles}" actionListener="#{behandleBean.handleDownloadTransactionRecap}" update="behandleServiceForm:behandleServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty behandleBean.perhitunganBehandles or empty behandleBean.registration.invoice.noReg or (behandleBean.disPrint and not loginSessionBean.supervisor) or behandleBean.disKredit}" actionListener="#{behandleBean.handleDownloadNota}" update="behandleServiceForm:behandleServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty behandleBean.perhitunganBehandles or empty behandleBean.registration.invoice.noInvoice}" actionListener="#{behandleBean.handleDownloadDetail}" update="behandleServiceForm:behandleServiceTable"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Entry Behandle Service"  widgetVar="dlg" modal="true" minWidth="750" >
+            <h:form id="dsFormDialog">
+                <p:panel>
+                    <div style="overflow: auto;">
+                        <h:panelGrid columns="5" style="float:left" id="containerInfoPanel">
+                            <h:outputLabel value="Container No *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="bl" onkeypress="showContainersToBehandled();" onmousedown="showContainersToBehandled();" value="#{behandleBean.perhitunganBehandle.behandleService.contNo}" readonly="true" size="25" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton onstart="freeze();"  image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showContainersToBehandled();"/>
+                            <p:message for="bl" display="icon"/>
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{behandleBean.perhitunganBehandle.behandleService.contSize}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{behandleBean.perhitunganBehandle.behandleService.masterContainerType.masterContainerTypeInGeneral.id}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{behandleBean.perhitunganBehandle.behandleService.contStatus}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{behandleBean.perhitunganBehandle.behandleService.contGross}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{behandleBean.perhitunganBehandle.behandleService.overSize}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="5" style="float: right;" id="strippingStuffingCalculationPanel">
+                            <h:outputLabel value="Include Stripping Stuffing" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="includeStrippingStuffingSelection" value="#{behandleBean.paketBehandle.includeStrippingStuffing}" disabled="#{empty behandleBean.perhitunganBehandle.behandleService.contNo}">
+                                <f:selectItem itemValue="true" itemLabel="Yes"/>
+                                <f:selectItem itemValue="false" itemLabel="No"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{behandleBean.calculatePaketBehandle}" update="strippingStuffingCalculationPanel upahBuruhCharge sewaAlatCharge"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                            <h:outputLabel value="Use Equipment" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="useEquipmentSelection" value="#{behandleBean.paketBehandle.isUseEquipment}" disabled="#{empty behandleBean.perhitunganBehandle.behandleService.contNo or not behandleBean.paketBehandle.includeStrippingStuffing}">
+                                <f:selectItem itemValue="true" itemLabel="Yes"/>
+                                <f:selectItem itemValue="false" itemLabel="No"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{behandleBean.calculatePaketBehandle}" update="mekanikSelection equipmentSelection upahBuruhCharge sewaAlatCharge mekanikTonase"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                            <h:outputLabel value="Equipment Name" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="equipmentSelection" style="width:135px;" value="#{behandleBean.paketBehandle.equipment}" disabled="#{not behandleBean.paketBehandle.isUseEquipment or empty behandleBean.perhitunganBehandle.behandleService.contNo or not behandleBean.paketBehandle.includeStrippingStuffing}">
+                                <f:selectItem itemValue="ForkLift3Ton" itemLabel="Forklift 3 Ton"/>
+                                <f:selectItem itemValue="ForkLift7Ton" itemLabel="Forklift 7 Ton"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{behandleBean.calculatePaketBehandle}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                            <h:outputLabel value="Full Handling" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="fullHandlingSelection" style="width:135px;" value="#{behandleBean.paketBehandle.fullHandling}" disabled="#{empty behandleBean.perhitunganBehandle.behandleService.contNo or not behandleBean.paketBehandle.includeStrippingStuffing}">
+                                <f:selectItem itemValue="GeneralCargo" itemLabel="General Cargo"/>
+                                <f:selectItem itemValue="CurahKering" itemLabel="Curah Kering"/>
+                                <f:selectItem itemValue="CurahCair" itemLabel="Curah Cair"/>
+                                <f:selectItem itemValue="PalletsCargo" itemLabel="Pallets Cargo"/>
+                                <f:selectItem itemValue="DT_KSG_S_CONT_SKID_T" itemLabel="D/T KSG &amp; S.CONT./SKID.T"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{behandleBean.calculatePaketBehandle}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel value=" Tonase " />
+                            <h:inputText value="#{behandleBean.paketBehandle.fullHandlingTonage}" styleClass="countable" size="3" disabled="#{empty behandleBean.perhitunganBehandle.behandleService.contNo or not behandleBean.paketBehandle.includeStrippingStuffing}">
+                                <p:ajax process="@this" event="keyup" listener="#{behandleBean.calculatePaketBehandle}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:inputText>
+                            <h:outputLabel value="Mekanik" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="mekanikSelection" style="width:135px;" value="#{behandleBean.paketBehandle.mekanik}" disabled="#{not behandleBean.paketBehandle.isUseEquipment or empty behandleBean.perhitunganBehandle.behandleService.contNo or not behandleBean.paketBehandle.includeStrippingStuffing}">
+                                <f:selectItem itemValue="PalletsCargo" itemLabel="Pallets Cargo"/>
+                                <f:selectItem itemValue="NonPalletsCargo" itemLabel="Non Pallets Cargo"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{behandleBean.calculatePaketBehandle}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel value=" Tonase " />
+                            <h:inputText id="mekanikTonase" styleClass="countable" value="#{behandleBean.paketBehandle.mekanikTonage}" size="3" disabled="#{not behandleBean.paketBehandle.isUseEquipment or empty behandleBean.perhitunganBehandle.behandleService.contNo or not behandleBean.paketBehandle.includeStrippingStuffing}">
+                                <p:ajax process="@this" event="keyup" listener="#{behandleBean.calculatePaketBehandle}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:inputText>
+                        </h:panelGrid>
+                        <script type="text/javascript">
+                            jQuery(function() {
+                                jQuery('input[type=text].countable').livequery(function(){
+                                    jQuery(this).focus(function() {
+                                        jQuery(this).select();
+                                    }).mouseup(function(e) {
+                                        e.preventDefault();
+                                    });
+                                });
+                            });
+                        </script>
+                    </div>
+                    <f:facet name="footer">
+                        <div style="overflow: auto;">
+                            <h:panelGrid columns="3" style="float: right;">
+                                <h:outputLabel value="Behandle" style="font-weight: bold;"/>
+                                <h:outputLabel value=" : " />
+                                <h:inputText id="behandleCharge" readonly="true" value="#{behandleBean.perhitunganBehandle.charge.add(behandleBean.perhitunganBehandle.perhitunganSupervisi.totalCharge)}" required="true" size="25">
+                                    <f:converter converterId="idrCurrencyConverter"/>
+                                </h:inputText>
+
+                                <h:outputLabel value="Biaya Handling" style="font-weight: bold;"/>
+                                <h:outputLabel value=" : " />
+                                <h:inputText id="upahBuruhCharge" readonly="true" value="#{behandleBean.perhitunganBehandle.perhitunganUpahBuruh.charge}" required="true" size="25">
+                                    <f:converter converterId="idrCurrencyConverter"/>
+                                </h:inputText>
+
+                                <h:outputLabel value="Sewa Alat" style="font-weight: bold;"/>
+                                <h:outputLabel value=" : " />
+                                <h:inputText id="sewaAlatCharge" readonly="true" value="#{behandleBean.perhitunganBehandle.perhitunganSewaAlat.charge}" required="true" size="25">
+                                    <f:converter converterId="idrCurrencyConverter"/>
+                                </h:inputText>
+                            </h:panelGrid>
+                        </div>
+                        <br />
+                        <h:panelGroup id="buttonGroup">
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{behandleBean.handleConfirm}" update="behandleServiceForm:behandleServiceTable containerToBehandledListForm:containerToBehandledListTable dsFormDialog growl" oncomplete="handleRequestValidation(xhr, status, args)" disabled="#{empty behandleBean.perhitunganBehandle.behandleService.contNo}"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Registration"  widgetVar="registrationsDialog" modal="true" minWidth="750">
+            <h:form id="registrationsForm">
+                <p:dataTable id="registrationsTable"  widgetVar="registrationsTable"
+                             var="item" value="#{behandleBean.registrations}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{behandleBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail registrationForm:cek behandleServiceForm:behandleServiceTable containerToBehandledListForm:containerToBehandledListTable" oncomplete="registrationsDialog.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Service Container Discharge"  widgetVar="containerToBehandledListDialog" modal="true" minWidth="600">
+            <h:form id="containerToBehandledListForm">
+                <p:dataTable id="containerToBehandledListTable"  widgetVar="containerToBehandledListTable" var="item" value="#{behandleBean.serviceContDischarges}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{behandleBean.handleSelectContPick}" value="#{msg['application.operation.select']}" update="dsFormDialog" oncomplete="containerToBehandledListDialog.hide();">
+                            <f:attribute name="idCont" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{behandleBean.handleDelete}" update="registrationForm:registrationDetail registrationForm:cek behandleServiceForm:behandleServiceTable containerToBehandledListForm:containerToBehandledListTable growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{behandleBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{behandleBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{behandleBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{behandleBean.handleCancelInvoice}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="registrationForm:registrationDetail registrationForm:cek behandleServiceForm:behandleServiceTable containerToBehandledListForm:containerToBehandledListTable growl"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" visible="true" rendered="#{not behandleBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="Behandle.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showRegistrations" immediate="true" actionListener="#{behandleBean.handleShowRegistrations}" update="registrationsForm:registrationsTable" oncomplete="registrationsDialog.show();registrationsTable.clearFilters();"/>
+            <p:remoteCommand name="showContainersToBehandled" immediate="true" actionListener="#{behandleBean.handleShowContainersThatAbleToBehandled}" update="containerToBehandledListForm:containerToBehandledListTable" oncomplete="containerToBehandledListDialog.show();containerToBehandledListTable.clearFilters();"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

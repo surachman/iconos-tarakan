@@ -1,0 +1,1673 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ebtos="http://java.sun.com/jsf/composite/tags/module"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.report']}"/>
+    </ui:define>
+
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+
+            var dlgBulan, dlgReport13, dlgReport14, dlgReport15, dlgReport16, dlgReport17;
+
+            jQuery(document).ready(function(){
+                jQuery('.cal').livequery(function(){
+                        jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+                    });
+                jQuery('.realisasi_produksi_report01').click(function(){
+                   realisasi_produksi_report01.show();
+                   return false;
+                });
+
+                jQuery('.realisasi_produksi_detail_report02').click(function(){
+                   realisasi_produksi_detail_report02.show();
+                   return false;
+                });
+
+                jQuery('.realisasi_produksi_pendapatan_report03').click(function(){
+                   realisasi_produksi_pendapatan_report03.show();
+                   return false;
+                });
+                 jQuery('.realisasi_produksi_pendapatan_receiving_delivery_report06').click(function(){
+                   realisasi_produksi_pendapatan_receiving_delivery_report06.show();
+                   return false;
+                });
+
+                 jQuery('.realisasi_kegiatan_petikemas_report7').click(function(){
+                   realisasi_kegiatan_petikemas_report7.show();
+                   return false;
+                });
+
+                 jQuery('.realisasi_kegiatan_petikemas_report8').click(function(){
+                   realisasi_kegiatan_petikemas_report8.show();
+                   return false;
+                });
+                 jQuery('.realisasi_kegiatan_petikemas_report9').click(function(){
+                   realisasi_kegiatan_petikemas_report9.show();
+                   return false;
+                });
+
+                jQuery('.realisasi_kegiatan_petikemas_report10').click(function(){
+                   realisasi_kegiatan_petikemas_report10.show();
+                   return false;
+                });
+
+                jQuery('.realisasi_kegiatan_petikemas_report23').click(function(){
+                   realisasi_kegiatan_petikemas_report23.show();
+                   return false;
+                });
+
+                jQuery('.realisasi_kegiatan_petikemas_report24').click(function(){
+                   realisasi_kegiatan_petikemas_report24.show();
+                   return false;
+                });
+
+                jQuery('.link_report13').click(function(){
+                   dlgReport13.show();
+                   return false;
+                });
+
+                 jQuery('.link_report14').click(function(){
+                   dlgReport14.show();
+                   return false;
+                });
+
+                 jQuery('.link_report15').click(function(){
+                   dlgReport15.show();
+                   return false;
+                });
+
+                 jQuery('.link_report16').click(function(){
+                   dlgReport16.show();
+                   return false;
+                });
+
+                 jQuery('.link_report17').click(function(){
+                   dlgReport17.show();
+                   return false;
+                });
+                //-----------
+                 jQuery('.link_report04').click(function(){
+                   link_report04.show();
+                   return false;
+                });
+
+                 jQuery('.link_report05').click(function(){
+                   link_report05.show();
+                   return false;
+                });
+
+                 jQuery('.link_report11').click(function(){
+                   link_report11.show();
+                   return false;
+                });
+
+                 jQuery('.link_report12').click(function(){
+                   link_report12.show();
+                   return false;
+                });
+
+                jQuery('.link_report18').click(function(){
+                   link_report18.show();
+                   return false;
+                });
+
+                 jQuery('.link_report19').click(function(){
+                   link_report19.show();
+                   return false;
+                });
+
+                 jQuery('.link_report191').click(function(){
+                   link_report191.show();
+                   return false;
+                });
+
+                jQuery('.link_report22').click(function(){
+                   link_report22.show();
+                   return false;
+                });
+
+                 jQuery('.link_report21').click(function(){
+                   link_report21.show();
+                   return false;
+                });
+
+                 jQuery('.link_report20').click(function(){
+                   link_report20.show();
+                   return false;
+                });
+
+                 jQuery('.laporan_harian').click(function(){
+                   laporan_harian.show();
+                   return false;
+                });
+                
+                 jQuery('.laporan_harian_reefer').click(function(){
+                   laporan_harian_reefer.show();
+                   return false;
+                });
+
+                jQuery('.laporan_harian_gate').click(function(){
+                   laporan_harian_gate.show();
+                   return false;
+                });
+
+            });
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+
+        </script>
+
+        <style type="text/css">
+            .first-td{
+                width: 110px;
+            }
+
+            .tops{
+                vertical-align: top;
+            }
+            .style-li li{
+                height: 30px;
+            }
+        </style>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.report']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+
+
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+
+        <p:growl id="growl" showDetail="true" />
+
+        <!--DIALOG REPORT 01-->
+
+        <p:dialog  widgetVar="realisasi_produksi_report01" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report01">
+                <div align="center">
+                    <p:panel >
+
+                        <h:panelGrid columns="3" cellpadding="10">
+                            <h:outputText value="Periode Bulan/Tahun : "/>
+                            <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                <f:selectItem itemValue="2" itemLabel="February"/>
+                                <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                <f:selectItem itemValue="4" itemLabel="April"/>
+                                <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                <f:selectItem itemValue="9" itemLabel="September"/>
+                                <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                <f:selectItem itemValue="11" itemLabel="November"/>
+                                <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                <p:ajax  event="change" onstart="freeze();" update="report01"/>
+                            </h:selectOneMenu>
+                            <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                <p:ajax event="change" onstart="freeze();" update="report01"/>
+                            </h:selectOneMenu>                           
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport01}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}"/>
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport01}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" update="report01"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_produksi_report01.hide();"/>
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG REPORT 02-->
+
+        <p:dialog  widgetVar="realisasi_produksi_detail_report02" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report02">
+                <div align="center">
+                    <p:panel >
+
+                        <h:panelGrid columns="3" cellpadding="10">
+                            <h:outputText value="Periode Bulan/Tahun : "/>
+                            <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                <f:selectItem itemValue="2" itemLabel="February"/>
+                                <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                <f:selectItem itemValue="4" itemLabel="April"/>
+                                <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                <f:selectItem itemValue="9" itemLabel="September"/>
+                                <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                <f:selectItem itemValue="11" itemLabel="November"/>
+                                <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                <p:ajax  event="change" onstart="freeze();" update="report02"/>
+                            </h:selectOneMenu>
+                            <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                <p:ajax event="change" onstart="freeze();" update="report02"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport02}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}"/>
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport02}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" update="report02"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_produksi_detail_report02.hide()"/>
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG REPORT 03-->
+
+        <p:dialog  widgetVar="realisasi_produksi_pendapatan_report03" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report03">
+                <div align="center">
+                    <p:panel >
+
+                        <h:panelGrid columns="3" cellpadding="10">
+                            <h:outputText value="Periode Bulan/Tahun : "/>
+                            <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                <f:selectItem itemValue="2" itemLabel="February"/>
+                                <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                <f:selectItem itemValue="4" itemLabel="April"/>
+                                <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                <f:selectItem itemValue="9" itemLabel="September"/>
+                                <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                <f:selectItem itemValue="11" itemLabel="November"/>
+                                <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                <p:ajax event="change" onstart="freeze();" update="report03"/>
+                            </h:selectOneMenu>
+                            <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                <p:ajax event="change" onstart="freeze();" update="report03"/>
+                            </h:selectOneMenu>
+
+                        </h:panelGrid>
+
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport03}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}"/>
+                                                                </a>   -->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport03}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" update="report03"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_produksi_pendapatan_report03.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG REPORT NO 6-->
+
+        <p:dialog  widgetVar="realisasi_produksi_pendapatan_receiving_delivery_report06" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="button">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="button"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="button"/>
+
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Owner" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.owner_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventOwner}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.mOwnerEquipmentList}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerName}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="button"/>
+                                </h:selectOneMenu>
+
+                                <!--                                <h:outputText value="Pilih Equipment" style=""/>
+                                                                <h:outputText value=":"></h:outputText>
+                                                                <h:selectOneMenu value="{rekapitulasiProduksiReportBean.equip_code}" valueChangeListener="{rekapitulasiProduksiReportBean.onChangeEventEquipment}">
+                                                                    <f:selectItems value="{rekapitulasiProduksiReportBean.masterEquipments}" var="i" itemValue="{i.equipCode}" itemLabel="{i.equipCode} || {i.name}"/>
+                                                                    <p:ajax event="change" onstart="freeze();" update="button"/>
+                                                                </h:selectOneMenu>-->
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlProduksiDanPendapatanReport06}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport06}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_produksi_pendapatan_receiving_delivery_report06.hide()"/>
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG 7-->
+
+        <p:dialog  widgetVar="realisasi_kegiatan_petikemas_report7" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report7">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report7"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report7"/>
+
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlProduksiDanPendapatanReport07}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport07}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport07Excel}" onstart="freeze();"
+                                                 value="#{msg['application.operation.print']} Excel" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_kegiatan_petikemas_report7.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog 8-->
+
+        <p:dialog  widgetVar="realisasi_kegiatan_petikemas_report8" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report8">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report8"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report8"/>
+
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlProduksiDanPendapatanReport08}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport08}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_kegiatan_petikemas_report8.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog 9-->
+
+        <p:dialog  widgetVar="realisasi_kegiatan_petikemas_report9" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report9">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report9"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report9"/>
+
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlProduksiDanPendapatanReport09}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport09}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_kegiatan_petikemas_report9.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog 23-->
+
+        <p:dialog  widgetVar="realisasi_kegiatan_petikemas_report23" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report23">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report23"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report23"/>
+
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlProduksiDanPendapatanReport23}" class="ui-button-text" >
+                                        <p:button value="{msg['application.operation.print']}" />
+                                    </a>-->
+
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport23}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_kegiatan_petikemas_report23.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog 24-->
+
+        <p:dialog  widgetVar="realisasi_kegiatan_petikemas_report24" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report24">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report24"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report24"/>
+
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlProduksiDanPendapatanReport24}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport24}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_kegiatan_petikemas_report24.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG REPORT 10-->
+
+        <p:dialog  widgetVar="realisasi_kegiatan_petikemas_report10" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report10">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report10"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report10"/>
+
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Customer" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.cust_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventCustomer}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.customers}" var="i" itemValue="#{i.custCode}" itemLabel="#{i.name}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report10"/>
+                                </h:selectOneMenu>                               
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlProduksiDanPendapatanReport10}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport10}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport10Excel}" onstart="freeze();"
+                                                 value="#{msg['application.operation.print']} Excel" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="realisasi_kegiatan_petikemas_report10.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--        dialog report 13 -->
+
+        <p:dialog  widgetVar="dlgReport13" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report13">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report13"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report13"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport13}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport13}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="dlgReport13.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--        dialog report 14 -->
+
+        <p:dialog  widgetVar="dlgReport14" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report14">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report14"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report14"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport14}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport14}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="dlgReport14.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--        dialog report 15 -->
+        <p:dialog  widgetVar="dlgReport15" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report15">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report15"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report15"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport15}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport15}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="dlgReport15.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--        dialog report 16 -->
+        <p:dialog  widgetVar="dlgReport16" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report16">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report16"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="dlgReport16"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport16}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport16}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="dlgReport16.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--        dialog report 17 -->
+        <p:dialog  widgetVar="dlgReport17" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report17">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report17"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report17"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport17}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport17}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="dlgReport17.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG REPORT link_report04-->
+
+        <p:dialog  widgetVar="link_report04" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report04">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report04"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report04"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Owner" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.owner_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventOwner}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.mOwnerEquipmentList}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerName}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report04"/>
+                                </h:selectOneMenu>
+
+                                <h:outputText value="Pilih Equipment" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.equip_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventEquipment}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.masterEquipments}" var="i" itemValue="#{i.equipCode}" itemLabel="#{i.equipCode} || #{i.name}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report04"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport04}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport04}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report04.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG REPORT link_report05-->
+
+        <p:dialog  widgetVar="link_report05" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report05">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report05"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report05"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Owner" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.owner_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventOwner}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.mOwnerEquipmentList}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerName}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report05"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport05}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport05}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report05.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG REPORT link_report11-->
+
+        <p:dialog  widgetVar="link_report11" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report11">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report11"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report11"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport11}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport11}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport11Excel}" onstart="freeze();"
+                                                 value="#{msg['application.operation.print']} Excel" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report11.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG link_report12-->
+
+        <p:dialog  widgetVar="link_report12" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report12">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report12"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report12"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Owner" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.owner_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventOwner}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.mOwnerEquipmentList}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerName}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report12"/>
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport12}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport12}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report12.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG link_report18-->
+
+        <p:dialog  widgetVar="link_report18" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report18">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report18"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report18"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport18}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport18}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report18.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG link_report19-->
+
+        <p:dialog  widgetVar="link_report19" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report19">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report19"/>
+                                </h:selectOneMenu>
+
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report19"/>
+                                </h:selectOneMenu>                               
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Owner" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.owner_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventOwner}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.mOwnerEquipmentList}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerName}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report19:equip"/>
+                                </h:selectOneMenu>
+
+                                <h:outputText value="Pilih Equipment" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.equip_code}" id="equip" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventEquipment}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listEquipment}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} || #{i[1]}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport19}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport19}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report19.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+
+        <!--DIALOG link_report19-->
+
+        <p:dialog  widgetVar="link_report191" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report191">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report19"/>
+                                </h:selectOneMenu>
+
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report19"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Owner" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.owner_code}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.mOwnerEquipmentList}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerName}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport191}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report19.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+        <!--DIALOG link_report122-->
+
+        <p:dialog  widgetVar="link_report22" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report22">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report22"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report22"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport22}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport22}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report22.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG link_report20-->
+
+        <p:dialog  widgetVar="link_report20" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report20">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report20"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report20"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport20}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport20}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report20.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <!--DIALOG link_report21-->
+
+        <p:dialog  widgetVar="link_report21" modal="true" minWidth="470" header="Pilih Bulan / Tahun">
+            <h:form id="report21">
+                <div align="center">
+                    <p:panel >
+                        <h:panelGrid columns="1">
+                            <h:panelGrid columns="3" >
+                                <h:outputText value="Periode Bulan/Tahun : "/>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.bulan}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventBulan}">
+                                    <f:selectItem itemValue="1" itemLabel="Januari"/>
+                                    <f:selectItem itemValue="2" itemLabel="February"/>
+                                    <f:selectItem itemValue="3" itemLabel="Maret"/>
+                                    <f:selectItem itemValue="4" itemLabel="April"/>
+                                    <f:selectItem itemValue="5" itemLabel="Mei"/>
+                                    <f:selectItem itemValue="6" itemLabel="Juni"/>
+                                    <f:selectItem itemValue="7" itemLabel="Juli"/>
+                                    <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                                    <f:selectItem itemValue="9" itemLabel="September"/>
+                                    <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                                    <f:selectItem itemValue="11" itemLabel="November"/>
+                                    <f:selectItem itemValue="12" itemLabel="Desember"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report21"/>
+                                </h:selectOneMenu>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.tahun}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEvent}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.listTahun}" itemValue="#{listTahun.get(0)}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report21"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <h:panelGrid columns="3" columnClasses="first-td" >
+                                <h:outputText value="Pilih Equipment" style=""/>
+                                <h:outputText value=":"></h:outputText>
+                                <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.equip_code}" valueChangeListener="#{rekapitulasiProduksiReportBean.onChangeEventEquipment}">
+                                    <f:selectItems value="#{rekapitulasiProduksiReportBean.eqForCrane}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} || #{i[1]}"/>
+                                    <p:ajax event="change" onstart="freeze();" update="report21"/>
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <f:facet name="footer" >
+                            <div class="header-panel-single-left" >
+                                <!--                                <a href="{rekapitulasiProduksiReportBean.urlReport21}" class="ui-button-text" >
+                                                                    <p:button value="{msg['application.operation.print']}" />
+                                                                </a>-->
+                                <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadReport21}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="link_report21.hide()"/>
+
+                            </div>
+                        </f:facet>
+                    </p:panel>
+                </div>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" resizable="false" header="#{msg['menu.report.operasional_kapal']}" width="500"  widgetVar="dailyOperationReportDialog">
+            <h:form id="dailyOperationReportForm">
+                <p:panel id="dailyOperationReportPanel" rendered="true">
+                    <h:panelGrid columns="4">
+                        <h:outputLabel for="noPpkb"  value="No Ppkb *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="noPpkb" required="true" requiredMessage="No Ppkb is Required" value="#{rekapitulasiProduksiReportBean.dailyOperationReport.noPpkb}"/>
+                        <p:message display="icon" for="noPpkb"/>
+                        <h:outputLabel for="startDate"  value="Start Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="startDate" required="true" requiredMessage="Start Time is Required" styleClass="cal" value="#{rekapitulasiProduksiReportBean.dailyOperationReport.from}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message display="icon" for="startDate"/>
+                        <h:outputLabel for="endDate" value="End Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="endDate" required="true" requiredMessage="End Time is Required" styleClass="cal" value="#{rekapitulasiProduksiReportBean.dailyOperationReport.to}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message display="icon" for="endDate"/>
+                        <h:outputLabel for="foremanName"  value="Foreman Name"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="foremanName" value="#{rekapitulasiProduksiReportBean.dailyOperationReport.foremanName}"/>
+                        <h:outputText/>
+                        <h:outputLabel for="foremanNipp"  value="Foreman Nipp"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="foremanNipp" value="#{rekapitulasiProduksiReportBean.dailyOperationReport.foremanNipp}"/>
+                        <h:outputText/>
+                    </h:panelGrid>
+                    <f:facet name="footer" >
+                        <div class="header-panel-single-left" >
+                            <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadDailyOperationReport}" onstart="freeze();" value="#{msg['application.operation.print']}" update="dailyOperationReportForm:dailyOperationReportPanel growl" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="dailyOperationReportDialog.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--fildset isi data view -->
+        <h:form>
+            <p:remoteCommand name="showDailyOperationReport" actionListener="#{rekapitulasiProduksiReportBean.handleShowDailyOperationReport}" update="dailyOperationReportForm:dailyOperationReportPanel" oncomplete="dailyOperationReportDialog.show();"/>
+
+            <h:panelGrid columns="2" rowClasses="tops" style="width: 100%">
+                <p:fieldset legend="#{msg['menu.report']}">
+                    <ol class="style-li">
+                        <li><h:outputLink value="#" styleClass="realisasi_produksi_report01"><h:outputText value="#{msg['menu.report.report1']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_produksi_detail_report02"><h:outputText value="#{msg['menu.report.report2']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_produksi_pendapatan_report03"><h:outputText value="#{msg['menu.report.report3']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="link_report04"><h:outputText value="#{msg['menu.report.report4']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="link_report05"><h:outputText value="#{msg['menu.report.report5']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_produksi_pendapatan_receiving_delivery_report06"><h:outputText value="#{msg['menu.report.report6']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_kegiatan_petikemas_report7 style-li"><h:outputText value="#{msg['menu.report.report7']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_kegiatan_petikemas_report8"><h:outputText value="#{msg['menu.report.report8']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_kegiatan_petikemas_report9"><h:outputText value="#{msg['menu.report.report9']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_kegiatan_petikemas_report10"><h:outputText value="#{msg['menu.report.report10']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#"  styleClass="link_report11"><h:outputText value="#{msg['menu.report.report11']}"/></h:outputLink></li>
+<!--                        <li><h:outputLink value="#"  styleClass="link_report12"><h:outputText value="#{msg['menu.report.report12']}"/></h:outputLink></li>-->
+<!--                        <li><h:outputLink value="#" styleClass="link_report13"><h:outputText value="#{msg['menu.report.report13']}"/></h:outputLink></li>-->
+<!--                        <li><h:outputLink value="#" styleClass="link_report14"><h:outputText value="#{msg['menu.report.report14']}"/></h:outputLink></li>-->
+<!--                        <li><h:outputLink value="#" styleClass="link_report15"><h:outputText value="#{msg['menu.report.report15']}"/></h:outputLink></li>-->
+                        <!--                    <li><h:outputLink value="#" styleClass="link_report16"><h:outputText value="{msg['menu.report.report16']}"/></h:outputLink></li>
+                                            <li><h:outputLink value="#" styleClass="link_report17"><h:outputText value="{msg['menu.report.report17']}"/></h:outputLink></li>
+                                            <li><h:outputLink value="#" styleClass="link_report18"><h:outputText value="{msg['menu.report.report18']}"/></h:outputLink></li>-->
+                        <li><h:outputLink value="#" styleClass="link_report19"><h:outputText value="#{msg['menu.report.report19']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="link_report191"><h:outputText value="#{msg['menu.report.report191']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="link_report20"><h:outputText value="#{msg['menu.report.report20']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="link_report21"><h:outputText value="#{msg['menu.report.report21']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#"  styleClass="link_report22"><h:outputText value="#{msg['menu.report.report22']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_kegiatan_petikemas_report23"><h:outputText value="#{msg['menu.report.report23']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="realisasi_kegiatan_petikemas_report24"><h:outputText value="#{msg['menu.report.report24']}"/></h:outputLink></li>
+                        <li><p:commandLink onclick="showDailyOperationReport();" value="#{msg['menu.report.operasional_kapal']}"/></li>
+                        <li><h:outputLink value="#" styleClass="laporan_harian"><h:outputText value="#{msg['menu.report.operasional_harian']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="laporan_harian_reefer"><h:outputText value="#{msg['menu.report.operasional_reefer']}"/></h:outputLink></li>
+                        <li><h:outputLink value="#" styleClass="laporan_harian_gate"><h:outputText value="Print Activity Gate"/></h:outputLink></li>
+                        <li><p:commandLink onstart="freeze();" oncomplete="yardRealizationReport.show();" value="#{msg['menu.report.yard_realization']}" update="yardRealizationReportForm" title="#{msg['menu.report.yard_realization']}"/></li>
+                    </ol>
+                </p:fieldset>
+            </h:panelGrid>
+        </h:form>
+        
+        <ebtos:YardRealizationReport id="yardRealizationReport"  widgetVar="yardRealizationReport"/>
+
+        <p:dialog  widgetVar="laporan_harian" width="600" modal="true" position="center" header="Laporan Harian Operasional Lapangan">
+            <h:form id="printProduk">
+                <p:panel id="idProduk">
+                    <h:panelGrid columns="4">
+
+                        <h:outputLabel value="Koordinator Shift"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{rekapitulasiProduksiReportBean.koordinator}" id="pel" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="pel" display="icon"/>
+
+                        <h:outputLabel value="Periode Tanggal"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="6">
+                            <h:outputLabel value=":"/>
+                            <h:inputText id="tgl1" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{rekapitulasiProduksiReportBean.tanggal1}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <p:message for="tgl1" display="icon"/>
+                            <h:outputLabel value="S/D"/>
+                            <h:inputText id="tgl2" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{rekapitulasiProduksiReportBean.tanggal2}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText> 
+                            <p:message for="tgl2" display="icon"/>
+                        </h:panelGrid>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="Pilih Owner" style=""/>
+                        <h:outputText value=":"></h:outputText>
+                        <h:selectOneMenu value="#{rekapitulasiProduksiReportBean.owner_code}" id="owner" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItems value="#{rekapitulasiProduksiReportBean.mOwnerEquipmentList}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerName}" />
+                        </h:selectOneMenu>
+                        <p:message for="owner" display="icon"/>
+
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadDailyOperationReportCy}" onstart="freeze();" value="#{msg['application.operation.print']}" update="printProduk growl" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                        <p:commandButton value="#{msg['application.operation.exit']}" oncomplete="laporan_harian.hide()"/>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="laporan_harian_reefer" width="600" modal="true" position="center" header="Laporan Harian Operasional Reefer">
+            <h:form id="printReefer">
+                <p:panel id="idProduk">
+                    <h:panelGrid columns="4">
+
+                        <h:outputLabel value="Koordinator Shift"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{rekapitulasiProduksiReportBean.koordinator}" id="pel" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="pel" display="icon"/>
+
+                        <h:outputLabel value="Periode Tanggal"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="6">
+                            <h:outputLabel value=":"/>
+                            <h:inputText id="tgl1" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{rekapitulasiProduksiReportBean.tanggal1}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <p:message for="tgl1" display="icon"/>
+                            <h:outputLabel value="S/D"/>
+                            <h:inputText id="tgl2" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{rekapitulasiProduksiReportBean.tanggal2}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <p:message for="tgl2" display="icon"/>
+                        </h:panelGrid>
+
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <p:commandButton actionListener="#{rekapitulasiProduksiReportBean.handleDownloadDailyOperationReportReefer}" onstart="freeze();" value="#{msg['application.operation.print']}" update="printReefer growl" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                        <p:commandButton value="#{msg['application.operation.exit']}" oncomplete="laporan_harian_reefer.hide();"/>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog  widgetVar="laporan_harian_gate" width="600" modal="true" position="center" header="Print Daftar Petikemas Masuk / Keluar">
+            <h:form id="printProdukGate">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="Supervisor *"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{rekapitulasiProduksiReportBean.supervisor}" id="pel" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="pel" display="icon"/>
+
+                        <h:outputLabel value="Koordinator *"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{rekapitulasiProduksiReportBean.koordinator}" id="koordinator" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="koordinator" display="icon"/>
+
+                        <h:outputLabel value="Pelaksana Gate *"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{rekapitulasiProduksiReportBean.pelaksanaGate}" id="pelaksanaGate" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="pelaksanaGate" display="icon"/>
+
+                        <h:outputLabel value="Periode Tanggal *"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="6">
+                            <h:inputText id="tgl1" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{rekapitulasiProduksiReportBean.tanggal1}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <p:message for="tgl1" display="icon"/>
+                            <h:outputLabel value="S/D"/>
+                            <h:inputText id="tgl2" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{rekapitulasiProduksiReportBean.tanggal2}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <p:message for="tgl2" display="icon"/>
+                        </h:panelGrid>
+                        <p:message for="tipe" display="icon"/>
+
+                        <h:outputLabel value="Tipe"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneRadio value="#{rekapitulasiProduksiReportBean.tipe}" id="tipe" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItem itemValue="m" itemLabel="Masuk"/>
+                            <f:selectItem itemValue="k" itemLabel="Keluar"/>
+                        </h:selectOneRadio>
+                        <p:message for="tipe" display="icon"/>
+                        
+                        <h:outputLabel value="No Ppkb *"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="30" value="#{rekapitulasiProduksiReportBean.no_ppkb}" id="no_ppkb"/>
+                        <p:message for="no_ppkb" display="icon"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <p:commandButton id="printNota" onstart="freeze();" value="#{msg['application.operation.print']}" actionListener="#{rekapitulasiProduksiReportBean.handlePrintGate}" oncomplete="handleDownloadRequest(args)" update="printProdukGate"/>
+                        <p:commandButton value="#{msg['application.operation.exit']}" oncomplete="laporan_harian_gate.hide()"/>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ebtos="http://java.sun.com/jsf/composite/tags/module"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.berth_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.berth_monitoring']}"/>
+    </ui:define>
+    <ui:define name="content">
+        
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+
+        <h:form id="berthForm">
+            <p:dialog modal="true" header="Berth List"  widgetVar="dialogBerth" resizable="false" width="550">
+                <p:dataTable value="#{berthMonitoring.docks}" rowIndexVar="number" var="item"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="DockCode"/>
+                        </f:facet>
+                        <h:outputText value="#{item.dockCode}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Name"/>
+                        </f:facet>
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="FrMeter"/>
+                        </f:facet>
+                        <h:outputText value="#{item.frMeter}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="ToMeter"/>
+                        </f:facet>
+                        <h:outputText value="#{item.toMeter}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{berthMonitoring.handleSelectBerth}" value="#{msg['application.operation.select']}"
+                                         oncomplete="dialogBerth.hide()" update="berthForm:dockSubForm berthForm:imageSubForm">
+                            <f:attribute name="dockCode" value="#{item.dockCode}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <p>
+            <p:outputPanel id="dockSubForm">
+                    <td width="75">
+                        <h:outputText value="Berth Name"/>
+                    </td>
+                    <td>
+                        <h:inputHidden value="#{berthMonitoring.dock.dockCode}"/>
+                    </td>
+                    <td>
+                        <h:inputText onclick="dialogBerth.show();return false;" value="#{berthMonitoring.dock.name}"/>
+                    </td>
+                    <td align="right" width="50">
+                        <p:commandButton value="..." style="font-size: x-small" image="ui-icon-folder-open" onclick="dialogBerth.show()"/>
+                    </td>
+            </p:outputPanel>
+            <br/>
+            </p>
+            <p:outputPanel id="imageSubForm">
+                <p:graphicImage alt="berth" value="#{berthMonitoring.birdViewUrl}"/>
+            </p:outputPanel>
+        </h:form>
+
+       <ebtos:LaporanRencanaKedatanganKapal id="laporanRencanaKedatanganKapal"  widgetVar="laporanRencanaKedatanganKapal"/>
+    </ui:define>
+
+</ui:composition>

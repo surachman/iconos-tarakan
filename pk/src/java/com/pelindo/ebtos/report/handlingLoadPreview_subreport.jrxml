@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="handlingLoadPreview_subreport" language="groovy" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="cc2e1221-dadc-48ad-b108-7b4e3c8f1686">
+	<property name="ireport.zoom" value="1.3310000000000033"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT scl.cont_no,
+  scl.cont_size,
+  (SELECT mct1.type_in_general
+  FROM m_container_type mct1
+  WHERE scl.cont_type = mct1.cont_type
+  ) AS type ,
+  scl.cont_status,
+  scl.seal_no,
+  e3.equip_code AS tt_code,
+  e3.end_time   AS lift_date,
+  e2.equip_code AS ht,
+  e2.end_time   AS ht_date,
+  e1.equip_code AS cc_code,
+  e1.end_time   AS stv_date
+FROM service_cont_load scl
+LEFT JOIN equipment e1
+ON e1.no_ppkb             = scl.no_ppkb
+AND e1.cont_no            = scl.cont_no
+AND e1.equipment_act_code = 'STEVEDORING'
+AND e1.operation          = 'LOAD'
+LEFT JOIN equipment e2
+ON e2.no_ppkb             = scl.no_ppkb
+AND e2.cont_no            = scl.cont_no
+AND e2.equipment_act_code = 'H/T'
+AND e2.operation          = 'LOAD'
+LEFT JOIN equipment e3
+ON e3.no_ppkb             = scl.no_ppkb
+AND e3.cont_no            = scl.cont_no
+AND e3.equipment_act_code = 'LIFTON'
+AND e3.operation          = 'LOAD'
+WHERE scl.is_transhipment       = 'FALSE'
+AND scl.status_cancel_loading   = 'FALSE'
+AND is_transhipment             = 'FALSE'
+AND scl.no_ppkb                 = $P{no_ppkb}]]>
+	</queryString>
+	<field name="cont_no" class="java.lang.String"/>
+	<field name="cont_size" class="java.lang.Integer"/>
+	<field name="type" class="java.lang.String"/>
+	<field name="cont_status" class="java.lang.String"/>
+	<field name="seal_no" class="java.lang.String"/>
+	<field name="tt_code" class="java.lang.String"/>
+	<field name="lift_date" class="java.sql.Timestamp"/>
+	<field name="ht" class="java.lang.String"/>
+	<field name="ht_date" class="java.sql.Timestamp"/>
+	<field name="cc_code" class="java.lang.String"/>
+	<field name="stv_date" class="java.sql.Timestamp"/>
+	<detail>
+		<band height="10" splitType="Stretch">
+			<textField>
+				<reportElement uuid="5ed1ce22-211f-489d-9bdd-b59aa8507a1a" x="24" y="0" width="77" height="10"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cont_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2fac4ba6-0b6a-466b-a9f6-435d251dd7dc" x="101" y="0" width="31" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cont_size}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b62e2d03-f416-410c-ba23-f7e990b6aff6" x="132" y="0" width="29" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{type}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b7a1e1d0-9809-4c06-90ee-36baa0ed381c" x="161" y="0" width="35" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cont_status}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="0af89c92-60c2-4fec-ae9f-1a4519c876e4" x="230" y="0" width="43" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{tt_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement uuid="b4dcc2d6-95ed-4a8e-a174-4b12d2e7fb2e" x="273" y="0" width="66" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{lift_date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="19fd699c-ce41-4a4b-9c33-726da6191a6d" x="339" y="0" width="43" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ht}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement uuid="0e5e6d9f-aceb-4fec-bcd3-f9a5b48354ac" x="382" y="0" width="65" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ht_date}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="f7464f95-3ba3-4234-a223-e0d8036bc376" x="447" y="0" width="43" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cc_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement uuid="0f26bd03-1dfb-4398-9a1b-cc6d56d958d1" x="490" y="0" width="65" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{stv_date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2f4bfdb0-7e4c-4314-91bd-f7bed809e7e0" x="0" y="0" width="24" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d871c013-991b-481b-8e71-e2e44afb2115" x="196" y="0" width="34" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{seal_no}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

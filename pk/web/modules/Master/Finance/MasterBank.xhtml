@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.finance.master_bank']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.finance.master_bank']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogEdit').show();
+            } else {
+                dialogEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">     
+        <p:growl showDetail="true" life="3000" id="growl" globalOnly="true"/>
+        <h:form id="main-form">
+            <p:dataTable paginatorPosition="bottom" value="#{masterBankBean.masterBanks}" var="item"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" actionListener="#{masterBankBean.handleNew}" update="editForm" oncomplete="dialogEdit.show()" onclick="genTitle('dialogEdit','#{msg['application.operation.add']} Master Bank');"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.id}" style="width: 100px;text-align: center" filterBy="#{item.id}">
+                    <f:facet name="header">
+                        <h:outputText value="Id"/>
+                    </f:facet>
+                    <h:outputText value="#{item.id}"/>
+                </p:column>
+                <p:column sortBy="#{item.nama}" filterBy="#{item.nama}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.nama}"/>
+                </p:column>
+                <p:column sortBy="#{item.rekeningAkuntansi}" filterBy="#{item.rekeningAkuntansi}">
+                    <f:facet name="header">
+                        <h:outputText value="Value"/>
+                    </f:facet>
+                    <h:outputText value="#{item.rekeningAkuntansi}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" image="ui-icon-pencil" actionListener="#{masterBankBean.handleSelect}" update="editForm" onsuccess="dialogEdit.show();" title="Edit" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Bank');">
+                            <f:attribute name="id_bank" value="#{item.id}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" image="ui-icon-trash" oncomplete="confirmation.show();" update="deleteForm" title="Delete" actionListener="#{masterBankBean.handleSelect}">
+                            <f:attribute name="id_bank" value="#{item.id}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogEdit"  widgetVar="dialogEdit" minWidth="450" header="Edit Master Bank">
+            <h:form id="editForm">
+                <p:panel rendered="#{not empty masterBankBean.masterBank}">
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Id *" for="id" />
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="id" disabled="#{not empty masterBankBean.masterBank.id}" value="#{masterBankBean.masterBank.id}" required="true" requiredMessage="Id Bank field #{msg['application.validation.required']}"/>
+                        <p:message for="id" display="icon"/>
+
+                        <h:outputLabel value="Nama *" for="nama" />
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="nama" value="#{masterBankBean.masterBank.nama}" size="40" required="true" requiredMessage="Nama field #{msg['application.validation.required']}"/>
+                        <p:message for="nama" display="icon"/>
+
+                        <h:outputLabel value="Rekening Akuntansi *" for="rekeningAkuntansi" />
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="rekeningAkuntansi" value="#{masterBankBean.masterBank.rekeningAkuntansi}" required="true" requiredMessage="Rekening Akuntansi field #{msg['application.validation.required']}"/>
+                        <p:message for="rekeningAkuntansi" display="icon"/>
+
+                        <h:outputLabel value="guid" for="guid"/>
+                        <h:outputLabel value=" : "/>
+                        <p:outputPanel id="guidPanel">
+                            <h:inputText id="guid" disabled="true" size="40" value="#{masterBankBean.masterBank.guid}"/>
+                        </p:outputPanel>
+                        <h:outputText/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton onstart="freeze();" immediate="true" value="#{msg['application.operation.reset_guid']}" rendered="#{empty masterBankBean.masterBank.id}" actionListener="#{masterBankBean.handleResetGuid}" update="editForm:guidPanel" />
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" image="ui-icon-check" actionListener="#{masterBankBean.handleEdit}" update="main-form editForm growl" oncomplete="validateForm(xhr, status, args);"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogEdit.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel> 
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form id="deleteForm">
+                <p:panel rendered="#{not empty masterBankBean.masterBank}">
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{masterBankBean.handleDelete}"  update="main-form growl" oncomplete="confirmation.hide();"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,1214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="InvoiceDischargeF" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="409"/>
+	<property name="ireport.background.image" value="C:\Users\dycoder\Documents\Faktur pajak pelindo.jpg"/>
+	<property name="ireport.background.image.properties" value="true,true,0.25,-8,-8,0,0,628,803"/>
+	<parameter name="no_reg" class="java.lang.String"/>
+	<parameter name="terbilang" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object"/>
+	<parameter name="username" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT
+  (SELECT description
+    || ', '
+    ||
+    (SELECT description FROM m_setting_app WHERE id IN ('ebtos.cabang.kota')
+    )
+  FROM m_setting_app
+  WHERE id IN ('ebtos.cabang.alamat')
+  ) alamat,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.cabang.kota'
+  ) kota,
+  (SELECT description FROM m_setting_app WHERE id='ttd_ebtos_mgr_keu'
+  ) description,
+  (SELECT value_string FROM m_setting_app WHERE id='ttd_ebtos_mgr_keu'
+  ) nama_ttd,
+  (SELECT value_nip FROM m_setting_app WHERE id='ttd_ebtos_mgr_keu'
+  ) nip_ttd,
+  z.language,
+  z.country,
+  z.default_fraction_digits,
+  c.name,
+  (SELECT cus.name FROM m_customer cus WHERE cus.cust_code = r.cust_code
+  ) AS debit,
+  (SELECT cus.npwp FROM m_customer cus WHERE cus.cust_code = r.cust_code
+  ) AS npwp,
+  (SELECT cus.address FROM m_customer cus WHERE cus.cust_code = r.cust_code
+  ) AS address,
+  (SELECT value_string FROM m_setting_app WHERE id = 'ebtos.company.npwp'
+  ) npwp_company,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id = 'ebtos.company.ppkp'
+  ) ppkp_company,
+  changedate(TO_CHAR(
+  (SELECT value_date FROM m_setting_app WHERE id = 'ebtos.company.ppkp_tmt'
+  ), 'dd/mm/yyyy')) AS ppkp_tmt_company,
+  r.no_ppkb,
+  mv.name AS vessel,
+  pp.voy_in,
+  pp.voy_out,
+  TO_CHAR(i.modified_date, 'dd/MM/yyyy')   AS tanggal,
+  changedate(TO_CHAR(now(), 'dd/mm/yyyy')) AS tanggal2,
+  TO_CHAR(now(), 'yyyymm.')                AS tanggal3,
+  map.description                          AS nmttd,
+  map.value_string                         AS nipttd,
+  TO_CHAR(i.modified_date,'dd/MM/yyyy') modified_date,
+  i.modified_by,
+  i.created_date,
+  i.payment_status,
+  i.payment_tool,
+  r.pengurus_do,
+  i.no_faktur_pajak,
+  (SELECT COUNT(ds.job_slip)
+  FROM reefer_discharge_service ds,
+    perhitungan_plugging pp,
+    perhitungan_monitoring pm,
+    m_currency c
+  WHERE pp.curr_code=c.curr_code
+  AND pp.cont_no    = ds.cont_no
+  AND pm.cont_no    = ds.cont_no
+  AND pp.no_reg     = ds.no_reg
+  AND pm.no_reg     = ds.no_reg
+  AND ds.no_reg     = $P{no_reg}
+  ) AS totBox,
+  r.no_reg,
+  RPAD(s.service_name,24, ' SERVICE') AS service_name,
+  i.payment_type,
+  i.no_invoice,
+  i.jumlah_tagihan,
+  i.materai,
+  i.ppn,
+  i.total_tagihan,
+  tb1.totalPlug,
+  tb2.totalMon,
+  z.symbol,
+  seq_print(r.no_reg) invstatus
+FROM m_currency z,
+  m_service s,
+  m_customer c,
+  registration r,
+  planning_vessel pv,
+  preservice_vessel pp,
+  m_vessel mv,
+  invoice i,
+  m_setting_app map,
+  (SELECT NVLN(SUM(total_charge)) AS totalPlug
+  FROM perhitungan_plugging
+  WHERE no_reg = $P{no_reg}
+  ) tb1,
+  (SELECT NVLN(SUM(total_charge)) AS totalMon
+  FROM perhitungan_monitoring
+  WHERE no_reg = $P{no_reg}
+  ) tb2
+WHERE r.service_code = s.service_code
+AND i.no_reg         = r.no_reg
+AND r.no_ppkb        = pv.no_ppkb
+AND pv.booking_code  = pp.booking_code
+AND pp.vessel_code   = mv.vessel_code
+AND pp.cust_code     = c.cust_code
+AND r.no_reg         = $P{no_reg}
+AND i.curr_code      =z.curr_code
+AND map.id           ='ebtos.ttd.invoice']]>
+	</queryString>
+	<field name="alamat" class="java.lang.String"/>
+	<field name="kota" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="nama_ttd" class="java.lang.String"/>
+	<field name="nip_ttd" class="java.lang.String"/>
+	<field name="language" class="java.lang.String"/>
+	<field name="country" class="java.lang.String"/>
+	<field name="default_fraction_digits" class="java.lang.Integer"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="debit" class="java.lang.String"/>
+	<field name="npwp" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="npwp_company" class="java.lang.String"/>
+	<field name="ppkp_company" class="java.lang.String"/>
+	<field name="ppkp_tmt_company" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="vessel" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="tanggal" class="java.lang.String"/>
+	<field name="tanggal2" class="java.lang.String"/>
+	<field name="tanggal3" class="java.lang.String"/>
+	<field name="nmttd" class="java.lang.String"/>
+	<field name="nipttd" class="java.lang.String"/>
+	<field name="modified_date" class="java.lang.String"/>
+	<field name="modified_by" class="java.lang.String"/>
+	<field name="created_date" class="java.sql.Timestamp"/>
+	<field name="payment_status" class="java.lang.String"/>
+	<field name="payment_tool" class="java.lang.String"/>
+	<field name="pengurus_do" class="java.lang.String"/>
+	<field name="no_faktur_pajak" class="java.lang.String"/>
+	<field name="totbox" class="java.lang.Long"/>
+	<field name="no_reg" class="java.lang.String"/>
+	<field name="service_name" class="java.lang.String"/>
+	<field name="payment_type" class="java.lang.String"/>
+	<field name="no_invoice" class="java.lang.String"/>
+	<field name="jumlah_tagihan" class="java.math.BigDecimal"/>
+	<field name="materai" class="java.math.BigDecimal"/>
+	<field name="ppn" class="java.math.BigDecimal"/>
+	<field name="total_tagihan" class="java.math.BigDecimal"/>
+	<field name="totalplug" class="java.math.BigDecimal"/>
+	<field name="totalmon" class="java.math.BigDecimal"/>
+	<field name="symbol" class="java.lang.String"/>
+	<field name="invstatus" class="java.lang.String"/>
+	<variable name="curr_code" class="java.lang.String">
+		<variableExpression><![CDATA[com.qtasnim.el.QTasnim.getCurrencySymbol($F{language}, $F{country})]]></variableExpression>
+	</variable>
+	<variable name="tanggal_cetak" class="java.util.Date" resetType="None">
+		<variableExpression><![CDATA[new java.util.Date()]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="72" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="428" y="46" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_faktur_pajak}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="102" y="46" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ppkp_company}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="102" y="34" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{npwp_company}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="102" y="58" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ppkp_tmt_company}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="38" y="21" width="227" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{alamat}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="21" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="472" y="5" width="119" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["( " +$F{invstatus}+ " )"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="107" splitType="Stretch">
+			<staticText>
+				<reportElement x="134" y="33" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="144" y="33" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{debit}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="435" y="49" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="59" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[NPWP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="33" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Debitur]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="144" y="46" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="54" y="46" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="20" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Voy. / Nama Kapal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="46" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="49" width="80" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No Sistem]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="20" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="134" y="59" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="445" y="11" width="146" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{service_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="144" y="59" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{npwp}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="144" y="20" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["(VOY. " + $F{voy_in} + "/" + $F{voy_out} + ") " + $F{vessel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="445" y="49" width="146" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_reg}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="134" y="8" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="8" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PPKB / Pelayaran]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="11" width="80" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Kegiatan / Jasa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="435" y="11" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="23" width="80" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Jumlah Box]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="435" y="23" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="435" y="62" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="62" width="80" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No Nota / Tgl]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="435" y="74" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="74" width="80" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[User ID / Cetak]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="445" y="23" width="16" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{totbox}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="144" y="8" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_ppkb} + " / " + $F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="445" y="62" width="146" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_invoice} + " (" + $F{tanggal} + ")"]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="445" y="74" width="148" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{username} + " ,  " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($V{tanggal_cetak})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="460" y="23" width="131" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="378" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[kota]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="569" splitType="Stretch">
+			<staticText>
+				<reportElement x="226" y="39" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<line>
+				<reportElement x="227" y="54" width="111" height="1"/>
+			</line>
+			<textField pattern="#,##0">
+				<reportElement x="248" y="67" width="88" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{ppn},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="183" y="98" width="43" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="225" y="67" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="225" y="82" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement x="249" y="39" width="87" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{totalmon},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="78" y="24" width="148" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PLUGGING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="226" y="24" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="225" y="54" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="39" width="148" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[MONITORING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="96" y="54" width="130" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[SUB TOTAL PERHITUNGAN JASA]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement x="248" y="54" width="88" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{jumlah_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="249" y="98" width="87" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{total_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="77" y="83" width="90" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[MATERAI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="226" y="98" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="77" y="69" width="20" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PPN]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement x="249" y="24" width="87" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{totalplug},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="232" y="24" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="232" y="39" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="231" y="54" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="231" y="67" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="231" y="82" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="232" y="98" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="65" y="14" width="120" height="10"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PERHITUNGAN JASA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="14" width="10" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[I.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="24" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="39" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="68" y="69" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[3.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="68" y="83" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[4.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="116" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[II.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="64" y="116" width="123" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH UPER / UANG PANJAR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="64" y="132" width="120" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PIUTANG (ii - i)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="132" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[III.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="64" y="150" width="120" height="15"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[SISA UPER / UTIP]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="150" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[IV.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="232" y="116" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="226" y="116" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="226" y="132" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="232" y="132" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="226" y="150" width="6" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="232" y="150" width="17" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="97" y="168" width="268" height="35"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["("+$P{terbilang}+".)"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="92" y="168" width="7" height="15"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="54" y="168" width="37" height="15"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Terbilang]]></text>
+			</staticText>
+			<line>
+				<reportElement x="226" y="97" width="112" height="1"/>
+			</line>
+			<line>
+				<reportElement x="226" y="131" width="112" height="1"/>
+			</line>
+			<line>
+				<reportElement x="226" y="149" width="112" height="1"/>
+			</line>
+			<line>
+				<reportElement x="226" y="116" width="112" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="132" y="454" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="43" y="493" width="89" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No. Seri Faktur Pajak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="132" y="441" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="467" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Debitur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="441" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PPKB / Pelayaran]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="132" y="480" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="132" y="467" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="136" y="467" width="165" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{debit}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="132" y="493" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="480" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="454" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Voy. / Nama Kapal]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="136" y="480" width="165" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="43" y="545" width="103" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH NOTA]]></text>
+			</staticText>
+			<line>
+				<reportElement x="149" y="546" width="135" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="149" y="533" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="158" y="533" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="173" y="533" width="109" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{materai},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="158" y="546" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="72" y="520" width="74" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PPN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="149" y="507" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="158" y="520" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="173" y="520" width="109" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{ppn},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="173" y="507" width="109" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{jumlah_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="72" y="532" width="74" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[MATERAI]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="158" y="507" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="149" y="546" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="43" y="507" width="103" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PERHITUNGAN JASA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="149" y="520" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement x="173" y="546" width="109" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{total_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="248" y="82" width="88" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{materai},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="249" y="132" width="87" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{total_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="136" y="454" width="165" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["(VOY. " + $F{voy_in} + "/" + $F{voy_out} + ") " + $F{vessel}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="136" y="441" width="165" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_ppkb} + " / " + $F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="324" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nama_ttd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="426" y="242" width="126" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{kota}.substring(0, 1)+$F{kota}.substring(1, $F{kota}.length()).toLowerCase()+", " + new java.text.SimpleDateFormat("dd MMMMM yyyy", com.qtasnim.text.TextFormatter.createLocal("id", "ID")).format($F{created_date})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="270" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="433" y="258" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[AN. GENERAL MANAGER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="443" y="448" width="8" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="307" y="423" width="100" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["(" + $F{modified_date} + ")"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="241" y="423" width="65" height="15"/>
+				<box rightPadding="2">
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_invoice}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="443" y="437" width="8" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="381" y="437" width="62" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[User ID / Cetak]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="425" y="461" width="124" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{kota}.substring(0, 1)+$F{kota}.substring(1, $F{kota}.length()).toLowerCase()+", " + new java.text.SimpleDateFormat("dd MMMMM yyyy", com.qtasnim.text.TextFormatter.createLocal("id", "ID")).format($F{created_date})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="451" y="448" width="141" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_reg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="497" y="410" width="97" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_invoice}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="381" y="448" width="62" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No Sistem ]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="451" y="437" width="141" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{username} + " ,  " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($V{tanggal_cetak})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="136" y="493" width="165" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_faktur_pajak}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="289" y="534" width="136" height="13"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{debit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="249" y="150" width="87" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},java.math.BigDecimal.ZERO,false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="249" y="117" width="87" height="15" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},java.math.BigDecimal.ZERO,false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="31" y="428" width="227" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{alamat}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="334" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["NIP " + $F{nip_ttd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="435" y="514" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nama_ttd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="435" y="524" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["NIP " + $F{nip_ttd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="433" y="471" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

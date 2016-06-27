@@ -1,0 +1,3470 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report10_subreportJumlahBulanLaporan" language="groovy" pageWidth="894" pageHeight="609" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="854" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="459"/>
+	<property name="ireport.y" value="30"/>
+	<parameter name="tahun" class="java.lang.Integer"/>
+	<parameter name="bulan" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[SELECT COUNT(p.no_ppkb) cnt,
+  mc.name,
+  --hitung dan cari cont 20 full
+  SUM(
+  (SELECT COUNT(scd.cont_no) AS cont20fulldisch
+  FROM service_cont_discharge scd,
+    m_container_type me
+  WHERE scd.no_ppkb   = p.no_ppkb
+  AND scd.cont_type   =me.cont_type
+  AND ( me.iso_code   = '2200'
+  OR me.iso_code      = '2000'
+  OR me.iso_code      = '2010'
+  OR me.iso_code      = '2040'
+  OR me.iso_code      = '2070'
+  OR me.iso_code      = '2210'
+  OR me.iso_code      = '2213'
+  OR me.iso_code      = '2250'
+  OR me.iso_code      = '2251'
+  OR me.iso_code      = '2261'
+  OR me.iso_code      = '2263'
+  OR me.iso_code      = '2270'
+  OR me.iso_code      = '2275'
+  OR me.iso_code      = '2280'
+  OR me.iso_code      = '2500'
+  OR me.iso_code      = '2532'
+  OR me.iso_code      = '2650'
+  OR me.iso_code      = '2670'
+  OR me.iso_code      = '2960'
+  OR me.iso_code      = '2262'
+  OR me.iso_code      = '2265')
+  AND scd.cont_size   =20
+  AND scd.cont_status ='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont20fulldisch,
+  --hitung dan cari cont 40 full
+  SUM(
+  (SELECT COUNT(scd2.cont_no) AS cont40fulldisch
+  FROM service_cont_discharge scd2,
+    m_container_type me2
+  WHERE scd2.no_ppkb  = p.no_ppkb
+  AND scd2.cont_type  =me2.cont_type
+  AND ( me2.iso_code  = '4300'
+  OR me2.iso_code     = '4310'
+  OR me2.iso_code     = '4313'
+  OR me2.iso_code     = '4350'
+  OR me2.iso_code     = '4351'
+  OR me2.iso_code     = '4361'
+  OR me2.iso_code     = '4362'
+  OR me2.iso_code     = '4363'
+  OR me2.iso_code     = '4365'
+  OR me2.iso_code     = '4380'
+  OR me2.iso_code     = '4500'
+  OR me2.iso_code     = '4532'
+  OR me2.iso_code     = '4650'
+  OR me2.iso_code     = '4960')
+  AND scd2.cont_size  =40
+  AND scd2.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont40fulldisch,
+  --hitung dan cari cont 20 mty
+  SUM(
+  (SELECT COUNT(scd3.cont_no) AS cont20mtydisch
+  FROM service_cont_discharge scd3,
+    m_container_type me3
+  WHERE scd3.no_ppkb  = p.no_ppkb
+  AND scd3.cont_type  =me3.cont_type
+  AND ( me3.iso_code  = '2200'
+  OR me3.iso_code     = '2000'
+  OR me3.iso_code     = '2010'
+  OR me3.iso_code     = '2040'
+  OR me3.iso_code     = '2070'
+  OR me3.iso_code     = '2210'
+  OR me3.iso_code     = '2213'
+  OR me3.iso_code     = '2250'
+  OR me3.iso_code     = '2251'
+  OR me3.iso_code     = '2261'
+  OR me3.iso_code     = '2263'
+  OR me3.iso_code     = '2270'
+  OR me3.iso_code     = '2275'
+  OR me3.iso_code     = '2280'
+  OR me3.iso_code     = '2500'
+  OR me3.iso_code     = '2532'
+  OR me3.iso_code     = '2650'
+  OR me3.iso_code     = '2670'
+  OR me3.iso_code     = '2960'
+  OR me3.iso_code     = '2262'
+  OR me3.iso_code     = '2265' )
+  AND scd3.cont_size  =20
+  AND scd3.cont_status='MTY'
+  AND p.tipe_pelayaran='d'
+  )) AS cont20mtydisch,
+  --hitung dan cari cont 40 mty
+  SUM(
+  (SELECT COUNT(scd4.cont_no) AS cont40mtydisch
+  FROM service_cont_discharge scd4,
+    m_container_type me4
+  WHERE scd4.no_ppkb  = p.no_ppkb
+  AND scd4.cont_type  =me4.cont_type
+  AND ( me4.iso_code  = '4300'
+  OR me4.iso_code     = '4310'
+  OR me4.iso_code     = '4313'
+  OR me4.iso_code     = '4350'
+  OR me4.iso_code     = '4351'
+  OR me4.iso_code     = '4361'
+  OR me4.iso_code     = '4362'
+  OR me4.iso_code     = '4363'
+  OR me4.iso_code     = '4365'
+  OR me4.iso_code     = '4380'
+  OR me4.iso_code     = '4500'
+  OR me4.iso_code     = '4532'
+  OR me4.iso_code     = '4650'
+  OR me4.iso_code     = '4960' )
+  AND scd4.cont_size  =40
+  AND scd4.cont_status='MTY'
+  AND p.tipe_pelayaran='d'
+  )) AS cont40mtydisch,
+  --hitung dan cari 20 refeer
+  SUM(
+  (SELECT COUNT(scd7.cont_no) AS cont20fullrefeerdisch
+  FROM service_cont_discharge scd7,
+    m_container_type me7
+  WHERE scd7.no_ppkb  = p.no_ppkb
+  AND scd7.cont_type  =me7.cont_type
+  AND (me7.iso_code   = '2232'
+  OR me7.iso_code     = '2242'
+  OR me7.iso_code     = '2230')
+  AND scd7.cont_size  =20
+  AND scd7.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont20fullrefeerdisch,
+  --hitung dan cari 40 refeer
+  SUM(
+  (SELECT COUNT(scd8.cont_no) AS cont40fullrefeerdisch
+  FROM service_cont_discharge scd8,
+    m_container_type me8
+  WHERE scd8.no_ppkb  = p.no_ppkb
+  AND scd8.cont_type  =me8.cont_type
+  AND (me8.iso_code   = '4330')
+  AND scd8.cont_size  =40
+  AND scd8.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont40fullrefeerdisch,
+  ----------------------end hitung dan cari total container-------------------
+  -----------------------hohohhohoooho----------------------
+  ------------------start cari dan hitung gorss clas per ppkb (subquery hanya bisa return 1 field)-----------------
+  --hitung gros class 20 full
+  SUM(
+  (SELECT NVLN(SUM(scd9.cont_gross)) AS gross20fulldisch
+  FROM service_cont_discharge scd9,
+    m_container_type me9
+  WHERE scd9.no_ppkb  = p.no_ppkb
+  AND scd9.cont_type  =me9.cont_type
+  AND ( me9.iso_code  = '2200'
+  OR me9.iso_code     = '2000'
+  OR me9.iso_code     = '2010'
+  OR me9.iso_code     = '2040'
+  OR me9.iso_code     = '2070'
+  OR me9.iso_code     = '2210'
+  OR me9.iso_code     = '2213'
+  OR me9.iso_code     = '2250'
+  OR me9.iso_code     = '2251'
+  OR me9.iso_code     = '2261'
+  OR me9.iso_code     = '2263'
+  OR me9.iso_code     = '2270'
+  OR me9.iso_code     = '2275'
+  OR me9.iso_code     = '2280'
+  OR me9.iso_code     = '2500'
+  OR me9.iso_code     = '2532'
+  OR me9.iso_code     = '2650'
+  OR me9.iso_code     = '2670'
+  OR me9.iso_code     = '2960'
+  OR me9.iso_code     = '2262'
+  OR me9.iso_code     = '2265')
+  AND scd9.cont_size  =20
+  AND scd9.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS gross20fulldisch,
+  --hitung gross clas 40 full
+  SUM(
+  (SELECT NVLN(SUM(scd10.cont_gross)) AS gross40fulldisch
+  FROM service_cont_discharge scd10,
+    m_container_type me10
+  WHERE scd10.no_ppkb  = p.no_ppkb
+  AND scd10.cont_type  =me10.cont_type
+  AND ( me10.iso_code  = '4300'
+  OR me10.iso_code     = '4310'
+  OR me10.iso_code     = '4313'
+  OR me10.iso_code     = '4350'
+  OR me10.iso_code     = '4351'
+  OR me10.iso_code     = '4361'
+  OR me10.iso_code     = '4362'
+  OR me10.iso_code     = '4363'
+  OR me10.iso_code     = '4365'
+  OR me10.iso_code     = '4380'
+  OR me10.iso_code     = '4500'
+  OR me10.iso_code     = '4532'
+  OR me10.iso_code     = '4650'
+  OR me10.iso_code     = '4960')
+  AND scd10.cont_size  =40
+  AND scd10.cont_status='FCL'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross40fulldisch,
+  --hitung gross clas 20 mty
+  SUM(
+  (SELECT NVLN(SUM(scd11.cont_gross)) AS gross20mtydisch
+  FROM service_cont_discharge scd11,
+    m_container_type me11
+  WHERE scd11.no_ppkb  = p.no_ppkb
+  AND scd11.cont_type  =me11.cont_type
+  AND ( me11.iso_code  = '2200'
+  OR me11.iso_code     = '2000'
+  OR me11.iso_code     = '2010'
+  OR me11.iso_code     = '2040'
+  OR me11.iso_code     = '2070'
+  OR me11.iso_code     = '2210'
+  OR me11.iso_code     = '2213'
+  OR me11.iso_code     = '2250'
+  OR me11.iso_code     = '2251'
+  OR me11.iso_code     = '2261'
+  OR me11.iso_code     = '2263'
+  OR me11.iso_code     = '2270'
+  OR me11.iso_code     = '2275'
+  OR me11.iso_code     = '2280'
+  OR me11.iso_code     = '2500'
+  OR me11.iso_code     = '2532'
+  OR me11.iso_code     = '2650'
+  OR me11.iso_code     = '2670'
+  OR me11.iso_code     = '2960'
+  OR me11.iso_code     = '2262'
+  OR me11.iso_code     = '2265' )
+  AND scd11.cont_size  =20
+  AND scd11.cont_status='MTY'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross20mtydisch,
+  --hitung gross clas 40 mty
+  SUM(
+  (SELECT NVLN(SUM(scd12.cont_gross)) AS gross40mtydisch
+  FROM service_cont_discharge scd12,
+    m_container_type me12
+  WHERE scd12.no_ppkb  = p.no_ppkb
+  AND scd12.cont_type  =me12.cont_type
+  AND ( me12.iso_code  = '4300'
+  OR me12.iso_code     = '4310'
+  OR me12.iso_code     = '4313'
+  OR me12.iso_code     = '4350'
+  OR me12.iso_code     = '4351'
+  OR me12.iso_code     = '4361'
+  OR me12.iso_code     = '4362'
+  OR me12.iso_code     = '4363'
+  OR me12.iso_code     = '4365'
+  OR me12.iso_code     = '4380'
+  OR me12.iso_code     = '4500'
+  OR me12.iso_code     = '4532'
+  OR me12.iso_code     = '4650'
+  OR me12.iso_code     = '4960' )
+  AND scd12.cont_size  =40
+  AND scd12.cont_status='MTY'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross40mtydisch,
+  --hitung dan cari gross class 20 refeer
+  SUM(
+  (SELECT NVLN(SUM(scd15.cont_gross)) AS gross20fullrefeerdisch
+  FROM service_cont_discharge scd15,
+    m_container_type me15
+  WHERE scd15.no_ppkb  = p.no_ppkb
+  AND scd15.cont_type  =me15.cont_type
+  AND (me15.iso_code   = '2232'
+  OR me15.iso_code     = '2242'
+  OR me15.iso_code     = '2230')
+  AND scd15.cont_size  =20
+  AND scd15.cont_status='FCL'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross20fullrefeerdisch,
+  --hitung dan cari gross class 40 refeer
+  SUM(
+  (SELECT NVLN(SUM(scd16.cont_gross)) AS gross40fullrefeerdisch
+  FROM service_cont_discharge scd16,
+    m_container_type me16
+  WHERE scd16.no_ppkb  = p.no_ppkb
+  AND scd16.cont_type  =me16.cont_type
+  AND (me16.iso_code   = '4330')
+  AND scd16.cont_size  =40
+  AND scd16.cont_status='FCL'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross40fullrefeerdisch,
+  -----------------------------------START SERVICE CONT LOAD GAN---------------------------------------
+  --hitung dan cari cont 20 full
+  SUM(
+  (SELECT COUNT(scl.cont_no) AS cont20fullload
+  FROM service_cont_load scl,
+    m_container_type me
+  WHERE scl.no_ppkb   = p.no_ppkb
+  AND scl.cont_type   =me.cont_type
+  AND ( me.iso_code   = '2200'
+  OR me.iso_code      = '2000'
+  OR me.iso_code      = '2010'
+  OR me.iso_code      = '2040'
+  OR me.iso_code      = '2070'
+  OR me.iso_code      = '2210'
+  OR me.iso_code      = '2213'
+  OR me.iso_code      = '2250'
+  OR me.iso_code      = '2251'
+  OR me.iso_code      = '2261'
+  OR me.iso_code      = '2263'
+  OR me.iso_code      = '2270'
+  OR me.iso_code      = '2275'
+  OR me.iso_code      = '2280'
+  OR me.iso_code      = '2500'
+  OR me.iso_code      = '2532'
+  OR me.iso_code      = '2650'
+  OR me.iso_code      = '2670'
+  OR me.iso_code      = '2960'
+  OR me.iso_code      = '2262'
+  OR me.iso_code      = '2265')
+  AND scl.cont_size   =20
+  AND scl.cont_status ='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont20fullload ,
+  --hitung dan cari cont 40 full
+  SUM(
+  (SELECT COUNT(scl2.cont_no) AS cont40fullload
+  FROM service_cont_load scl2,
+    m_container_type me2
+  WHERE scl2.no_ppkb  = p.no_ppkb
+  AND scl2.cont_type  =me2.cont_type
+  AND ( me2.iso_code  = '4300'
+  OR me2.iso_code     = '4310'
+  OR me2.iso_code     = '4313'
+  OR me2.iso_code     = '4350'
+  OR me2.iso_code     = '4351'
+  OR me2.iso_code     = '4361'
+  OR me2.iso_code     = '4362'
+  OR me2.iso_code     = '4363'
+  OR me2.iso_code     = '4365'
+  OR me2.iso_code     = '4380'
+  OR me2.iso_code     = '4500'
+  OR me2.iso_code     = '4532'
+  OR me2.iso_code     = '4650'
+  OR me2.iso_code     = '4960')
+  AND scl2.cont_size  =40
+  AND scl2.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont40fullload,
+  --hitung dan cari cont 20 mty
+  SUM(
+  (SELECT COUNT(scl3.cont_no) AS cont20mtyload
+  FROM service_cont_load scl3,
+    m_container_type me3
+  WHERE scl3.no_ppkb  = p.no_ppkb
+  AND scl3.cont_type  =me3.cont_type
+  AND ( me3.iso_code  = '2200'
+  OR me3.iso_code     = '2000'
+  OR me3.iso_code     = '2010'
+  OR me3.iso_code     = '2040'
+  OR me3.iso_code     = '2070'
+  OR me3.iso_code     = '2210'
+  OR me3.iso_code     = '2213'
+  OR me3.iso_code     = '2250'
+  OR me3.iso_code     = '2251'
+  OR me3.iso_code     = '2261'
+  OR me3.iso_code     = '2263'
+  OR me3.iso_code     = '2270'
+  OR me3.iso_code     = '2275'
+  OR me3.iso_code     = '2280'
+  OR me3.iso_code     = '2500'
+  OR me3.iso_code     = '2532'
+  OR me3.iso_code     = '2650'
+  OR me3.iso_code     = '2670'
+  OR me3.iso_code     = '2960'
+  OR me3.iso_code     = '2262'
+  OR me3.iso_code     = '2265' )
+  AND scl3.cont_size  =20
+  AND scl3.cont_status='MTY'
+  AND p.tipe_pelayaran='d'
+  )) AS cont20mtyload,
+  --hitung dan cari cont 40 mty
+  SUM(
+  (SELECT COUNT(scl4.cont_no) AS cont40mtyload
+  FROM service_cont_load scl4,
+    m_container_type me4
+  WHERE scl4.no_ppkb  = p.no_ppkb
+  AND scl4.cont_type  =me4.cont_type
+  AND ( me4.iso_code  = '4300'
+  OR me4.iso_code     = '4310'
+  OR me4.iso_code     = '4313'
+  OR me4.iso_code     = '4350'
+  OR me4.iso_code     = '4351'
+  OR me4.iso_code     = '4361'
+  OR me4.iso_code     = '4362'
+  OR me4.iso_code     = '4363'
+  OR me4.iso_code     = '4365'
+  OR me4.iso_code     = '4380'
+  OR me4.iso_code     = '4500'
+  OR me4.iso_code     = '4532'
+  OR me4.iso_code     = '4650'
+  OR me4.iso_code     = '4960' )
+  AND scl4.cont_size  =40
+  AND scl4.cont_status='MTY'
+  AND p.tipe_pelayaran='d'
+  )) AS cont40mtyload,
+  --hitung dan cari 20 refeer
+  SUM(
+  (SELECT COUNT(scl7.cont_no) AS cont20fullrefeerload
+  FROM service_cont_load scl7,
+    m_container_type me7
+  WHERE scl7.no_ppkb  = p.no_ppkb
+  AND scl7.cont_type  =me7.cont_type
+  AND (me7.iso_code   = '2232'
+  OR me7.iso_code     = '2242'
+  OR me7.iso_code     = '2230')
+  AND scl7.cont_size  =20
+  AND scl7.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont20fullrefeerload,
+  --hitung dan cari 40 refeer
+  SUM(
+  (SELECT COUNT(scl8.cont_no) AS cont40fullrefeerload
+  FROM service_cont_load scl8,
+    m_container_type me8
+  WHERE scl8.no_ppkb  = p.no_ppkb
+  AND scl8.cont_type  =me8.cont_type
+  AND (me8.iso_code   = '4330')
+  AND scl8.cont_size  =40
+  AND scl8.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS cont40fullrefeerload,
+  ----------------------end hitung dan cari total container-------------------
+  -----------------------hohohhohoooho----------------------
+  ------------------start cari dan hitung gorss clas per ppkb (subquery hanya bisa return 1 field)-----------------
+  --hitung gros class 20 full
+  SUM(
+  (SELECT NVLN(SUM(scl9.cont_gross)) AS gross20fullload
+  FROM service_cont_load scl9,
+    m_container_type me9
+  WHERE scl9.no_ppkb  = p.no_ppkb
+  AND scl9.cont_type  =me9.cont_type
+  AND ( me9.iso_code  = '2200'
+  OR me9.iso_code     = '2000'
+  OR me9.iso_code     = '2010'
+  OR me9.iso_code     = '2040'
+  OR me9.iso_code     = '2070'
+  OR me9.iso_code     = '2210'
+  OR me9.iso_code     = '2213'
+  OR me9.iso_code     = '2250'
+  OR me9.iso_code     = '2251'
+  OR me9.iso_code     = '2261'
+  OR me9.iso_code     = '2263'
+  OR me9.iso_code     = '2270'
+  OR me9.iso_code     = '2275'
+  OR me9.iso_code     = '2280'
+  OR me9.iso_code     = '2500'
+  OR me9.iso_code     = '2532'
+  OR me9.iso_code     = '2650'
+  OR me9.iso_code     = '2670'
+  OR me9.iso_code     = '2960'
+  OR me9.iso_code     = '2262'
+  OR me9.iso_code     = '2265')
+  AND scl9.cont_size  =20
+  AND scl9.cont_status='FCL'
+  AND p.tipe_pelayaran='d'
+  )) AS gross20fullload,
+  --hitung gross clas 40 full
+  SUM(
+  (SELECT NVLN(SUM(scl10.cont_gross)) AS gross40fullload
+  FROM service_cont_load scl10,
+    m_container_type me10
+  WHERE scl10.no_ppkb  = p.no_ppkb
+  AND scl10.cont_type  =me10.cont_type
+  AND ( me10.iso_code  = '4300'
+  OR me10.iso_code     = '4310'
+  OR me10.iso_code     = '4313'
+  OR me10.iso_code     = '4350'
+  OR me10.iso_code     = '4351'
+  OR me10.iso_code     = '4361'
+  OR me10.iso_code     = '4362'
+  OR me10.iso_code     = '4363'
+  OR me10.iso_code     = '4365'
+  OR me10.iso_code     = '4380'
+  OR me10.iso_code     = '4500'
+  OR me10.iso_code     = '4532'
+  OR me10.iso_code     = '4650'
+  OR me10.iso_code     = '4960')
+  AND scl10.cont_size  =40
+  AND scl10.cont_status='FCL'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross40fullload,
+  --hitung gross clas 20 mty
+  SUM(
+  (SELECT NVLN(SUM(scl11.cont_gross)) AS gross20mtyload
+  FROM service_cont_load scl11,
+    m_container_type me11
+  WHERE scl11.no_ppkb  = p.no_ppkb
+  AND scl11.cont_type  =me11.cont_type
+  AND ( me11.iso_code  = '2200'
+  OR me11.iso_code     = '2000'
+  OR me11.iso_code     = '2010'
+  OR me11.iso_code     = '2040'
+  OR me11.iso_code     = '2070'
+  OR me11.iso_code     = '2210'
+  OR me11.iso_code     = '2213'
+  OR me11.iso_code     = '2250'
+  OR me11.iso_code     = '2251'
+  OR me11.iso_code     = '2261'
+  OR me11.iso_code     = '2263'
+  OR me11.iso_code     = '2270'
+  OR me11.iso_code     = '2275'
+  OR me11.iso_code     = '2280'
+  OR me11.iso_code     = '2500'
+  OR me11.iso_code     = '2532'
+  OR me11.iso_code     = '2650'
+  OR me11.iso_code     = '2670'
+  OR me11.iso_code     = '2960'
+  OR me11.iso_code     = '2262'
+  OR me11.iso_code     = '2265' )
+  AND scl11.cont_size  =20
+  AND scl11.cont_status='MTY'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross20mtyload,
+  --hitung gross clas 40 mty
+  SUM(
+  (SELECT NVLN(SUM(scl12.cont_gross)) AS gross40mtyload
+  FROM service_cont_load scl12,
+    m_container_type me12
+  WHERE scl12.no_ppkb  = p.no_ppkb
+  AND scl12.cont_type  =me12.cont_type
+  AND ( me12.iso_code  = '4300'
+  OR me12.iso_code     = '4310'
+  OR me12.iso_code     = '4313'
+  OR me12.iso_code     = '4350'
+  OR me12.iso_code     = '4351'
+  OR me12.iso_code     = '4361'
+  OR me12.iso_code     = '4362'
+  OR me12.iso_code     = '4363'
+  OR me12.iso_code     = '4365'
+  OR me12.iso_code     = '4380'
+  OR me12.iso_code     = '4500'
+  OR me12.iso_code     = '4532'
+  OR me12.iso_code     = '4650'
+  OR me12.iso_code     = '4960' )
+  AND scl12.cont_size  =40
+  AND scl12.cont_status='MTY'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross40mtyload,
+  --hitung dan cari gross class 20 refeer
+  SUM(
+  (SELECT NVLN(SUM(scl15.cont_gross)) AS gross20fullrefeerload
+  FROM service_cont_load scl15,
+    m_container_type me15
+  WHERE scl15.no_ppkb  = p.no_ppkb
+  AND scl15.cont_type  =me15.cont_type
+  AND (me15.iso_code   = '2232'
+  OR me15.iso_code     = '2242'
+  OR me15.iso_code     = '2230')
+  AND scl15.cont_size  =20
+  AND scl15.cont_status='FCL'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross20fullrefeerload,
+  --hitung dan cari gross class 40 refeer
+  SUM(
+  (SELECT NVLN(SUM(scl16.cont_gross)) AS gross40fullrefeerload
+  FROM service_cont_load scl16,
+    m_container_type me16
+  WHERE scl16.no_ppkb  = p.no_ppkb
+  AND scl16.cont_type  =me16.cont_type
+  AND (me16.iso_code   = '4330')
+  AND scl16.cont_size  =40
+  AND scl16.cont_status='FCL'
+  AND p.tipe_pelayaran ='d'
+  )) AS gross40fullrefeerload,
+  -- START MULAI TIPE PELAYARAN INTERNATIONAL
+  --hitung dan cari cont 20 full
+  SUM(
+  (SELECT COUNT(scd.cont_no) AS cont20fulldisch
+  FROM service_cont_discharge scd,
+    m_container_type me
+  WHERE scd.no_ppkb   = p.no_ppkb
+  AND scd.cont_type   =me.cont_type
+  AND ( me.iso_code   = '2200'
+  OR me.iso_code      = '2000'
+  OR me.iso_code      = '2010'
+  OR me.iso_code      = '2040'
+  OR me.iso_code      = '2070'
+  OR me.iso_code      = '2210'
+  OR me.iso_code      = '2213'
+  OR me.iso_code      = '2250'
+  OR me.iso_code      = '2251'
+  OR me.iso_code      = '2261'
+  OR me.iso_code      = '2263'
+  OR me.iso_code      = '2270'
+  OR me.iso_code      = '2275'
+  OR me.iso_code      = '2280'
+  OR me.iso_code      = '2500'
+  OR me.iso_code      = '2532'
+  OR me.iso_code      = '2650'
+  OR me.iso_code      = '2670'
+  OR me.iso_code      = '2960'
+  OR me.iso_code      = '2262'
+  OR me.iso_code      = '2265')
+  AND scd.cont_size   =20
+  AND scd.cont_status ='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont20fulldischi,
+  --hitung dan cari cont 40 full
+  SUM(
+  (SELECT COUNT(scd2.cont_no) AS cont40fulldisch
+  FROM service_cont_discharge scd2,
+    m_container_type me2
+  WHERE scd2.no_ppkb  = p.no_ppkb
+  AND scd2.cont_type  =me2.cont_type
+  AND ( me2.iso_code  = '4300'
+  OR me2.iso_code     = '4310'
+  OR me2.iso_code     = '4313'
+  OR me2.iso_code     = '4350'
+  OR me2.iso_code     = '4351'
+  OR me2.iso_code     = '4361'
+  OR me2.iso_code     = '4362'
+  OR me2.iso_code     = '4363'
+  OR me2.iso_code     = '4365'
+  OR me2.iso_code     = '4380'
+  OR me2.iso_code     = '4500'
+  OR me2.iso_code     = '4532'
+  OR me2.iso_code     = '4650'
+  OR me2.iso_code     = '4960')
+  AND scd2.cont_size  =40
+  AND scd2.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont40fulldischi,
+  --hitung dan cari cont 20 mty
+  SUM(
+  (SELECT COUNT(scd3.cont_no) AS cont20mtydisch
+  FROM service_cont_discharge scd3,
+    m_container_type me3
+  WHERE scd3.no_ppkb  = p.no_ppkb
+  AND scd3.cont_type  =me3.cont_type
+  AND ( me3.iso_code  = '2200'
+  OR me3.iso_code     = '2000'
+  OR me3.iso_code     = '2010'
+  OR me3.iso_code     = '2040'
+  OR me3.iso_code     = '2070'
+  OR me3.iso_code     = '2210'
+  OR me3.iso_code     = '2213'
+  OR me3.iso_code     = '2250'
+  OR me3.iso_code     = '2251'
+  OR me3.iso_code     = '2261'
+  OR me3.iso_code     = '2263'
+  OR me3.iso_code     = '2270'
+  OR me3.iso_code     = '2275'
+  OR me3.iso_code     = '2280'
+  OR me3.iso_code     = '2500'
+  OR me3.iso_code     = '2532'
+  OR me3.iso_code     = '2650'
+  OR me3.iso_code     = '2670'
+  OR me3.iso_code     = '2960'
+  OR me3.iso_code     = '2262'
+  OR me3.iso_code     = '2265' )
+  AND scd3.cont_size  =20
+  AND scd3.cont_status='MTY'
+  AND p.tipe_pelayaran='i'
+  )) AS cont20mtydischi,
+  --hitung dan cari cont 40 mty
+  SUM(
+  (SELECT COUNT(scd4.cont_no) AS cont40mtydisch
+  FROM service_cont_discharge scd4,
+    m_container_type me4
+  WHERE scd4.no_ppkb  = p.no_ppkb
+  AND scd4.cont_type  =me4.cont_type
+  AND ( me4.iso_code  = '4300'
+  OR me4.iso_code     = '4310'
+  OR me4.iso_code     = '4313'
+  OR me4.iso_code     = '4350'
+  OR me4.iso_code     = '4351'
+  OR me4.iso_code     = '4361'
+  OR me4.iso_code     = '4362'
+  OR me4.iso_code     = '4363'
+  OR me4.iso_code     = '4365'
+  OR me4.iso_code     = '4380'
+  OR me4.iso_code     = '4500'
+  OR me4.iso_code     = '4532'
+  OR me4.iso_code     = '4650'
+  OR me4.iso_code     = '4960' )
+  AND scd4.cont_size  =40
+  AND scd4.cont_status='MTY'
+  AND p.tipe_pelayaran='i'
+  )) AS cont40mtydischi,
+  --hitung dan cari 20 refeer
+  SUM(
+  (SELECT COUNT(scd7.cont_no) AS cont20fullrefeerdisch
+  FROM service_cont_discharge scd7,
+    m_container_type me7
+  WHERE scd7.no_ppkb  = p.no_ppkb
+  AND scd7.cont_type  =me7.cont_type
+  AND (me7.iso_code   = '2232'
+  OR me7.iso_code     = '2242'
+  OR me7.iso_code     = '2230')
+  AND scd7.cont_size  =20
+  AND scd7.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont20fullrefeerdischi,
+  --hitung dan cari 40 refeer
+  SUM(
+  (SELECT COUNT(scd8.cont_no) AS cont40fullrefeerdisch
+  FROM service_cont_discharge scd8,
+    m_container_type me8
+  WHERE scd8.no_ppkb  = p.no_ppkb
+  AND scd8.cont_type  =me8.cont_type
+  AND (me8.iso_code   = '4330')
+  AND scd8.cont_size  =40
+  AND scd8.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont40fullrefeerdischi,
+  ----------------------end hitung dan cari total container-------------------
+  -----------------------hohohhohoooho----------------------
+  ------------------start cari dan hitung gorss clas per ppkb (subquery hanya bisa return 1 field)-----------------
+  --hitung gros class 20 full
+  SUM(
+  (SELECT NVLN(SUM(scd9.cont_gross)) AS gross20fulldisch
+  FROM service_cont_discharge scd9,
+    m_container_type me9
+  WHERE scd9.no_ppkb  = p.no_ppkb
+  AND scd9.cont_type  =me9.cont_type
+  AND ( me9.iso_code  = '2200'
+  OR me9.iso_code     = '2000'
+  OR me9.iso_code     = '2010'
+  OR me9.iso_code     = '2040'
+  OR me9.iso_code     = '2070'
+  OR me9.iso_code     = '2210'
+  OR me9.iso_code     = '2213'
+  OR me9.iso_code     = '2250'
+  OR me9.iso_code     = '2251'
+  OR me9.iso_code     = '2261'
+  OR me9.iso_code     = '2263'
+  OR me9.iso_code     = '2270'
+  OR me9.iso_code     = '2275'
+  OR me9.iso_code     = '2280'
+  OR me9.iso_code     = '2500'
+  OR me9.iso_code     = '2532'
+  OR me9.iso_code     = '2650'
+  OR me9.iso_code     = '2670'
+  OR me9.iso_code     = '2960'
+  OR me9.iso_code     = '2262'
+  OR me9.iso_code     = '2265')
+  AND scd9.cont_size  =20
+  AND scd9.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS gross20fulldischi,
+  --hitung gross clas 40 full
+  SUM(
+  (SELECT NVLN(SUM(scd10.cont_gross)) AS gross40fulldisch
+  FROM service_cont_discharge scd10,
+    m_container_type me10
+  WHERE scd10.no_ppkb  = p.no_ppkb
+  AND scd10.cont_type  =me10.cont_type
+  AND ( me10.iso_code  = '4300'
+  OR me10.iso_code     = '4310'
+  OR me10.iso_code     = '4313'
+  OR me10.iso_code     = '4350'
+  OR me10.iso_code     = '4351'
+  OR me10.iso_code     = '4361'
+  OR me10.iso_code     = '4362'
+  OR me10.iso_code     = '4363'
+  OR me10.iso_code     = '4365'
+  OR me10.iso_code     = '4380'
+  OR me10.iso_code     = '4500'
+  OR me10.iso_code     = '4532'
+  OR me10.iso_code     = '4650'
+  OR me10.iso_code     = '4960')
+  AND scd10.cont_size  =40
+  AND scd10.cont_status='FCL'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross40fulldischi,
+  --hitung gross clas 20 mty
+  SUM(
+  (SELECT NVLN(SUM(scd11.cont_gross)) AS gross20mtydisch
+  FROM service_cont_discharge scd11,
+    m_container_type me11
+  WHERE scd11.no_ppkb  = p.no_ppkb
+  AND scd11.cont_type  =me11.cont_type
+  AND ( me11.iso_code  = '2200'
+  OR me11.iso_code     = '2000'
+  OR me11.iso_code     = '2010'
+  OR me11.iso_code     = '2040'
+  OR me11.iso_code     = '2070'
+  OR me11.iso_code     = '2210'
+  OR me11.iso_code     = '2213'
+  OR me11.iso_code     = '2250'
+  OR me11.iso_code     = '2251'
+  OR me11.iso_code     = '2261'
+  OR me11.iso_code     = '2263'
+  OR me11.iso_code     = '2270'
+  OR me11.iso_code     = '2275'
+  OR me11.iso_code     = '2280'
+  OR me11.iso_code     = '2500'
+  OR me11.iso_code     = '2532'
+  OR me11.iso_code     = '2650'
+  OR me11.iso_code     = '2670'
+  OR me11.iso_code     = '2960'
+  OR me11.iso_code     = '2262'
+  OR me11.iso_code     = '2265' )
+  AND scd11.cont_size  =20
+  AND scd11.cont_status='MTY'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross20mtydischi,
+  --hitung gross clas 40 mty
+  SUM(
+  (SELECT NVLN(SUM(scd12.cont_gross)) AS gross40mtydisch
+  FROM service_cont_discharge scd12,
+    m_container_type me12
+  WHERE scd12.no_ppkb  = p.no_ppkb
+  AND scd12.cont_type  =me12.cont_type
+  AND ( me12.iso_code  = '4300'
+  OR me12.iso_code     = '4310'
+  OR me12.iso_code     = '4313'
+  OR me12.iso_code     = '4350'
+  OR me12.iso_code     = '4351'
+  OR me12.iso_code     = '4361'
+  OR me12.iso_code     = '4362'
+  OR me12.iso_code     = '4363'
+  OR me12.iso_code     = '4365'
+  OR me12.iso_code     = '4380'
+  OR me12.iso_code     = '4500'
+  OR me12.iso_code     = '4532'
+  OR me12.iso_code     = '4650'
+  OR me12.iso_code     = '4960' )
+  AND scd12.cont_size  =40
+  AND scd12.cont_status='MTY'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross40mtydischi,
+  --hitung dan cari gross class 20 refeer
+  SUM(
+  (SELECT NVLN(SUM(scd15.cont_gross)) AS gross20fullrefeerdisch
+  FROM service_cont_discharge scd15,
+    m_container_type me15
+  WHERE scd15.no_ppkb  = p.no_ppkb
+  AND scd15.cont_type  =me15.cont_type
+  AND (me15.iso_code   = '2232'
+  OR me15.iso_code     = '2242'
+  OR me15.iso_code     = '2230')
+  AND scd15.cont_size  =20
+  AND scd15.cont_status='FCL'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross20fullrefeerdischi,
+  --hitung dan cari gross class 40 refeer
+  SUM(
+  (SELECT NVLN(SUM(scd16.cont_gross)) AS gross40fullrefeerdisch
+  FROM service_cont_discharge scd16,
+    m_container_type me16
+  WHERE scd16.no_ppkb  = p.no_ppkb
+  AND scd16.cont_type  =me16.cont_type
+  AND (me16.iso_code   = '4330')
+  AND scd16.cont_size  =40
+  AND scd16.cont_status='FCL'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross40fullrefeerdischi,
+  -----------------------------------START SERVICE CONT LOAD GAN---------------------------------------
+  --hitung dan cari cont 20 full
+  SUM(
+  (SELECT COUNT(scl.cont_no) AS cont20fullload
+  FROM service_cont_load scl,
+    m_container_type me
+  WHERE scl.no_ppkb   = p.no_ppkb
+  AND scl.cont_type   =me.cont_type
+  AND ( me.iso_code   = '2200'
+  OR me.iso_code      = '2000'
+  OR me.iso_code      = '2010'
+  OR me.iso_code      = '2040'
+  OR me.iso_code      = '2070'
+  OR me.iso_code      = '2210'
+  OR me.iso_code      = '2213'
+  OR me.iso_code      = '2250'
+  OR me.iso_code      = '2251'
+  OR me.iso_code      = '2261'
+  OR me.iso_code      = '2263'
+  OR me.iso_code      = '2270'
+  OR me.iso_code      = '2275'
+  OR me.iso_code      = '2280'
+  OR me.iso_code      = '2500'
+  OR me.iso_code      = '2532'
+  OR me.iso_code      = '2650'
+  OR me.iso_code      = '2670'
+  OR me.iso_code      = '2960'
+  OR me.iso_code      = '2262'
+  OR me.iso_code      = '2265')
+  AND scl.cont_size   =20
+  AND scl.cont_status ='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont20fullloadi ,
+  --hitung dan cari cont 40 full
+  SUM(
+  (SELECT COUNT(scl2.cont_no) AS cont40fullload
+  FROM service_cont_load scl2,
+    m_container_type me2
+  WHERE scl2.no_ppkb  = p.no_ppkb
+  AND scl2.cont_type  =me2.cont_type
+  AND ( me2.iso_code  = '4300'
+  OR me2.iso_code     = '4310'
+  OR me2.iso_code     = '4313'
+  OR me2.iso_code     = '4350'
+  OR me2.iso_code     = '4351'
+  OR me2.iso_code     = '4361'
+  OR me2.iso_code     = '4362'
+  OR me2.iso_code     = '4363'
+  OR me2.iso_code     = '4365'
+  OR me2.iso_code     = '4380'
+  OR me2.iso_code     = '4500'
+  OR me2.iso_code     = '4532'
+  OR me2.iso_code     = '4650'
+  OR me2.iso_code     = '4960')
+  AND scl2.cont_size  =40
+  AND scl2.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont40fullloadi,
+  --hitung dan cari cont 20 mty
+  SUM(
+  (SELECT COUNT(scl3.cont_no) AS cont20mtyload
+  FROM service_cont_load scl3,
+    m_container_type me3
+  WHERE scl3.no_ppkb  = p.no_ppkb
+  AND scl3.cont_type  =me3.cont_type
+  AND ( me3.iso_code  = '2200'
+  OR me3.iso_code     = '2000'
+  OR me3.iso_code     = '2010'
+  OR me3.iso_code     = '2040'
+  OR me3.iso_code     = '2070'
+  OR me3.iso_code     = '2210'
+  OR me3.iso_code     = '2213'
+  OR me3.iso_code     = '2250'
+  OR me3.iso_code     = '2251'
+  OR me3.iso_code     = '2261'
+  OR me3.iso_code     = '2263'
+  OR me3.iso_code     = '2270'
+  OR me3.iso_code     = '2275'
+  OR me3.iso_code     = '2280'
+  OR me3.iso_code     = '2500'
+  OR me3.iso_code     = '2532'
+  OR me3.iso_code     = '2650'
+  OR me3.iso_code     = '2670'
+  OR me3.iso_code     = '2960'
+  OR me3.iso_code     = '2262'
+  OR me3.iso_code     = '2265' )
+  AND scl3.cont_size  =20
+  AND scl3.cont_status='MTY'
+  AND p.tipe_pelayaran='i'
+  )) AS cont20mtyloadi,
+  --hitung dan cari cont 40 mty
+  SUM(
+  (SELECT COUNT(scl4.cont_no) AS cont40mtyload
+  FROM service_cont_load scl4,
+    m_container_type me4
+  WHERE scl4.no_ppkb  = p.no_ppkb
+  AND scl4.cont_type  =me4.cont_type
+  AND ( me4.iso_code  = '4300'
+  OR me4.iso_code     = '4310'
+  OR me4.iso_code     = '4313'
+  OR me4.iso_code     = '4350'
+  OR me4.iso_code     = '4351'
+  OR me4.iso_code     = '4361'
+  OR me4.iso_code     = '4362'
+  OR me4.iso_code     = '4363'
+  OR me4.iso_code     = '4365'
+  OR me4.iso_code     = '4380'
+  OR me4.iso_code     = '4500'
+  OR me4.iso_code     = '4532'
+  OR me4.iso_code     = '4650'
+  OR me4.iso_code     = '4960' )
+  AND scl4.cont_size  =40
+  AND scl4.cont_status='MTY'
+  AND p.tipe_pelayaran='i'
+  )) AS cont40mtyloadi,
+  --hitung dan cari 20 refeer
+  SUM(
+  (SELECT COUNT(scl7.cont_no) AS cont20fullrefeerload
+  FROM service_cont_load scl7,
+    m_container_type me7
+  WHERE scl7.no_ppkb  = p.no_ppkb
+  AND scl7.cont_type  =me7.cont_type
+  AND (me7.iso_code   = '2232'
+  OR me7.iso_code     = '2242'
+  OR me7.iso_code     = '2230')
+  AND scl7.cont_size  =20
+  AND scl7.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont20fullrefeerloadi,
+  --hitung dan cari 40 refeer
+  SUM(
+  (SELECT COUNT(scl8.cont_no) AS cont40fullrefeerload
+  FROM service_cont_load scl8,
+    m_container_type me8
+  WHERE scl8.no_ppkb  = p.no_ppkb
+  AND scl8.cont_type  =me8.cont_type
+  AND (me8.iso_code   = '4330')
+  AND scl8.cont_size  =40
+  AND scl8.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS cont40fullrefeerloadi,
+  ----------------------end hitung dan cari total container-------------------
+  -----------------------hohohhohoooho----------------------
+  ------------------start cari dan hitung gorss clas per ppkb (subquery hanya bisa return 1 field)-----------------
+  --hitung gros class 20 full
+  SUM(
+  (SELECT NVLN(SUM(scl9.cont_gross)) AS gross20fullload
+  FROM service_cont_load scl9,
+    m_container_type me9
+  WHERE scl9.no_ppkb  = p.no_ppkb
+  AND scl9.cont_type  =me9.cont_type
+  AND ( me9.iso_code  = '2200'
+  OR me9.iso_code     = '2000'
+  OR me9.iso_code     = '2010'
+  OR me9.iso_code     = '2040'
+  OR me9.iso_code     = '2070'
+  OR me9.iso_code     = '2210'
+  OR me9.iso_code     = '2213'
+  OR me9.iso_code     = '2250'
+  OR me9.iso_code     = '2251'
+  OR me9.iso_code     = '2261'
+  OR me9.iso_code     = '2263'
+  OR me9.iso_code     = '2270'
+  OR me9.iso_code     = '2275'
+  OR me9.iso_code     = '2280'
+  OR me9.iso_code     = '2500'
+  OR me9.iso_code     = '2532'
+  OR me9.iso_code     = '2650'
+  OR me9.iso_code     = '2670'
+  OR me9.iso_code     = '2960'
+  OR me9.iso_code     = '2262'
+  OR me9.iso_code     = '2265')
+  AND scl9.cont_size  =20
+  AND scl9.cont_status='FCL'
+  AND p.tipe_pelayaran='i'
+  )) AS gross20fullloadi,
+  --hitung gross clas 40 full
+  SUM(
+  (SELECT NVLN(SUM(scl10.cont_gross)) AS gross40fullload
+  FROM service_cont_load scl10,
+    m_container_type me10
+  WHERE scl10.no_ppkb  = p.no_ppkb
+  AND scl10.cont_type  =me10.cont_type
+  AND ( me10.iso_code  = '4300'
+  OR me10.iso_code     = '4310'
+  OR me10.iso_code     = '4313'
+  OR me10.iso_code     = '4350'
+  OR me10.iso_code     = '4351'
+  OR me10.iso_code     = '4361'
+  OR me10.iso_code     = '4362'
+  OR me10.iso_code     = '4363'
+  OR me10.iso_code     = '4365'
+  OR me10.iso_code     = '4380'
+  OR me10.iso_code     = '4500'
+  OR me10.iso_code     = '4532'
+  OR me10.iso_code     = '4650'
+  OR me10.iso_code     = '4960')
+  AND scl10.cont_size  =40
+  AND scl10.cont_status='FCL'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross40fullloadi,
+  --hitung gross clas 20 mty
+  SUM(
+  (SELECT NVLN(SUM(scl11.cont_gross)) AS gross20mtyload
+  FROM service_cont_load scl11,
+    m_container_type me11
+  WHERE scl11.no_ppkb  = p.no_ppkb
+  AND scl11.cont_type  =me11.cont_type
+  AND ( me11.iso_code  = '2200'
+  OR me11.iso_code     = '2000'
+  OR me11.iso_code     = '2010'
+  OR me11.iso_code     = '2040'
+  OR me11.iso_code     = '2070'
+  OR me11.iso_code     = '2210'
+  OR me11.iso_code     = '2213'
+  OR me11.iso_code     = '2250'
+  OR me11.iso_code     = '2251'
+  OR me11.iso_code     = '2261'
+  OR me11.iso_code     = '2263'
+  OR me11.iso_code     = '2270'
+  OR me11.iso_code     = '2275'
+  OR me11.iso_code     = '2280'
+  OR me11.iso_code     = '2500'
+  OR me11.iso_code     = '2532'
+  OR me11.iso_code     = '2650'
+  OR me11.iso_code     = '2670'
+  OR me11.iso_code     = '2960'
+  OR me11.iso_code     = '2262'
+  OR me11.iso_code     = '2265' )
+  AND scl11.cont_size  =20
+  AND scl11.cont_status='MTY'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross20mtyloadi,
+  --hitung gross clas 40 mty
+  SUM(
+  (SELECT NVLN(SUM(scl12.cont_gross)) AS gross40mtyload
+  FROM service_cont_load scl12,
+    m_container_type me12
+  WHERE scl12.no_ppkb  = p.no_ppkb
+  AND scl12.cont_type  =me12.cont_type
+  AND ( me12.iso_code  = '4300'
+  OR me12.iso_code     = '4310'
+  OR me12.iso_code     = '4313'
+  OR me12.iso_code     = '4350'
+  OR me12.iso_code     = '4351'
+  OR me12.iso_code     = '4361'
+  OR me12.iso_code     = '4362'
+  OR me12.iso_code     = '4363'
+  OR me12.iso_code     = '4365'
+  OR me12.iso_code     = '4380'
+  OR me12.iso_code     = '4500'
+  OR me12.iso_code     = '4532'
+  OR me12.iso_code     = '4650'
+  OR me12.iso_code     = '4960' )
+  AND scl12.cont_size  =40
+  AND scl12.cont_status='MTY'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross40mtyloadi,
+  --hitung dan cari gross class 20 refeer
+  SUM(
+  (SELECT NVLN(SUM(scl15.cont_gross)) AS gross20fullrefeerload
+  FROM service_cont_load scl15,
+    m_container_type me15
+  WHERE scl15.no_ppkb  = p.no_ppkb
+  AND scl15.cont_type  =me15.cont_type
+  AND (me15.iso_code   = '2232'
+  OR me15.iso_code     = '2242'
+  OR me15.iso_code     = '2230')
+  AND scl15.cont_size  =20
+  AND scl15.cont_status='FCL'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross20fullrefeerloadi,
+  --hitung dan cari gross class 40 refeer
+  SUM(
+  (SELECT NVLN(SUM(scl16.cont_gross)) AS gross40fullrefeerload
+  FROM service_cont_load scl16,
+    m_container_type me16
+  WHERE scl16.no_ppkb  = p.no_ppkb
+  AND scl16.cont_type  =me16.cont_type
+  AND (me16.iso_code   = '4330')
+  AND scl16.cont_size  =40
+  AND scl16.cont_status='FCL'
+  AND p.tipe_pelayaran ='i'
+  )) AS gross40fullrefeerloadi
+FROM preservice_vessel pp,
+  service_vessel p,
+  m_customer mc
+WHERE extract(MONTH FROM p.end_work_time) = $P{bulan}
+AND extract(YEAR FROM p.end_work_time)    = $P{tahun}
+AND p.booking_code                        =pp.booking_code
+AND pp.cust_code                          =mc.cust_code
+GROUP BY mc.name]]>
+	</queryString>
+	<field name="cnt" class="java.lang.Long"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="cont20fulldisch" class="java.math.BigDecimal"/>
+	<field name="cont40fulldisch" class="java.math.BigDecimal"/>
+	<field name="cont20mtydisch" class="java.math.BigDecimal"/>
+	<field name="cont40mtydisch" class="java.math.BigDecimal"/>
+	<field name="cont20fullrefeerdisch" class="java.math.BigDecimal"/>
+	<field name="cont40fullrefeerdisch" class="java.math.BigDecimal"/>
+	<field name="gross20fulldisch" class="java.math.BigDecimal"/>
+	<field name="gross40fulldisch" class="java.math.BigDecimal"/>
+	<field name="gross20mtydisch" class="java.math.BigDecimal"/>
+	<field name="gross40mtydisch" class="java.math.BigDecimal"/>
+	<field name="gross20fullrefeerdisch" class="java.math.BigDecimal"/>
+	<field name="gross40fullrefeerdisch" class="java.math.BigDecimal"/>
+	<field name="cont20fullload" class="java.math.BigDecimal"/>
+	<field name="cont40fullload" class="java.math.BigDecimal"/>
+	<field name="cont20mtyload" class="java.math.BigDecimal"/>
+	<field name="cont40mtyload" class="java.math.BigDecimal"/>
+	<field name="cont20fullrefeerload" class="java.math.BigDecimal"/>
+	<field name="cont40fullrefeerload" class="java.math.BigDecimal"/>
+	<field name="gross20fullload" class="java.math.BigDecimal"/>
+	<field name="gross40fullload" class="java.math.BigDecimal"/>
+	<field name="gross20mtyload" class="java.math.BigDecimal"/>
+	<field name="gross40mtyload" class="java.math.BigDecimal"/>
+	<field name="gross20fullrefeerload" class="java.math.BigDecimal"/>
+	<field name="gross40fullrefeerload" class="java.math.BigDecimal"/>
+	<field name="cont20fulldischi" class="java.math.BigDecimal"/>
+	<field name="cont40fulldischi" class="java.math.BigDecimal"/>
+	<field name="cont20mtydischi" class="java.math.BigDecimal"/>
+	<field name="cont40mtydischi" class="java.math.BigDecimal"/>
+	<field name="cont20fullrefeerdischi" class="java.math.BigDecimal"/>
+	<field name="cont40fullrefeerdischi" class="java.math.BigDecimal"/>
+	<field name="gross20fulldischi" class="java.math.BigDecimal"/>
+	<field name="gross40fulldischi" class="java.math.BigDecimal"/>
+	<field name="gross20mtydischi" class="java.math.BigDecimal"/>
+	<field name="gross40mtydischi" class="java.math.BigDecimal"/>
+	<field name="gross20fullrefeerdischi" class="java.math.BigDecimal"/>
+	<field name="gross40fullrefeerdischi" class="java.math.BigDecimal"/>
+	<field name="cont20fullloadi" class="java.math.BigDecimal"/>
+	<field name="cont40fullloadi" class="java.math.BigDecimal"/>
+	<field name="cont20mtyloadi" class="java.math.BigDecimal"/>
+	<field name="cont40mtyloadi" class="java.math.BigDecimal"/>
+	<field name="cont20fullrefeerloadi" class="java.math.BigDecimal"/>
+	<field name="cont40fullrefeerloadi" class="java.math.BigDecimal"/>
+	<field name="gross20fullloadi" class="java.math.BigDecimal"/>
+	<field name="gross40fullloadi" class="java.math.BigDecimal"/>
+	<field name="gross20mtyloadi" class="java.math.BigDecimal"/>
+	<field name="gross40mtyloadi" class="java.math.BigDecimal"/>
+	<field name="gross20fullrefeerloadi" class="java.math.BigDecimal"/>
+	<field name="gross40fullrefeerloadi" class="java.math.BigDecimal"/>
+	<variable name="cont20fulldisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20fulldisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont40fulldisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40fulldisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont20mtydisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20mtydisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont40mtydisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40mtydisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross20fulldisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20fulldisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross40fulldisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40fulldisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross20mtydisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20mtydisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross40mtydisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40mtydisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross20fullrefeerdisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20fullrefeerdisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont40fullrefeerdisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40fullrefeerdisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross20fullrefeerdisch_2" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20fullrefeerdisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross40fullrefeerdisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40fullrefeerdisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont20fullrefeerdisch_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20fullrefeerdisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont20fullload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20fullload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont40fullload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40fullload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont20mtyload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont40mtyload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont20fullrefeerload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20fullrefeerload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="cont40fullrefeerload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40fullrefeerload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross20fullload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20fullload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross40fullload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40fullload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross20mtyload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross40mtyload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross20fullrefeerload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20fullrefeerload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="gross40fullrefeerload_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40fullrefeerload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarfull20cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20fulldisch} + $F{cont20fullrefeerdisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarfull20gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[($F{gross20fulldisch} / 1000 )+ ($F{gross20fullrefeerdisch} / 1000)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarfull40cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40fulldisch} + $F{cont40fullrefeerdisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarfull40gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[($F{gross40fulldisch} / 1000 )+ ($F{gross40fullrefeerdisch} / 1000)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarmty20cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20mtydisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarmty20gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20mtydisch} / 1000]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarmty40cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40mtydisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="bongkarmty40gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40mtydisch}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatfull20cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20fullload} + $F{cont20fullrefeerload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatfull40cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40fullload} + $F{cont40fullrefeerload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatmty20cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatmty40cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatfull20gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20fullload} / 1000 + $F{gross20fullrefeerload} / 1000]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatfull40gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40fullload} / 1000 + $F{gross40fullrefeerload} / 1000]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatmty20gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20mtyload} / 1000]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="muatmty40gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40mtyload} / 1000]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalfull20cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[($F{cont20fulldisch} + $F{cont20fullrefeerdisch}) + ($F{cont20fullload} + $F{cont20fullrefeerload})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalfull40cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[($F{cont40fulldisch} + $F{cont40fullrefeerdisch}) + ($F{cont40fullload} + $F{cont40fullrefeerload})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalmty20cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont20mtydisch} + $F{cont20mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalmty40cont" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cont40mtydisch} + $F{cont40mtyload}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalfull20gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[(($F{gross20fulldisch} / 1000 )+ ($F{gross20fullrefeerdisch} / 1000)) + ($F{gross20fullload} / 1000 + $F{gross20fullrefeerload} / 1000)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalfull40gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[(($F{gross40fulldisch} / 1000 )+ ($F{gross40fullrefeerdisch} / 1000)) + ($F{gross40fullload} / 1000 + $F{gross40fullrefeerload} / 1000)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalmty20gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross20mtydisch} / 1000 + $F{gross20mtyload} / 1000]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalmty40gross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{gross40mtydisch} + $F{gross40mtyload} / 1000]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalboxcont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[(($F{cont20fulldisch} + $F{cont20fullrefeerdisch}) + ($F{cont20fullload} + $F{cont20fullrefeerload}))+(($F{cont40fulldisch} + $F{cont40fullrefeerdisch}) + ($F{cont40fullload} + $F{cont40fullrefeerload})) + ($F{cont20mtydisch} + $F{cont20mtyload}) + ($F{cont40mtydisch} + $F{cont40mtyload})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalboxgross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[((($F{gross20fulldisch} / 1000 )+ ($F{gross20fullrefeerdisch} / 1000)) + ($F{gross20fullload} / 1000 + $F{gross20fullrefeerload} / 1000)) + ((($F{gross40fulldisch} / 1000 )+ ($F{gross40fullrefeerdisch} / 1000)) + ($F{gross40fullload} / 1000 + $F{gross40fullrefeerload} / 1000)) + ($F{gross20mtydisch} / 1000 + $F{gross20mtyload} / 1000) + ($F{gross40mtydisch} + $F{gross40mtyload} / 1000)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalteusgross" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[((($F{gross20fulldisch} / 1000 )+ ($F{gross20fullrefeerdisch} / 1000)) + ($F{gross20fullload} / 1000 + $F{gross20fullrefeerload} / 1000)) + ((($F{gross40fulldisch} / 1000 )+ ($F{gross40fullrefeerdisch} / 1000)) + ($F{gross40fullload} / 1000 + $F{gross40fullrefeerload} / 1000)) + ($F{gross20mtydisch} / 1000 + $F{gross20mtyload} / 1000) + ($F{gross40mtydisch} + $F{gross40mtyload} / 1000)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalteuscont" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[(($F{cont20fulldisch} + $F{cont20fullrefeerdisch}) + ($F{cont20fullload} + $F{cont20fullrefeerload}))+
+((($F{cont40fulldisch} + $F{cont40fullrefeerdisch})*2) + (($F{cont40fullload} + $F{cont40fullrefeerload}))*2) +
+($F{cont20mtydisch} + $F{cont20mtyload}) +
+(($F{cont40mtydisch} + $F{cont40mtyload})*2)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="count_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cnt}]]></variableExpression>
+	</variable>
+	<variable name="count_2" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{cnt}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="38" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="21" width="854" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA['LAPORAN BULAN :' + ($P{bulan} == 1 ? "JANUARI" : $P{bulan} == 2 ? "FEBRUARI" : $P{bulan} == 3 ? "MARET" : $P{bulan} == 4 ? "APRIL" : $P{bulan} == 5 ? "MEI" : $P{bulan} == 6 ? "JUNI" : $P{bulan} == 7 ? "JULI" : $P{bulan} == 8 ? "AGUSTUS" : $P{bulan} == 9 ? "SEPTEMBER" : $P{bulan} == 10 ? "OKTOBER" : $P{bulan} == 11 ? "NOVEMBER" : "DESEMBER") + " " +$P{tahun}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="854" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REALISASI ARUS BONGKAR MUAT PETIKEMAS
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="11" width="854" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PER PERUSAHAAN PELAYARAN
+]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="56">
+			<staticText>
+				<reportElement x="790" y="0" width="64" height="43"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL
+(I+II)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="790" y="43" width="32" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="822" y="43" width="32" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TEUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="246" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="262" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TEUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="246" y="20" width="32" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH
+A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="374" y="20" width="32" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH
+B]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="390" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TEUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="374" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="406" y="12" width="50" height="31"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH
+(A+B)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="406" y="43" width="25" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="431" y="43" width="25" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TEUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="20" width="46" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH
+(A+B)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="744" y="43" width="23" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="767" y="43" width="23" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TEUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="0" width="334" height="12"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERDAGANGAN DALAM NEGRI II]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="536" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="472" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="20" width="64" height="15"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STANDARD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="488" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="664" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="504" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="616" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="20" width="64" height="15"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STANDARD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="664" y="20" width="32" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REEFER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="632" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FULL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="12" width="128" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[IMPORT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="15" height="56"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="214" y="20" width="32" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REEFER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="0" width="26" height="56"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S
+A
+T
+U
+A
+N]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="0" width="306" height="12"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PERDAGANGAN LUAR NEGRI I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="12" width="128" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EXPORT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FULL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="342" y="20" width="32" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REEFER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="103" y="0" width="21" height="56"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CALL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FULL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="310" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMTPY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="182" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMPTY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="15" y="0" width="88" height="56"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NAMA KAPAL
+
+NO. PPKB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="230" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="182" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="150" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="342" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="214" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="166" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="326" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="310" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[20']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="358" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="294" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="20" width="64" height="15"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STANDARD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="20" width="64" height="15"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STANDARD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="552" y="20" width="48" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH
+A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="552" y="43" width="24" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="576" y="43" width="24" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TEUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="720" y="43" width="24" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TEUS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="696" y="43" width="24" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="696" y="20" width="48" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH
+B]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="12" width="190" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MUAT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="632" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMTPY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FULL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="12" width="144" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[BONGKAR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="680" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="648" y="43" width="16" height="13"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[40']]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="20" width="32" height="23"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REEFER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="488" y="35" width="32" height="8"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4" isBold="true"/>
+				</textElement>
+				<text><![CDATA[EMPTY]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement x="600" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fullload} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="616" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fullload}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="664" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fullrefeerload} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="648" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40mtyload} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="632" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20mtyload}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="664" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20fullrefeerload}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="600" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20fullload}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="616" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fullload} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="648" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40mtyload}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="680" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fullrefeerload} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="680" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fullrefeerload}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="632" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20mtyload} / 1000]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="124" y="0" width="26" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="15" width="26" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4"/>
+				</textElement>
+				<text><![CDATA[T/M3]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="0" width="15" height="30"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="4"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="15" y="0" width="88" height="30"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="103" y="0" width="21" height="30"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cnt}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="488" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20mtydisch} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="504" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40mtydisch}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="520" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fullrefeerdisch} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="472" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fulldisch} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="520" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20fullrefeerdisch}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="536" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fullrefeerdisch} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="456" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fulldisch} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="536" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fullrefeerdisch}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="552" y="15" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fulldisch}/1000) + ($F{gross40fulldisch}/1000) +($F{gross20mtydisch}/1000)+($F{gross40mtydisch}/1000)+($F{gross20fullrefeerdisch}/1000)+($F{gross40fullrefeerdisch}/1000)]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="576" y="15" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fulldisch}/1000) + ($F{gross40fulldisch}/1000) +($F{gross20mtydisch}/1000)+($F{gross40mtydisch}/1000)+($F{gross20fullrefeerdisch}/1000)+($F{gross40fullrefeerdisch}/1000)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="472" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fulldisch}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="488" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20mtydisch}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="504" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40mtydisch}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="552" y="0" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fulldisch}+$F{cont40fulldisch}+$F{cont20mtydisch}+$F{cont40mtydisch}+$F{cont20fullrefeerdisch}+$F{cont40fullrefeerdisch}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="456" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fulldisch}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="576" y="0" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fulldisch}+($F{cont40fulldisch} * 2) +$F{cont20mtydisch}+ ($F{cont40mtydisch} *2) +$F{cont20fullrefeerdisch}+ ($F{cont40fullrefeerdisch}*2)]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="720" y="15" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fullload}/1000) + ($F{gross40fullload}/1000) +($F{gross20mtyload}/1000)+($F{gross40mtyload}/1000)+($F{gross20fullrefeerload}/1000)+($F{gross40fullrefeerload}/1000)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="720" y="0" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fullload}+($F{cont40fullload} * 2) +$F{cont20mtyload}+ ($F{cont40mtyload} *2) +$F{cont20fullrefeerload}+ ($F{cont40fullrefeerload}*2)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="696" y="0" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fullload}+$F{cont40fullload}+$F{cont20mtyload}+$F{cont40mtyload}+$F{cont20fullrefeerload}+$F{cont40fullrefeerload}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="696" y="15" width="24" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fullload}/1000) + ($F{gross40fullload}/1000) +($F{gross20mtyload}/1000)+($F{gross40mtyload}/1000)+($F{gross20fullrefeerload}/1000)+($F{gross40fullrefeerload}/1000)]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="790" y="15" width="32" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[((($F{gross20fullloadi}/1000) + ($F{gross40fullloadi}/1000) +($F{gross20mtyloadi}/1000)+($F{gross40mtyloadi}/1000)+($F{gross20fullrefeerloadi}/1000)+($F{gross40fullrefeerloadi}/1000))+(($F{gross20fulldischi}/1000) + ($F{gross40fulldischi}/1000) +($F{gross20mtydischi}/1000)+($F{gross40mtydischi}/1000)+($F{gross20fullrefeerdischi}/1000)+($F{gross40fullrefeerdischi}/1000))) +
+((($F{gross20fullload}/1000) + ($F{gross40fullload}/1000) +($F{gross20mtyload}/1000)+($F{gross40mtyload}/1000)+($F{gross20fullrefeerload}/1000)+($F{gross40fullrefeerload}/1000))+(($F{gross20fulldisch}/1000) + ($F{gross40fulldisch}/1000) +($F{gross20mtydisch}/1000)+($F{gross40mtydisch}/1000)+($F{gross20fullrefeerdisch}/1000)+($F{gross40fullrefeerdisch}/1000)))]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="822" y="15" width="32" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[((($F{gross20fullloadi}/1000) + ($F{gross40fullloadi}/1000) +($F{gross20mtyloadi}/1000)+($F{gross40mtyloadi}/1000)+($F{gross20fullrefeerloadi}/1000)+($F{gross40fullrefeerloadi}/1000))+(($F{gross20fulldischi}/1000) + ($F{gross40fulldischi}/1000) +($F{gross20mtydischi}/1000)+($F{gross40mtydischi}/1000)+($F{gross20fullrefeerdischi}/1000)+($F{gross40fullrefeerdischi}/1000))) +
+((($F{gross20fullload}/1000) + ($F{gross40fullload}/1000) +($F{gross20mtyload}/1000)+($F{gross40mtyload}/1000)+($F{gross20fullrefeerload}/1000)+($F{gross40fullrefeerload}/1000))+(($F{gross20fulldisch}/1000) + ($F{gross40fulldisch}/1000) +($F{gross20mtydisch}/1000)+($F{gross40mtydisch}/1000)+($F{gross20fullrefeerdisch}/1000)+($F{gross40fullrefeerdisch}/1000)))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="822" y="0" width="32" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[(($F{cont20fullloadi}+($F{cont40fullloadi} * 2) +$F{cont20mtyloadi}+ ($F{cont40mtyloadi} *2) +$F{cont20fullrefeerloadi}+ ($F{cont40fullrefeerloadi}*2))+($F{cont20fulldischi}+($F{cont40fulldischi} * 2) +$F{cont20mtydischi}+ ($F{cont40mtydischi} *2) +$F{cont20fullrefeerdischi}+ ($F{cont40fullrefeerdischi}*2))) +
+(($F{cont20fullload} +($F{cont40fullload} * 2) +$F{cont20mtyload}+ ($F{cont40mtyload} *2) +$F{cont20fullrefeerload}+ ($F{cont40fullrefeerload}*2))+($F{cont20fulldisch}+($F{cont40fulldisch} * 2) +$F{cont20mtydisch}+ ($F{cont40mtydisch} *2) +$F{cont20fullrefeerdisch}+ ($F{cont40fullrefeerdisch}*2)))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="790" y="0" width="32" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[(($F{cont20fullloadi}+$F{cont40fullloadi}+$F{cont20mtyloadi}+$F{cont40mtyloadi}+$F{cont20fullrefeerloadi}+$F{cont40fullrefeerloadi})+($F{cont20fulldischi}+$F{cont40fulldischi}+$F{cont20mtydischi}+$F{cont40mtydischi}+$F{cont20fullrefeerdischi}+$F{cont40fullrefeerdischi})) +
+(($F{cont20fullload} +$F{cont40fullload} +$F{cont20mtyload} +$F{cont40mtyload} +$F{cont20fullrefeerload} +$F{cont40fullrefeerload}) +($F{cont20fulldisch} +$F{cont40fulldisch} +$F{cont20mtydisch} +$F{cont40mtydisch} +$F{cont20fullrefeerdisch} +$F{cont40fullrefeerdisch}))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="767" y="0" width="23" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{cont20fullload}+($F{cont40fullload} * 2) +$F{cont20mtyload}+ ($F{cont40mtyload} *2) +$F{cont20fullrefeerload}+ ($F{cont40fullrefeerload}*2))+($F{cont20fulldisch}+($F{cont40fulldisch} * 2) +$F{cont20mtydisch}+ ($F{cont40mtydisch} *2) +$F{cont20fullrefeerdisch}+ ($F{cont40fullrefeerdisch}*2))]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="767" y="15" width="23" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[(($F{gross20fullload}/1000) + ($F{gross40fullload}/1000) +($F{gross20mtyload}/1000)+($F{gross40mtyload}/1000)+($F{gross20fullrefeerload}/1000)+($F{gross40fullrefeerload}/1000))+(($F{gross20fulldisch}/1000) + ($F{gross40fulldisch}/1000) +($F{gross20mtydisch}/1000)+($F{gross40mtydisch}/1000)+($F{gross20fullrefeerdisch}/1000)+($F{gross40fullrefeerdisch}/1000))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="744" y="0" width="23" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{cont20fullload}+$F{cont40fullload}+$F{cont20mtyload}+$F{cont40mtyload}+$F{cont20fullrefeerload}+$F{cont40fullrefeerload})+($F{cont20fulldisch}+$F{cont40fulldisch}+$F{cont20mtydisch}+$F{cont40mtydisch}+$F{cont20fullrefeerdisch}+$F{cont40fullrefeerdisch})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="744" y="15" width="23" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[(($F{gross20fullload}/1000) + ($F{gross40fullload}/1000) +($F{gross20mtyload}/1000)+($F{gross40mtyload}/1000)+($F{gross20fullrefeerload}/1000)+($F{gross40fullrefeerload}/1000))+(($F{gross20fulldisch}/1000) + ($F{gross40fulldisch}/1000) +($F{gross20mtydisch}/1000)+($F{gross40mtydisch}/1000)+($F{gross20fullrefeerdisch}/1000)+($F{gross40fullrefeerdisch}/1000))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="198" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40mtydischi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="182" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20mtydischi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="198" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40mtydischi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="166" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fulldischi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fulldischi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="166" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fulldischi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="182" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20mtydischi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="150" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fulldischi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="262" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fulldischi}+($F{cont40fulldischi} * 2) +$F{cont20mtydischi}+ ($F{cont40mtydischi} *2) +$F{cont20fullrefeerdischi}+ ($F{cont40fullrefeerdischi}*2)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fullrefeerdischi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="246" y="15" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fulldischi}/1000) + ($F{gross40fulldischi}/1000) +($F{gross20mtydischi}/1000)+($F{gross40mtydischi}/1000)+($F{gross20fullrefeerdischi}/1000)+($F{gross40fullrefeerdischi}/1000)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="214" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fullrefeerdischi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="246" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fulldischi}+$F{cont40fulldischi}+$F{cont20mtydischi}+$F{cont40mtydischi}+$F{cont20fullrefeerdischi}+$F{cont40fullrefeerdischi}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="262" y="15" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fulldischi}/1000) + ($F{gross40fulldischi}/1000) +($F{gross20mtydischi}/1000)+($F{gross40mtydischi}/1000)+($F{gross20fullrefeerdischi}/1000)+($F{gross40fullrefeerdischi}/1000)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="230" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fullrefeerdischi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="214" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20fullrefeerdischi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="342" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20fullrefeerloadi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="390" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fullloadi}+($F{cont40fullloadi} * 2) +$F{cont20mtyloadi}+ ($F{cont40mtyloadi} *2) +$F{cont20fullrefeerloadi}+ ($F{cont40fullrefeerloadi}*2)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20mtyloadi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="310" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20mtyloadi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="294" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fullloadi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40mtyloadi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="374" y="15" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fullloadi}/1000) + ($F{gross40fullloadi}/1000) +($F{gross20mtyloadi}/1000)+($F{gross40mtyloadi}/1000)+($F{gross20fullrefeerloadi}/1000)+($F{gross40fullrefeerloadi}/1000)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="278" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont20fullloadi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="374" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{cont20fullloadi}+$F{cont40fullloadi}+$F{cont20mtyloadi}+$F{cont40mtyloadi}+$F{cont20fullrefeerloadi}+$F{cont40fullrefeerloadi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="294" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fullloadi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="358" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross40fullrefeerloadi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="326" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40mtyloadi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="342" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fullrefeerloadi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="390" y="15" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{gross20fullloadi}/1000) + ($F{gross40fullloadi}/1000) +($F{gross20mtyloadi}/1000)+($F{gross40mtyloadi}/1000)+($F{gross20fullrefeerloadi}/1000)+($F{gross40fullrefeerloadi}/1000)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="358" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{cont40fullrefeerloadi}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="278" y="15" width="16" height="15"/>
+				<box>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{gross20fullloadi} / 1000]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="406" y="0" width="25" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{cont20fullloadi}+$F{cont40fullloadi}+$F{cont20mtyloadi}+$F{cont40mtyloadi}+$F{cont20fullrefeerloadi}+$F{cont40fullrefeerloadi})+($F{cont20fulldischi}+$F{cont40fulldischi}+$F{cont20mtydischi}+$F{cont40mtydischi}+$F{cont20fullrefeerdischi}+$F{cont40fullrefeerdischi})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="431" y="15" width="25" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[(($F{gross20fullloadi}/1000) + ($F{gross40fullloadi}/1000) +($F{gross20mtyloadi}/1000)+($F{gross40mtyloadi}/1000)+($F{gross20fullrefeerloadi}/1000)+($F{gross40fullrefeerloadi}/1000))+(($F{gross20fulldischi}/1000) + ($F{gross40fulldischi}/1000) +($F{gross20mtydischi}/1000)+($F{gross40mtydischi}/1000)+($F{gross20fullrefeerdischi}/1000)+($F{gross40fullrefeerdischi}/1000))]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="431" y="0" width="25" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[($F{cont20fullloadi}+($F{cont40fullloadi} * 2) +$F{cont20mtyloadi}+ ($F{cont40mtyloadi} *2) +$F{cont20fullrefeerloadi}+ ($F{cont40fullrefeerloadi}*2))+($F{cont20fulldischi}+($F{cont40fulldischi} * 2) +$F{cont20mtydischi}+ ($F{cont40mtydischi} *2) +$F{cont20fullrefeerdischi}+ ($F{cont40fullrefeerdischi}*2))]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement x="406" y="15" width="25" height="15"/>
+				<box>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="5"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[(($F{gross20fullloadi}/1000) + ($F{gross40fullloadi}/1000) +($F{gross20mtyloadi}/1000)+($F{gross40mtyloadi}/1000)+($F{gross20fullrefeerloadi}/1000)+($F{gross40fullrefeerloadi}/1000))+(($F{gross20fulldischi}/1000) + ($F{gross40fulldischi}/1000) +($F{gross20mtydischi}/1000)+($F{gross40mtydischi}/1000)+($F{gross20fullrefeerdischi}/1000)+($F{gross40fullrefeerdischi}/1000))]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="8"/>
+	</columnFooter>
+</jasperReport>

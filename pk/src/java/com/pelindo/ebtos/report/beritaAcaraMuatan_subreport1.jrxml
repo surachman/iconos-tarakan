@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="beritaAcaraBongkaran_subreport1" language="groovy" pageWidth="510" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="510" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+  --20rffull
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  = $P{no_ppkb}
+  AND s.cont_status='FCL'
+  AND s.cont_type  =me.cont_type
+  AND position     ='01'
+  AND (me.iso_code = '2232'
+  OR me.iso_code   = '2242'
+  OR me.iso_code   = '2230')
+  ) rf20full,
+  --20rfempty
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  = $P{no_ppkb}
+  AND s.cont_status='MTY'
+  AND s.cont_type  =me.cont_type
+  AND position     ='01'
+  AND (me.iso_code = '2232'
+  OR me.iso_code   = '2242'
+  OR me.iso_code   = '2230')
+  ) rf20mty,
+  --40rffull
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  = $P{no_ppkb}
+  AND s.cont_status='FCL'
+  AND s.cont_type  =me.cont_type
+  AND position     ='01'
+  AND (me.iso_code = '4650'
+  OR me.iso_code   = '4960'
+  OR me.iso_code   = '4330')
+  ) rf40full,
+  --40frempty
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  =$P{no_ppkb}
+  AND s.cont_status='MTY'
+  AND s.cont_type  =me.cont_type
+  AND position     ='01'
+  AND (me.iso_code = '4650'
+  OR me.iso_code   = '4960'
+  OR me.iso_code   = '4330')
+  ) rf40mty,
+  --20full
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  =$P{no_ppkb}
+  AND s.cont_status='FCL'
+  AND s.cont_type  =me.cont_type
+  AND position     ='01'
+  AND (me.iso_code = '2200'
+  OR me.iso_code   = '2000'
+  OR me.iso_code   = '2010'
+  OR me.iso_code   = '2040'
+  OR me.iso_code   = '2070'
+  OR me.iso_code   = '2210'
+  OR me.iso_code   = '2213'
+  OR me.iso_code   = '2250'
+  OR me.iso_code   = '2251'
+  OR me.iso_code   = '2261'
+  OR me.iso_code   = '2263'
+  OR me.iso_code   = '2270'
+  OR me.iso_code   = '2275'
+  OR me.iso_code   = '2280'
+  OR me.iso_code   = '2500'
+  OR me.iso_code   = '2532'
+  OR me.iso_code   = '2650'
+  OR me.iso_code   = '2670'
+  OR me.iso_code   = '2960'
+  OR me.iso_code   = '2262'
+  OR me.iso_code   = '2265' )
+  ) dry20full,
+  --20mty
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  =$P{no_ppkb}
+  AND s.cont_status='MTY'
+  AND s.cont_type  =me.cont_type
+  AND position     ='01'
+  AND (me.iso_code = '2200'
+  OR me.iso_code   = '2000'
+  OR me.iso_code   = '2010'
+  OR me.iso_code   = '2040'
+  OR me.iso_code   = '2070'
+  OR me.iso_code   = '2210'
+  OR me.iso_code   = '2213'
+  OR me.iso_code   = '2250'
+  OR me.iso_code   = '2251'
+  OR me.iso_code   = '2261'
+  OR me.iso_code   = '2263'
+  OR me.iso_code   = '2270'
+  OR me.iso_code   = '2275'
+  OR me.iso_code   = '2280'
+  OR me.iso_code   = '2500'
+  OR me.iso_code   = '2532'
+  OR me.iso_code   = '2650'
+  OR me.iso_code   = '2670'
+  OR me.iso_code   = '2960'
+  OR me.iso_code   = '2262'
+  OR me.iso_code   = '2265' )
+  ) dry20mty,
+  --40full
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  =$P{no_ppkb}
+  AND s.cont_status='FCL'
+  AND s.cont_type  =me.cont_type
+  AND s.position   ='01'
+  AND (me.iso_code = '4300'
+  OR me.iso_code   = '4310'
+  OR me.iso_code   = '4313'
+  OR me.iso_code   = '4350'
+  OR me.iso_code   = '4351'
+  OR me.iso_code   = '4361'
+  OR me.iso_code   = '4362'
+  OR me.iso_code   = '4363'
+  OR me.iso_code   = '4365'
+  OR me.iso_code   = '4380'
+  OR me.iso_code   = '4500'
+  OR me.iso_code   = '4532')
+  ) dry40full,
+  --40mty
+  (
+  SELECT COUNT(s.cont_no)
+  FROM service_cont_load s,
+    m_container_type me
+  WHERE s.no_ppkb  =$P{no_ppkb}
+  AND s.cont_status='MTY'
+  AND s.cont_type  =me.cont_type
+  AND position     ='01'
+  AND (me.iso_code = '4300'
+  OR me.iso_code   = '4310'
+  OR me.iso_code   = '4313'
+  OR me.iso_code   = '4350'
+  OR me.iso_code   = '4351'
+  OR me.iso_code   = '4361'
+  OR me.iso_code   = '4362'
+  OR me.iso_code   = '4363'
+  OR me.iso_code   = '4365'
+  OR me.iso_code   = '4380'
+  OR me.iso_code   = '4500'
+  OR me.iso_code   = '4532')
+  ) dry40mty,
+  (SELECT COUNT(id_uc)
+  FROM uncontainerized_service
+  WHERE no_ppkb=$P{no_ppkb}
+  AND operation='LOAD'
+  ) uc,
+  'KM '
+  || mv.name,
+  pv.eta,
+  pv.etd
+FROM planning_vessel pv,
+  m_vessel mv
+WHERE pv.no_ppkb  =$P{no_ppkb}
+AND pv.vessel_code=mv.vessel_code]]>
+	</queryString>
+	<field name="rf20full" class="java.lang.Long"/>
+	<field name="rf20mty" class="java.lang.Long"/>
+	<field name="rf40full" class="java.lang.Long"/>
+	<field name="rf40mty" class="java.lang.Long"/>
+	<field name="dry20full" class="java.lang.Long"/>
+	<field name="dry20mty" class="java.lang.Long"/>
+	<field name="dry40full" class="java.lang.Long"/>
+	<field name="dry40mty" class="java.lang.Long"/>
+	<field name="uc" class="java.lang.Long"/>
+	<field name="?column?" class="java.lang.String"/>
+	<field name="eta" class="java.sql.Timestamp"/>
+	<field name="etd" class="java.sql.Timestamp"/>
+	<variable name="total" class="java.lang.Long">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<pageHeader>
+		<band height="20">
+			<staticText>
+				<reportElement x="0" y="0" width="27" height="20"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="0" width="97" height="20"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Jenis Barang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="0" width="44" height="20"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Merek]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="168" y="0" width="45" height="20"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Jumlah]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="213" y="0" width="131" height="20"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Untuk/dari Kapal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="344" y="0" width="60" height="10"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Tanggal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="344" y="10" width="60" height="10"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Tiba / Berangkat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="0" width="106" height="20"/>
+				<box>
+					<topPen lineWidth="0.25" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Keterangan]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="116" splitType="Stretch">
+			<staticText>
+				<reportElement x="124" y="0" width="44" height="116"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="213" y="0" width="131" height="116"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{?column?}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="344" y="0" width="60" height="39"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{eta}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="344" y="39" width="60" height="77"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{etd}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="404" y="0" width="106" height="116"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="13" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="26" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="39" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[4.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="52" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[5.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="65" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[6.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="78" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[7.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="103" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[9.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="91" width="27" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[8.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="0" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 20' DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="39" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 40' DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="65" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 20' RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="78" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 40' RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="103" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[UNCONTAINERIZED]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="52" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 20' RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="91" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 40' RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="13" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 20' DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="26" width="97" height="13"/>
+				<box leftPadding="6">
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[CONT 40' DRY FL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="168" y="0" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{dry20full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="13" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{dry20mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="26" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{dry40full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="39" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{dry40mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="52" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{rf20full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="65" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{rf20mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="78" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{rf40full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="91" width="45" height="13"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{rf40mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="104" width="45" height="12"/>
+				<box>
+					<leftPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{uc}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<summary>
+		<band height="15" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="124" height="15"/>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.75" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[TOTAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="124" y="0" width="44" height="15"/>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.75" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="213" y="0" width="131" height="15"/>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.75" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="344" y="0" width="60" height="15"/>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.75" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="404" y="0" width="106" height="15"/>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Double"/>
+					<leftPen lineWidth="0.75" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.75" lineStyle="Double"/>
+					<rightPen lineWidth="0.75" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<textField pattern="">
+				<reportElement x="168" y="0" width="45" height="15"/>
+				<box>
+					<topPen lineWidth="0.75" lineStyle="Double"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75" lineStyle="Double"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{rf20full} + $F{rf20mty} +$F{rf40full} + $F{rf40mty}+ $F{dry20full} +
+$F{dry20mty}+$F{dry40full}+$F{dry40mty}+$F{uc}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

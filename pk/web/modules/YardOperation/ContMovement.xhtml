@@ -1,0 +1,1374 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.yard_operation.container_movement']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            liftOnDialog.hide();
+                            dialogLiftOff.hide();
+                            loadLiftOffDialog.hide();
+                            cancelLoadingLiftOffDialog.hide();
+                            containerMovementTable.clearFilters();
+                    }
+            }
+        </script>
+        <script type="text/javascript" src="./../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.yard_operation.container_movement']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        
+        <h:form id="containerMovementForm">
+            <p:dataTable paginatorPosition="bottom" value="#{contMovementBean.containerMovementHistories}" var="item"
+                         paginator="true" rowIndexVar="No" rows="10" rowsPerPageTemplate="5,10,15" id="containerMovementTable"  widgetVar="containerMovementTable"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" immediate="true" value="#{msg['application.operation.lifton']}" actionListener="#{contMovementBean.handleAdd}" update="dischargeLiftOnForm cancelLoadingLiftOnForm loadLiftOnForm" oncomplete="liftOnDialog.show()" onclick="genTitle('liftOnDialog','#{msg['application.operation.lifton']} Container Discharge');"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" image="ui-icon-refresh" immediate="true" value="#{msg['application.operation.refresh']}" actionListener="#{contMovementBean.handleRefreshMovementHistories}" update="containerMovementForm:containerMovementTable" oncomplete="containerMovementTable.clearFilters();"/>
+                    </div>
+                </f:facet>
+
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No"/>
+                    </f:facet>
+                    <h:outputText value="#{No+1}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Container No"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Size"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column sortBy="#{item[4]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Block"/>
+                    </f:facet>
+                    <h:outputText rendered="#{item[14] == 'TRUE'}" value="#{item[6]}"/>
+                    <h:outputText rendered="#{item[14] == 'FALSE'}" value="-"/>
+                </p:column>
+                <p:column style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Slot"/>
+                    </f:facet>
+                    <h:outputText rendered="#{item[14] == 'TRUE'}" value="#{item[7]}"/>
+                    <h:outputText rendered="#{item[14] == 'FALSE'}" value="-"/>
+                </p:column>
+                <p:column style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Row"/>
+                    </f:facet>
+                    <h:outputText rendered="#{item[14] == 'TRUE'}" value="#{item[8]}"/>
+                    <h:outputText rendered="#{item[14] == 'FALSE'}" value="-"/>
+                </p:column>
+                <p:column style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Tier"/>
+                    </f:facet>
+                    <h:outputText rendered="#{item[14] == 'TRUE'}" value="#{item[9]}"/>
+                    <h:outputText rendered="#{item[14] == 'FALSE'}" value="-"/>
+                </p:column>
+                <p:column style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Location"/>
+                    </f:facet>
+                    <h:outputText rendered="#{item[11] == 'TRUE'}" value="Behandle"/>
+                    <h:outputText rendered="#{item[12]== 'TRUE'}"  value="CFS"/>
+                    <h:outputText rendered="#{item[13]== 'TRUE'}" value="Inspection"/>
+                    <h:outputText rendered="#{item[14]== 'TRUE'}" value="CY"/>
+                </p:column>
+                <p:column style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Service"/>
+                    </f:facet>
+                    <h:outputText value="#{item[16]}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{contMovementBean.handleEditLiftOff}" disabled="#{item[10] == false}" rendered="#{item[16].equals('DISCHARGE')}" update="dischargeLiftOffForm:gridLiftOff" value="#{msg['application.operation.liftoff']}" immediate="true" oncomplete="dialogLiftOff.show()" title="Lift Off Container Movement" >
+                            <f:attribute name="contNo" value="#{item[1]}"/>
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{contMovementBean.handleEditLiftOffLoad}" disabled="#{item[10] == false}" rendered="#{item[16].equals('RECEIVING') or item[16].equals('TRANSHIPMENT') or item[16].equals('SHIFTING')}" update="loadLiftOffForm:gridLiftOff" value="#{msg['application.operation.liftoff']}" oncomplete="loadLiftOffDialog.show()" title="Lift Off Container Movement ">
+                            <f:attribute name="contNo" value="#{item[1]}"/>
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{contMovementBean.handleEditLiftOffCancelLoading}" disabled="#{item[10] == false}" rendered="#{item[16].equals('CANCEL_LOADING')}" update="cancelLoadingLiftOffForm:gridLiftOff" value="#{msg['application.operation.liftoff']}" oncomplete="cancelLoadingLiftOffDialog.show()" title="Lift Off Container Movement ">
+                            <f:attribute name="contNo" value="#{item[1]}"/>
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true"  widgetVar="liftOnDialog" minWidth="800" header="Container Movement" id="dlgCont">
+            <h:form id="dischargeLiftOnForm">
+                <p:panel rendered="#{not empty contMovementBean.serviceContDischarge}">
+                    <h:panelGrid columns="3" id="grid">
+                        <h:panelGrid id="dialog" columns="4">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="contNo" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.containerNoQuery}"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton actionListener="#{contMovementBean.handleFindMovableContainer}" onstart="freeze();" update="dischargeLiftOnForm cancelLoadingLiftOnForm loadLiftOnForm growl" process="@this dischargeLiftOnForm:contNo" disabled="#{contMovementBean.edit}" image="ui-icon ui-icon-search" style="font-size: x-small"/>
+                                <p:message display="icon" for="contNo"/>
+                            </h:panelGrid>
+
+                            <h:outputText value="Service"/>:
+                            <h:inputText disabled="true" rendered="#{not empty contMovementBean.serviceContDischarge.contNo}" value="DISCHARGE"/>
+                            <h:inputText disabled="true" rendered="#{empty contMovementBean.serviceContDischarge.contNo}" value=""/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.contSize}"/>
+                            <h:outputLabel/>
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.contStatus}"/>
+                            <h:outputLabel/>
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.contGross}"/>
+                            <h:outputLabel/>
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.sealNo}"/>
+                            <h:outputLabel/>
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.masterCommodity.name}"/>
+                            <h:outputLabel/>
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.overSize ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.dangerous ? contMovementBean.serviceContDischarge.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Stripping Status"/>
+                            <h:outputText value=":"/>
+                            <h:selectOneMenu value="#{contMovementBean.cfsOperationStatus}" disabled="#{contMovementBean.serviceContDischarge.isCfs == false or empty contMovementBean.serviceContDischarge.contNo}">
+                                <f:selectItem itemLabel="Completed" itemValue="COMPLETED"/>
+                                <f:selectItem itemLabel="Cancel" itemValue="CANCEL"/>
+                            </h:selectOneMenu>
+                            <p:spacer height="20"/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <p:spacer width="20" height="60"/>
+                            <h:selectBooleanCheckbox value="#{contMovementBean.check}" disabled="#{empty contMovementBean.serviceContDischarge.contNo}" rendered="#{not (contMovementBean.containerMovementHistory.isCfs or contMovementBean.containerMovementHistory.isBehandle or contMovementBean.containerMovementHistory.isInspection)}" valueChangeListener="#{contMovementBean.onChangeEventHT}">
+                                <f:ajax execute="@this" event="change" render="headTruckPanel planYard"/>
+                            </h:selectBooleanCheckbox>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid columns="3">
+                                <h:outputText value="Last Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isCfs}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isBehandle}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isInspection}" value="Inspection"/>
+                                <h:panelGrid id="dialog2" rendered="#{not contMovementBean.containerMovementHistory.isCfs and not contMovementBean.containerMovementHistory.isBehandle and not contMovementBean.containerMovementHistory.isInspection}" columns="8">
+                                    B <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.masterYard.block}" size="2"/>
+                                    S <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardSlot}" size="2"/>
+                                    R <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardRow}" size="2"/>
+                                    T <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardTier}" size="2"/>
+                                </h:panelGrid>
+                                <h:outputText value="New Post"/>:
+                                <h:panelGrid columns="1" id="planYard">
+                                    <h:panelGrid columns="2">
+                                        <h:outputText value="B"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.serviceContDischarge.contNo}" value="#{contMovementBean.serviceContDischarge.masterYard.block}" valueChangeListener="#{contMovementBean.onChangeEventYard}">
+                                            <f:selectItems var="blok" value="#{contMovementBean.masterYards}" itemValue="#{blok.block}" itemLabel="#{blok.block} - #{blok.description}" />
+                                            <f:ajax execute="@this" event="change" render="planYard"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="6">
+                                        <h:outputText value="S"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.serviceContDischarge.contNo}" value="#{contMovementBean.serviceContDischarge.YSlot}">
+                                            <f:selectItems value="#{contMovementBean.slots}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="R"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.serviceContDischarge.contNo}" value="#{contMovementBean.serviceContDischarge.YRow}">
+                                            <f:selectItems value="#{contMovementBean.rows}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="T"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.serviceContDischarge.contNo}" value="#{contMovementBean.serviceContDischarge.YTier}">
+                                            <f:selectItems value="#{contMovementBean.tiers}" />
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <br/>
+                            <h:panelGrid id="tangoPanel" columns="4">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="tangoName" required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{empty contMovementBean.serviceContDischarge.contNo}" value="#{contMovementBean.equipmentLift.masterEquipment.name}">
+                                    <f:param name="update" value="dischargeLiftOnForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="keypress" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="mousedown" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton image="ui-icon-folder-open" value="..." style="font-size: x-small" disabled="#{empty contMovementBean.serviceContDischarge.contNo}" actionListener="#{contMovementBean.handlePopupTriggered('tango')}" process="@this" oncomplete="showTangosDialog();" update="tangosForm">
+                                        <f:param name="update" value="dischargeLiftOnForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt Tango *"/>:
+                                <h:inputText id="tangoOperatorName" disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode or empty contMovementBean.serviceContDischarge.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterOperator.name}">
+                                    <f:param name="update" value="dischargeLiftOnForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode or empty contMovementBean.serviceContDischarge.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="dischargeLiftOnForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="headTruckPanel" columns="5">
+                                <h:outputText value="H/T Code"/><p:spacer width="10"/>:
+                                <h:inputText id="headTruckName" disabled="#{contMovementBean.isHT or empty contMovementBean.serviceContDischarge.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentHT.masterEquipment.name}">
+                                    <f:param name="update" value="dischargeLiftOnForm:headTruckPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('headTruck')}" onstart="freeze();" process="@this headTruckName" immediate="true" event="keypress" oncomplete="showHeadTrucksDialog();" update="headTrucksForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('headTruck')}" onstart="freeze();" process="@this headTruckName" immediate="true" event="mousedown" oncomplete="showHeadTrucksDialog();" update="headTrucksForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton id="headTruckNameButton" image="ui-icon-folder-open" value="..." disabled="#{contMovementBean.isHT or empty contMovementBean.serviceContDischarge.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('headTruck')}" process="@this" oncomplete="showHeadTrucksDialog();" update="headTrucksForm">
+                                        <f:param name="update" value="dischargeLiftOnForm:headTruckPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="headTruckName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt H/T"/><p:spacer width="10"/>:
+                                <h:inputText id="headTruckOperatorName" disabled="#{empty contMovementBean.equipmentHT.masterEquipment.equipCode or empty contMovementBean.serviceContDischarge.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentHT.masterOperator.name}">
+                                    <f:param name="update" value="dischargeLiftOnForm:headTruckPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this headTruckOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this headTruckOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton id="headTruckOperatorNameButton" image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentHT.masterEquipment.equipCode or empty contMovementBean.serviceContDischarge.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="dischargeLiftOnForm:headTruckPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="headTruckOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="startEnd" columns="6">
+                                <h:outputText value="Start Time *"/><p:spacer width="2"/>:
+                                <h:inputText id="s" styleClass="cal" value="#{contMovementBean.equipmentLift.startTime}" disabled="#{empty contMovementBean.serviceContDischarge.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="s"/>
+                                <h:outputText value="End Time *"/><p:spacer width="2"/>:
+                                <h:inputText id="e" styleClass="cal" value="#{contMovementBean.equipmentLift.endTime}" disabled="#{empty contMovementBean.serviceContDischarge.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" disabled="#{empty contMovementBean.serviceContDischarge.contNo}" actionListener="#{contMovementBean.handleLiftOnConfirmDischargeContainer}" update="containerMovementForm:containerMovementTable growl dischargeLiftOnForm cancelLoadingLiftOnForm loadLiftOnForm" oncomplete="handleRequestValidation(xhr, status, args);"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="liftOnDialog.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+            <h:form id="loadLiftOnForm">
+                <p:panel rendered="#{not empty contMovementBean.planningContLoad}">
+                    <h:panelGrid columns="3" id="grid">
+                        <h:panelGrid id="dialog" columns="4">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="contNo" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.containerNoQuery}"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton actionListener="#{contMovementBean.handleFindMovableContainer}" process="@this loadLiftOnForm:contNo" update="dischargeLiftOnForm cancelLoadingLiftOnForm loadLiftOnForm loadLiftOnForm growl" onstart="freeze();" disabled="#{contMovementBean.edit}" image="ui-icon ui-icon-search" value="..." style="font-size: x-small"/>
+                                <p:message display="icon" for="contNo"/>
+                            </h:panelGrid>
+
+                            <h:outputText value="Service"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.service}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.contSize}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.contStatus}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.contGross}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.sealNo}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.masterCommodity.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.overSize ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.dg ? contMovementBean.planningContLoad.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Stuffing Status"/>
+                            <h:outputText value=":"/>
+                            <h:selectOneMenu value="#{contMovementBean.cfsOperationStatus}" disabled="true">
+                                <f:selectItem itemLabel="Completed" itemValue="COMPLETED"/>
+                                <f:selectItem itemLabel="Cancel" itemValue="CANCEL"/>
+                            </h:selectOneMenu>
+                            <p:spacer height="20"/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <p:spacer width="20" height="58"/>
+                            <h:selectBooleanCheckbox value="#{contMovementBean.check}" disabled="#{empty contMovementBean.planningContLoad.contNo}" valueChangeListener="#{contMovementBean.onChangeEventHT}">
+                                <f:ajax execute="@this" event="change" render="headTruckPanel planYard"/>
+                            </h:selectBooleanCheckbox>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid columns="3">
+                                <h:outputText value="Last Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isCfs}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isBehandle}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isInspection}" value="Inspection"/>
+                                <h:panelGrid id="dialog2" rendered="#{not contMovementBean.containerMovementHistory.isCfs and not contMovementBean.containerMovementHistory.isBehandle and not contMovementBean.containerMovementHistory.isInspection}" columns="8">
+                                    B <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.masterYard.block}" size="2"/>
+                                    S <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardSlot}" size="2"/>
+                                    R <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardRow}" size="2"/>
+                                    T <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardTier}" size="2"/>
+                                </h:panelGrid>
+                                <h:outputText value="New Post"/>:
+                                <h:panelGrid columns="1" id="planYard">
+                                    <h:panelGrid columns="2">
+                                        <h:outputText value="B"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.planningContLoad.contNo}" value="#{contMovementBean.planningContLoad.masterYard.block}" valueChangeListener="#{contMovementBean.onChangeEventYard}">
+                                            <f:selectItems var="blok" value="#{contMovementBean.masterYards}" itemValue="#{blok.block}" itemLabel="#{blok.block} - #{blok.description}" />
+                                            <p:ajax process="@this" event="change" update="planYard" onstart="freeze();"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="6">
+                                        <h:outputText value="S"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.planningContLoad.contNo}" value="#{contMovementBean.planningContLoad.YSlot}">
+                                            <f:selectItems value="#{contMovementBean.slots}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="R"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.planningContLoad.contNo}" value="#{contMovementBean.planningContLoad.YRow}">
+                                            <f:selectItems value="#{contMovementBean.rows}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="T"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.planningContLoad.contNo}" value="#{contMovementBean.planningContLoad.YTier}">
+                                            <f:selectItems value="#{contMovementBean.tiers}" />
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <br/>
+                            <h:panelGrid id="tangoPanel" columns="4">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="tangoName" required="true" disabled="#{empty contMovementBean.planningContLoad.contNo}" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterEquipment.name}">
+                                    <f:param name="update" value="loadLiftOnForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="keypress" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="mousedown" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton image="ui-icon-folder-open" value="..." style="font-size: x-small" disabled="#{empty contMovementBean.planningContLoad.contNo}" actionListener="#{contMovementBean.handlePopupTriggered('tango')}" process="@this" oncomplete="showTangosDialog();" update="tangosForm">
+                                        <f:param name="update" value="loadLiftOnForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt Tango *"/>:
+                                <h:inputText id="tangoOperatorName" disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode or empty contMovementBean.planningContLoad.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterOperator.name}">
+                                    <f:param name="update" value="loadLiftOnForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode or empty contMovementBean.planningContLoad.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="loadLiftOnForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="headTruckPanel" columns="5">
+                                <h:outputText value="H/T Code"/><p:spacer width="10"/>:
+                                <h:inputText id="headTruckName" disabled="#{contMovementBean.isHT or empty contMovementBean.planningContLoad.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentHT.masterEquipment.name}">
+                                    <f:param name="update" value="loadLiftOnForm:headTruckPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('headTruck')}" onstart="freeze();" process="@this headTruckName" immediate="true" event="keypress" oncomplete="showHeadTrucksDialog();" update="headTrucksForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('headTruck')}" onstart="freeze();" process="@this headTruckName" immediate="true" event="mousedown" oncomplete="showHeadTrucksDialog();" update="headTrucksForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton id="headTruckNameButton" image="ui-icon-folder-open" value="..." disabled="#{contMovementBean.isHT or empty contMovementBean.planningContLoad.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('headTruck')}" process="@this" oncomplete="showHeadTrucksDialog();" update="headTrucksForm">
+                                        <f:param name="update" value="loadLiftOnForm:headTruckPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="headTruckName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt H/T"/><p:spacer width="10"/>:
+                                <h:inputText id="headTruckOperatorName" disabled="#{empty contMovementBean.equipmentHT.masterEquipment.equipCode or empty contMovementBean.planningContLoad.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentHT.masterOperator.name}">
+                                    <f:param name="update" value="loadLiftOnForm:headTruckPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this headTruckOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this headTruckOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton id="headTruckOperatorNameButton" image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentHT.masterEquipment.equipCode or empty contMovementBean.planningContLoad.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="loadLiftOnForm:headTruckPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="headTruckOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="startEnd" columns="6">
+                                <h:outputText value="Start Time *"/><p:spacer width="2"/>:
+                                <h:inputText id="s" styleClass="cal" value="#{contMovementBean.equipmentLift.startTime}" disabled="#{empty contMovementBean.planningContLoad.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                                <h:outputText value="End Time *"/><p:spacer width="2"/>:
+                                <h:inputText id="e" styleClass="cal" value="#{contMovementBean.equipmentLift.endTime}" disabled="#{empty contMovementBean.planningContLoad.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" disabled="#{empty contMovementBean.planningContLoad.contNo}" actionListener="#{contMovementBean.handleLiftOnConfirmLoadContainer}" update="containerMovementForm:containerMovementTable growl dischargeLiftOnForm cancelLoadingLiftOnForm loadLiftOnForm" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="liftOnDialog.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+            <h:form id="cancelLoadingLiftOnForm">
+                <p:panel rendered="#{not empty contMovementBean.cancelLoadingService}">
+                    <h:panelGrid columns="3" id="grid">
+                        <h:panelGrid id="dialog" columns="4">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="contNo" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.containerNoQuery}"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton actionListener="#{contMovementBean.handleFindMovableContainer}" process="@this cancelLoadingLiftOnForm:contNo" update="dischargeLiftOnForm cancelLoadingLiftOnForm cancelLoadingLiftOnForm growl" onstart="freeze();" disabled="#{contMovementBean.edit}" image="ui-icon ui-icon-search" value="..." style="font-size: x-small"/>
+                                <p:message display="icon" for="contNo"/>
+                            </h:panelGrid>
+
+                            <h:outputText value="Service"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.service}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.contSize}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.contStatus}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.contGross}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.sealNo}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.masterCommodity.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.overSize ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.dg ? contMovementBean.cancelLoadingService.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Stuffing Status"/>
+                            <h:outputText value=":"/>
+                            <h:selectOneMenu value="#{contMovementBean.cfsOperationStatus}" disabled="true">
+                                <f:selectItem itemLabel="Completed" itemValue="COMPLETED"/>
+                                <f:selectItem itemLabel="Cancel" itemValue="CANCEL"/>
+                            </h:selectOneMenu>
+                            <p:spacer height="20"/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <p:spacer width="20" height="58"/>
+                            <h:selectBooleanCheckbox value="#{contMovementBean.check}" disabled="#{empty contMovementBean.cancelLoadingService.contNo}" valueChangeListener="#{contMovementBean.onChangeEventHT}">
+                                <f:ajax execute="@this" event="change" render="headTruckPanel planYard"/>
+                            </h:selectBooleanCheckbox>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid columns="3">
+                                <h:outputText value="Last Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isCfs}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isBehandle}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isInspection}" value="Inspection"/>
+                                <h:panelGrid id="dialog2" rendered="#{not contMovementBean.containerMovementHistory.isCfs and not contMovementBean.containerMovementHistory.isBehandle and not contMovementBean.containerMovementHistory.isInspection}" columns="8">
+                                    B <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.masterYard.block}" size="2"/>
+                                    S <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardSlot}" size="2"/>
+                                    R <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardRow}" size="2"/>
+                                    T <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardTier}" size="2"/>
+                                </h:panelGrid>
+                                <h:outputText value="New Post"/>:
+                                <h:panelGrid columns="1" id="planYard">
+                                    <h:panelGrid columns="2">
+                                        <h:outputText value="B"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.cancelLoadingService.contNo}" value="#{contMovementBean.cancelLoadingService.masterYard.block}" valueChangeListener="#{contMovementBean.onChangeEventYard}">
+                                            <f:selectItems var="blok" value="#{contMovementBean.masterYards}" itemValue="#{blok.block}" itemLabel="#{blok.block} - #{blok.description}" />
+                                            <p:ajax process="@this" event="change" update="planYard" onstart="freeze();"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="6">
+                                        <h:outputText value="S"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.cancelLoadingService.contNo}" value="#{contMovementBean.cancelLoadingService.ySlot}">
+                                            <f:selectItems value="#{contMovementBean.slots}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="R"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.cancelLoadingService.contNo}" value="#{contMovementBean.cancelLoadingService.yRow}">
+                                            <f:selectItems value="#{contMovementBean.rows}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="T"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.isHT or empty contMovementBean.cancelLoadingService.contNo}" value="#{contMovementBean.cancelLoadingService.yTier}">
+                                            <f:selectItems value="#{contMovementBean.tiers}" />
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <br/>
+                            <h:panelGrid id="tangoPanel" columns="4">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="tangoName" required="true" disabled="#{empty contMovementBean.cancelLoadingService.contNo}" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterEquipment.name}">
+                                    <f:param name="update" value="cancelLoadingLiftOnForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="keypress" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="mousedown" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton image="ui-icon-folder-open" value="..." style="font-size: x-small" disabled="#{empty contMovementBean.cancelLoadingService.contNo}" actionListener="#{contMovementBean.handlePopupTriggered('tango')}" process="@this" oncomplete="showTangosDialog();" update="tangosForm">
+                                        <f:param name="update" value="cancelLoadingLiftOnForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt Tango *"/>:
+                                <h:inputText id="tangoOperatorName" disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode or empty contMovementBean.cancelLoadingService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterOperator.name}">
+                                    <f:param name="update" value="cancelLoadingLiftOnForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode or empty contMovementBean.cancelLoadingService.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="cancelLoadingLiftOnForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="headTruckPanel" columns="5">
+                                <h:outputText value="H/T Code"/><p:spacer width="10"/>:
+                                <h:inputText id="headTruckName" disabled="#{contMovementBean.isHT or empty contMovementBean.cancelLoadingService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentHT.masterEquipment.name}">
+                                    <f:param name="update" value="cancelLoadingLiftOnForm:headTruckPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('headTruck')}" onstart="freeze();" process="@this headTruckName" immediate="true" event="keypress" oncomplete="showHeadTrucksDialog();" update="headTrucksForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('headTruck')}" onstart="freeze();" process="@this headTruckName" immediate="true" event="mousedown" oncomplete="showHeadTrucksDialog();" update="headTrucksForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton id="headTruckNameButton" image="ui-icon-folder-open" value="..." disabled="#{contMovementBean.isHT or empty contMovementBean.cancelLoadingService.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('headTruck')}" process="@this" oncomplete="showHeadTrucksDialog();" update="headTrucksForm">
+                                        <f:param name="update" value="cancelLoadingLiftOnForm:headTruckPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="headTruckName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt H/T"/><p:spacer width="10"/>:
+                                <h:inputText id="headTruckOperatorName" disabled="#{empty contMovementBean.equipmentHT.masterEquipment.equipCode or empty contMovementBean.cancelLoadingService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentHT.masterOperator.name}">
+                                    <f:param name="update" value="cancelLoadingLiftOnForm:headTruckPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this headTruckOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this headTruckOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton id="headTruckOperatorNameButton" image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentHT.masterEquipment.equipCode or empty contMovementBean.cancelLoadingService.contNo}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="cancelLoadingLiftOnForm:headTruckPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="headTruckOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="startEnd" columns="6">
+                                <h:outputText value="Start Time *"/><p:spacer width="2"/>:
+                                <h:inputText id="s" styleClass="cal" value="#{contMovementBean.equipmentLift.startTime}" disabled="#{empty contMovementBean.cancelLoadingService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                                <h:outputText value="End Time *"/><p:spacer width="2"/>:
+                                <h:inputText id="e" styleClass="cal" value="#{contMovementBean.equipmentLift.endTime}" disabled="#{empty contMovementBean.cancelLoadingService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" disabled="#{empty contMovementBean.cancelLoadingService.contNo}" actionListener="#{contMovementBean.handleLiftOnConfirmCancelLoadingContainer}" update="containerMovementForm:containerMovementTable growl dischargeLiftOnForm cancelLoadingLiftOnForm cancelLoadingLiftOnForm" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="liftOnDialog.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="dischargeLiftOffForm">
+            <p:dialog modal="true"  widgetVar="dialogLiftOff" minWidth="800" header="Lift Off Container Discharge">
+                <p:panel>
+                    <h:panelGrid columns="3" id="gridLiftOff">
+                        <h:panelGrid id="dialogLiftOff" columns="4">
+                            <h:outputText value="Movement Type"/>:
+                            <h:selectOneMenu value="#{contMovementBean.movement}" valueChangeListener="#{contMovementBean.onChangeMovement}">
+                                <f:selectItems value="#{contMovementBean.movements}" var="i" itemLabel="#{i[0]}" itemValue="#{i[1]}"/>
+                                <f:ajax execute="@this" event="change" render="movementTypeOption"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.contNo}"/>
+                            <p:commandButton onstart="freeze();" disabled="#{contMovementBean.edit}" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.mlo.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.contSize}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.contStatus}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.contGross}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.sealNo}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.masterCommodity.name ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+                            
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.serviceContDischarge.dangerous ? contMovementBean.serviceContDischarge.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <p:spacer width="20" height="55"/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid columns="3" id="movementTypeOption">
+                                <h:outputText value="Last Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isCfs}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isBehandle}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isInspection}" value="Inspection"/>
+                                <h:panelGrid id="dialog2" rendered="#{not contMovementBean.containerMovementHistory.isCfs and not contMovementBean.containerMovementHistory.isBehandle and not contMovementBean.containerMovementHistory.isInspection}" columns="8">
+                                    B <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.masterYard.block}" size="2"/>
+                                    S <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardSlot}" size="2"/>
+                                    R <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardRow}" size="2"/>
+                                    T <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardTier}" size="2"/>
+                                </h:panelGrid>
+                                <h:outputText value="New Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('CFS')}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('BEHANDLE')}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('INSPECTION')}" value="Inspection"/>
+                                <h:panelGrid columns="1" rendered="#{not contMovementBean.movement.equals('CFS') and not contMovementBean.movement.equals('BEHANDLE') and not contMovementBean.movement.equals('INSPECTION')}" id="planYard">
+                                    <h:panelGrid columns="2">
+                                        <h:outputText value="B"/>
+                                        <h:selectOneMenu value="#{contMovementBean.serviceContDischarge.masterYard.block}"
+                                                         valueChangeListener="#{contMovementBean.onChangeEventYard}" immediate="true">
+                                            <f:selectItems var="blok" value="#{contMovementBean.masterYards}" itemValue="#{blok.block}" itemLabel="#{blok.block} - #{blok.description}" />
+                                            <f:ajax execute="@this" event="change" render="planYard"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                        <h:panelGrid columns="6">
+                                        <h:outputText value="S"/>
+                                        <h:selectOneMenu value="#{contMovementBean.serviceContDischarge.YSlot}">
+                                            <f:selectItems value="#{contMovementBean.slots}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="R"/>
+                                        <h:selectOneMenu value="#{contMovementBean.serviceContDischarge.YRow}">
+                                            <f:selectItems value="#{contMovementBean.rows}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="T"/>
+                                        <h:selectOneMenu value="#{contMovementBean.serviceContDischarge.YTier}">
+                                            <f:selectItems value="#{contMovementBean.tiers}" />
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+
+                                <h:outputText value="Operation"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="op" value="#{contMovementBean.cfsOperation}" disabled="#{not contMovementBean.movement.equals('CFS')}">
+
+                                    <f:selectItem itemLabel="Stripping" itemValue="STRIPPING"/>
+
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <br/>
+                            <h:panelGrid id="tangoPanel" columns="4">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="tangoName" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterEquipment.name}">
+                                    <f:param name="update" value="dischargeLiftOffForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="keypress" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="mousedown" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('tango')}" process="@this" oncomplete="showTangosDialog();" update="tangosForm">
+                                        <f:param name="update" value="dischargeLiftOffForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt Tango *"/>:
+                                <h:inputText id="tangoOperatorName" disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterOperator.name}">
+                                    <f:param name="update" value="dischargeLiftOffForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="dischargeLiftOffForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="startEnd" columns="5">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText id="s" styleClass="cal" value="#{contMovementBean.equipmentLift.startTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="s"/>
+                                <h:outputText value="End Time *"/>:
+                                <h:inputText id="e" styleClass="cal" value="#{contMovementBean.equipmentLift.endTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{contMovementBean.handleLiftOffConfirmDischargeContainer}" update="dischargeLiftOffForm:gridLiftOff containerMovementForm:containerMovementTable growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogLiftOff.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="loadLiftOffForm">
+            <p:dialog modal="true"  widgetVar="loadLiftOffDialog" minWidth="800" header="Lift Off Container Load">
+                <p:panel>
+                    <h:panelGrid columns="3" id="gridLiftOff">
+                        <h:panelGrid id="dialogLiftOff" columns="4">
+                            <h:outputText value="Movement Type"/>:
+                            <h:selectOneMenu value="#{contMovementBean.movement}" valueChangeListener="#{contMovementBean.onChangeMovement}" disabled="#{contMovementBean.planningContLoad.isTranshipment or contMovementBean.planningContLoad.isShifting}">
+                                <f:selectItems value="#{contMovementBean.movements}" var="i" itemLabel="#{i[0]}" itemValue="#{i[1]}"/>
+                                <f:ajax execute="@this" event="change" render="movementTypeOption"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.contNo}"/>
+                            <p:commandButton onstart="freeze();" disabled="#{contMovementBean.edit}" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.contSize}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.contStatus}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.contGross}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.sealNo}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.masterCommodity.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.planningContLoad.dg ? contMovementBean.planningContLoad.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <p:spacer width="20" height="55"/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid columns="3" id="movementTypeOption">
+                                <h:outputText value="Last Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isCfs}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isBehandle}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isInspection}" value="Inspection"/>
+                                <h:panelGrid id="dialog2" rendered="#{not contMovementBean.containerMovementHistory.isCfs and not contMovementBean.containerMovementHistory.isBehandle and not contMovementBean.containerMovementHistory.isInspection}" columns="8">
+                                    B <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.masterYard.block}" size="2"/>
+                                    S <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardSlot}" size="2"/>
+                                    R <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardRow}" size="2"/>
+                                    T <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardTier}" size="2"/>
+                                </h:panelGrid>
+                                <h:outputText value="New Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('CFS')}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('BEHANDLE')}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('INSPECTION')}" value="Inspection"/>
+                                <h:panelGrid columns="1" rendered="#{not contMovementBean.movement.equals('CFS') and not contMovementBean.movement.equals('BEHANDLE') and not contMovementBean.movement.equals('INSPECTION')}" id="planYard">
+                                    <h:panelGrid columns="2">
+                                        <h:outputText value="B"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.movement.equals('CY')}" value="#{contMovementBean.planningContLoad.masterYard.block}"
+                                                         valueChangeListener="#{contMovementBean.onChangeEventYard}" immediate="true">
+                                            <f:selectItems var="blok" value="#{contMovementBean.masterYards}" itemValue="#{blok.block}" itemLabel="#{blok.block} - #{blok.description}" />
+                                            <f:ajax execute="@this" event="change" render="planYard"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                    <h:panelGrid columns="6">
+                                        <h:outputText value="S"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.movement.equals('CY')}" value="#{contMovementBean.planningContLoad.YSlot}">
+                                            <f:selectItems value="#{contMovementBean.slots}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="R"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.movement.equals('CY')}" value="#{contMovementBean.planningContLoad.YRow}">
+                                            <f:selectItems value="#{contMovementBean.rows}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="T"/>
+                                        <h:selectOneMenu disabled="#{not contMovementBean.movement.equals('CY')}" value="#{contMovementBean.planningContLoad.YTier}">
+                                            <f:selectItems value="#{contMovementBean.tiers}" />
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+
+                                <h:outputText value="Operation"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="op" value="#{contMovementBean.cfsOperation}" disabled="#{not contMovementBean.movement.equals('CFS') or contMovementBean.planningContLoad.isTranshipment or contMovementBean.planningContLoad.isShifting}">
+                                    <f:selectItem itemLabel="Stuffing" itemValue="STUFFING"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <br/>
+                            <h:panelGrid id="tangoPanel" columns="4">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="tangoName" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterEquipment.name}">
+                                    <f:param name="update" value="loadLiftOffForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="keypress" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="mousedown" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('tango')}" process="@this" oncomplete="showTangosDialog();" update="tangosForm">
+                                        <f:param name="update" value="loadLiftOffForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt Tango *"/>:
+                                <h:inputText id="tangoOperatorName" disabled="#{empty contMovementBean.equipmentLift.masterEquipment}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterOperator.name}">
+                                    <f:param name="update" value="loadLiftOffForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentLift.masterEquipment}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="loadLiftOffForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="startEnd" columns="5">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText id="s" styleClass="cal" value="#{contMovementBean.equipmentLift.startTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                                <h:outputText value="End Time *"/>:
+                                <h:inputText id="e" styleClass="cal" value="#{contMovementBean.equipmentLift.endTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{contMovementBean.handleLiftOffConfirmLoadContainer}" update="loadLiftOffForm:gridLiftOff containerMovementForm:containerMovementTable growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="loadLiftOffDialog.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="cancelLoadingLiftOffForm">
+            <p:dialog modal="true"  widgetVar="cancelLoadingLiftOffDialog" minWidth="800" header="Lift Off Container Cancel Loading">
+                <p:panel>
+                    <h:panelGrid columns="3" id="gridLiftOff">
+                        <h:panelGrid id="dialogLiftOff" columns="4">
+                            <h:outputText value="Movement Type"/>:
+                            <h:selectOneMenu value="#{contMovementBean.movement}" valueChangeListener="#{contMovementBean.onChangeMovement}">
+                                <f:selectItems value="#{contMovementBean.movements}" var="i" itemLabel="#{i[0]}" itemValue="#{i[1]}"/>
+                                <f:ajax execute="@this" event="change" render="movementTypeOption"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.contNo}"/>
+                            <p:commandButton onstart="freeze();" disabled="#{contMovementBean.edit}" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.mlo.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.contSize}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.contStatus}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.contGross}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.sealNo}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.masterCommodity.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{contMovementBean.cancelLoadingService.dg ? contMovementBean.cancelLoadingService.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <p:spacer width="20" height="55"/>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid columns="3" id="movementTypeOption">
+                                <h:outputText value="Last Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isCfs}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isBehandle}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.containerMovementHistory.isInspection}" value="Inspection"/>
+                                <h:panelGrid id="dialog2" rendered="#{not contMovementBean.containerMovementHistory.isCfs and not contMovementBean.containerMovementHistory.isBehandle and not contMovementBean.containerMovementHistory.isInspection}" columns="8">
+                                    B <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.masterYard.block}" size="2"/>
+                                    S <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardSlot}" size="2"/>
+                                    R <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardRow}" size="2"/>
+                                    T <h:inputText disabled="true" value="#{contMovementBean.containerMovementHistory.yardTier}" size="2"/>
+                                </h:panelGrid>
+                                <h:outputText value="New Post"/>:
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('CFS')}" value="CFS"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('BEHANDLE')}" value="Behandle"/>
+                                <h:inputText disabled="true" rendered="#{contMovementBean.movement.equals('INSPECTION')}" value="Inspection"/>
+                                <h:panelGrid columns="1" rendered="#{not contMovementBean.movement.equals('CFS') and not contMovementBean.movement.equals('BEHANDLE') and not contMovementBean.movement.equals('INSPECTION')}" id="planYard">
+                                    <h:panelGrid columns="2">
+                                        <h:outputText value="B"/>
+                                        <h:selectOneMenu value="#{contMovementBean.cancelLoadingService.masterYard.block}"
+                                                         valueChangeListener="#{contMovementBean.onChangeEventYard}" immediate="true">
+                                            <f:selectItems var="blok" value="#{contMovementBean.masterYards}" itemValue="#{blok.block}" itemLabel="#{blok.block} - #{blok.description}" />
+                                            <f:ajax execute="@this" event="change" render="planYard"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                        <h:panelGrid columns="6">
+                                        <h:outputText value="S"/>
+                                        <h:selectOneMenu value="#{contMovementBean.cancelLoadingService.ySlot}">
+                                            <f:selectItems value="#{contMovementBean.slots}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="R"/>
+                                        <h:selectOneMenu value="#{contMovementBean.cancelLoadingService.yRow}">
+                                            <f:selectItems value="#{contMovementBean.rows}" />
+                                        </h:selectOneMenu>
+                                        <h:outputText value="T"/>
+                                        <h:selectOneMenu value="#{contMovementBean.cancelLoadingService.yTier}">
+                                            <f:selectItems value="#{contMovementBean.tiers}" />
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <br/>
+                            <h:panelGrid id="tangoPanel" columns="4">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="tangoName" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterEquipment.name}">
+                                    <f:param name="update" value="cancelLoadingLiftOffForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="keypress" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('tango')}" onstart="freeze();" process="@this tangoName" immediate="true" event="mousedown" oncomplete="showTangosDialog();" update="tangosForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('tango')}" process="@this" oncomplete="showTangosDialog();" update="tangosForm">
+                                        <f:param name="update" value="cancelLoadingLiftOffForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoName"/>
+                                </h:panelGrid>
+
+                                <h:outputText value="Opt Tango *"/>:
+                                <h:inputText id="tangoOperatorName" disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode}" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{contMovementBean.equipmentLift.masterOperator.name}">
+                                    <f:param name="update" value="cancelLoadingLiftOffForm:tangoPanel"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="keypress" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                    <p:ajax listener="#{contMovementBean.handlePopupTriggered('operator')}" onstart="freeze();" process="@this tangoOperatorName" immediate="true" event="mousedown" oncomplete="showOperatorsDialog();" update="operatorsForm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{empty contMovementBean.equipmentLift.masterEquipment.equipCode}" style="font-size: x-small" actionListener="#{contMovementBean.handlePopupTriggered('operator')}" process="@this" oncomplete="showOperatorsDialog();" update="operatorsForm">
+                                        <f:param name="update" value="cancelLoadingLiftOffForm:tangoPanel"/>
+                                    </p:commandButton>
+                                    <p:message display="icon" for="tangoOperatorName"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+
+                            <h:panelGrid id="startEnd" columns="5">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText id="s" styleClass="cal" value="#{contMovementBean.equipmentLift.startTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="s"/>
+                                <h:outputText value="End Time *"/>:
+                                <h:inputText id="e" styleClass="cal" value="#{contMovementBean.equipmentLift.endTime}" required="true" requiredMessage="#{msg['application.validation.required']}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="e"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{contMovementBean.handleLiftOffConfirmCancelLoadingContainer}" update="cancelLoadingLiftOffForm:gridLiftOff containerMovementForm:containerMovementTable growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogLiftOff.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog header="Select Operator"  widgetVar="operatorsDialog" modal="true" minWidth="500">
+            <h:form id="operatorsForm">
+                <p:dataTable var="item" value="#{contMovementBean.operators}"
+                             id="operatorsTable"  widgetVar="operatorsTable"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item.optCode}" sortBy="#{item.optCode}">
+                        <f:facet name="header">
+                            <h:outputText value="Operator Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.optCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.isOutsource}">
+                        <f:facet name="header">
+                            <h:outputText value="is Out Source" />
+                        </f:facet>
+                        <h:outputText value="#{item.isOutsource}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{contMovementBean.handleSelectOperator}" value="#{msg['application.operation.select']}" update="#{contMovementBean.popupTargetUpdate}" immediate="true" oncomplete="operatorsDialog.hide();">
+                                <f:attribute name="idOperator" value="#{item.optCode}"/>
+                                <f:attribute name="opName" value="#{item.name}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Equipment Tango"  widgetVar="tangosDialog" modal="true" minWidth="700">
+            <h:form id="tangosForm">
+                <p:dataTable id="tangosTable"  widgetVar="tangosTable"
+                             value="#{contMovementBean.equipments}" var="item" paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Equipment Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Capacity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Merk" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Made" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{contMovementBean.handleSelectTangoEquipment}" value="#{msg['application.operation.select']}" update="#{contMovementBean.popupTargetUpdate}" immediate="true" oncomplete="tangosDialog.hide();">
+                                <f:attribute name="idEquipment" value="#{item[0]}"/>
+                                <f:attribute name="eqName" value="#{item[1]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Equipment H/T"  widgetVar="headTrucksDialog" modal="true" minWidth="700">
+            <h:form id="headTrucksForm">
+                <p:dataTable id="headTrucksTable"  widgetVar="headTrucksTable"
+                             value="#{contMovementBean.equipmentsHT}" var="item" paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Equipment Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Capacity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Merk" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Made" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{contMovementBean.handleSelectHTEquipment}" value="#{msg['application.operation.select']}" update="#{contMovementBean.popupTargetUpdate}" immediate="true" oncomplete="headTrucksDialog.hide();">
+                                <f:attribute name="idEquipment" value="#{item[0]}"/>
+                                <f:attribute name="eqName" value="#{item[1]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{contMovementBean.handleDelete}" update="containerMovementForm:containerMovementTable growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:remoteCommand name="showOperatorsDialog" onstart="operatorsDialog.show();operatorsTable.clearFilters();"/>
+            <p:remoteCommand name="showTangosDialog" onstart="tangosDialog.show();tangosTable.clearFilters();"/>
+            <p:remoteCommand name="showHeadTrucksDialog" onstart="headTrucksDialog.show();headTrucksTable.clearFilters();"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

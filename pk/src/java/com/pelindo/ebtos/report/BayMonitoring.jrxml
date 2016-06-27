@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BayMonitoring" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="url" class="java.lang.String">
+		<defaultValueExpression><![CDATA["http://localhost:8080/ebtos/bayMonitoring.png?isLoad=t&vessel=%s&bay=%s&ppkb=%s"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="username" class="java.lang.String"/>
+	<parameter name="ppkb" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\iKerja\\Project\\PELINDO4\\Aplikasi\\Source\\e-BTOS\\Kariangau\\ebtos-ear\\ebtos\\src\\java\\com\\pelindo\\ebtos\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="vessel" class="java.lang.String"/>
+	<parameter name="bay" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT p.no_ppkb, mv.name, pp.voy_in, pp.voy_out, pp.vessel_code
+FROM service_vessel p JOIN preservice_vessel pp ON (p.booking_code=pp.booking_code)
+JOIN m_vessel mv ON (pp.vessel_code = mv.vessel_code)
+WHERE p.no_ppkb = $P{ppkb} AND p.status IN ('Approved', 'Servicing', 'ReadyService', 'Served')]]>
+	</queryString>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="vessel_code" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="97" splitType="Stretch">
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="97" y="73" width="127" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{voy_in}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="97" y="53" width="127" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="97" y="33" width="127" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_ppkb}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="6" y="53" width="81" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Vessel Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="33" width="81" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[No. PPKB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="6" y="73" width="81" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Voyage]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="555" height="22" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Bay Monitoring]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="87" y="73" width="10" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="87" y="33" width="10" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="87" y="53" width="10" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="100" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="100"/>
+				<subreportParameter name="vessel">
+					<subreportParameterExpression><![CDATA[$P{vessel}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="bay">
+					<subreportParameterExpression><![CDATA[$P{bay}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="ppkb">
+					<subreportParameterExpression><![CDATA[$P{ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="url">
+					<subreportParameterExpression><![CDATA[$P{url}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="20">
+			<textField>
+				<reportElement x="435" y="0" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="515" y="0" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,661 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="loadingList" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT container.cont_size,
+  COALESCE(fcl.box,0)   AS fcl_box,
+  COALESCE(fcl.teus,0)  AS fcl_teus,
+  COALESCE(mty.box,0)   AS mty_box,
+  COALESCE(mty.teus,0)  AS mty_teus,
+  COALESCE(lcl.box,0)   AS lcl_box,
+  COALESCE(lcl.teus,0)  AS lcl_teus,
+  SUM(COALESCE(fcl.gross,0)+COALESCE(mty.gross,0)+COALESCE(lcl.gross,0)) AS gross
+FROM
+  (SELECT DISTINCT b.name AS cont_size,
+    a.no_ppkb
+  FROM planning_cont_load a
+  JOIN m_container_type b
+  ON a.cont_type  = b.cont_type
+  WHERE a.no_ppkb = $P{no_ppkb}
+  GROUP BY b.name,
+    a.no_ppkb
+  ) container
+LEFT JOIN
+  (SELECT a.cont_size ||' ' ||a.cont_type AS cont_size,
+    a.gross,
+    a.box,
+    a.teus,
+    a.cont_status,
+    a.no_ppkb
+  FROM
+    (SELECT loading.no_ppkb,
+      loading.cont_size,
+      loading.cont_type,
+      SUM(loading.cont_gross) AS gross,
+      CASE
+        WHEN loading.cont_size = 20
+        THEN COUNT(loading.cont_size)
+        WHEN loading.cont_size >= 40
+        THEN COUNT(loading.cont_size)*2
+      END                       AS teus ,
+      COUNT( loading.cont_size) AS box,
+      loading.cont_status
+    FROM
+      (SELECT pcl.no_ppkb,
+        pcl.cont_no,
+        pcl.cont_size,
+        mct.type_in_general AS cont_type,
+        pcl.cont_status,
+        pcl.cont_gross,
+        pcl.seal_no,
+        pcl.v_bay,
+        pcl.v_row,
+        pcl.v_tier,
+        pcl.load_port,
+        pcl.disch_port,
+        pcl.id,
+        pcl.block,
+        pcl.y_slot,
+        pcl.y_row,
+        pcl.y_tier,
+        pcl.completed,
+        pcl.bl_no,
+        mp.name,
+        CASE
+          WHEN pcl.is_transhipment = 'TRUE'
+          THEN 'TRANSHIPMENT'
+          WHEN pcl.is_change_vessel  = 'TRUE'
+          THEN 'EX CANCEL LOADING'
+          WHEN pcl.is_shifting = 'TRUE'
+          THEN 'SHIFTING'
+          ELSE 'RECEIVING'
+        END AS status,
+        CASE
+          WHEN pcl.is_change_vessel = 'TRUE'
+          THEN mc_cls.name
+          WHEN pcl.is_transhipment = 'TRUE'
+          OR pcl.is_shifting = 'TRUE'
+          THEN mc_vs.name
+          ELSE mc.name
+        END AS cust_name,
+        CASE
+          WHEN (sgr.cont_no IS NOT NULL)
+          OR pcl.is_change_vessel = 'TRUE'
+          OR pcl.is_transhipment = 'TRUE'
+          OR pcl.is_shifting = 'TRUE'
+          THEN 'OS'
+          ELSE 'GT'
+        END AS i_stat,
+        mco.name commodity,
+        pcl.status_cancel_loading
+      FROM planning_cont_load pcl
+      LEFT JOIN receiving_service rs
+      ON (pcl.no_ppkb=rs.no_ppkb
+      AND pcl.cont_no=rs.cont_no)
+      LEFT JOIN registration r
+      ON (r.no_reg=rs.no_reg)
+      LEFT JOIN m_customer mc
+      ON (r.cust_code=mc.cust_code)
+      LEFT JOIN service_gate_receiving sgr
+      ON (rs.job_slip=sgr.job_slip)
+      LEFT JOIN cancel_loading_service cls
+      ON (pcl.no_ppkb=cls.new_ppkb
+      AND pcl.cont_no=cls.cont_no)
+      LEFT JOIN registration r_cls
+      ON (r_cls.no_reg=cls.no_reg)
+      LEFT JOIN m_customer mc_cls
+      ON (r_cls.cust_code=mc_cls.cust_code)
+      LEFT JOIN service_shifting ss
+      ON (pcl.cont_no=ss.cont_no
+      AND pcl.no_ppkb=ss.no_ppkb
+      AND ss.shift_to='TOCY')
+      JOIN planning_vessel pv
+      ON (pcl.no_ppkb=pv.no_ppkb)
+      JOIN preservice_vessel prv
+      ON (prv.booking_code=pv.booking_code)
+      JOIN m_customer mc_vs
+      ON (prv.cust_code=mc_vs.cust_code)
+      JOIN m_port mp
+      ON (mp.port_code=pcl.disch_port)
+      JOIN m_container_type mct
+      ON (pcl.cont_type = mct.cont_type)
+      JOIN m_commodity mco
+      ON (mco.commodity_code=pcl.commodity_code)
+      ) loading
+    WHERE NOT loading.status_cancel_loading = 'TRUE'
+    AND loading.cont_status='FCL'
+    GROUP BY loading.cont_size,
+      loading.cont_type,
+      loading.cont_status,
+      loading.no_ppkb
+    ORDER BY loading.cont_size,
+      loading.cont_type ASC
+    )a
+  ) fcl ON (container.cont_size=fcl.cont_size
+AND container.no_ppkb          =fcl.no_ppkb)
+LEFT JOIN
+  (SELECT a.cont_size || ' ' || a.cont_type AS cont_size,
+    a.gross,
+    a.box,
+    a.teus,
+    a.cont_status,
+    a.no_ppkb
+  FROM
+    (SELECT loading.no_ppkb,
+      loading.cont_size,
+      loading.cont_type,
+      SUM(loading.cont_gross) AS gross,
+      CASE
+        WHEN loading.cont_size = 20
+        THEN COUNT(loading.cont_size)
+        WHEN loading.cont_size >= 40
+        THEN COUNT(loading.cont_size)
+      END                       AS box ,
+      COUNT( loading.cont_size) AS teus,
+      loading.cont_status
+    FROM
+      (SELECT pcl.no_ppkb,
+        pcl.cont_no,
+        pcl.cont_size,
+        mct.type_in_general AS cont_type,
+        pcl.cont_status,
+        pcl.cont_gross,
+        pcl.seal_no,
+        pcl.v_bay,
+        pcl.v_row,
+        pcl.v_tier,
+        pcl.load_port,
+        pcl.disch_port,
+        pcl.id,
+        pcl.block,
+        pcl.y_slot,
+        pcl.y_row,
+        pcl.y_tier,
+        pcl.completed,
+        pcl.bl_no,
+        mp.name,
+        CASE
+          WHEN pcl.is_transhipment = 'TRUE'
+          THEN 'TRANSHIPMENT'
+          WHEN pcl.is_change_vessel = 'TRUE'
+          THEN 'EX CANCEL LOADING'
+          WHEN pcl.is_shifting = 'TRUE'
+          THEN 'SHIFTING'
+          ELSE 'RECEIVING'
+        END AS status,
+        CASE
+          WHEN pcl.is_change_vessel = 'TRUE'
+          THEN mc_cls.name
+          WHEN pcl.is_transhipment = 'TRUE'
+          OR pcl.is_shifting = 'TRUE'
+          THEN mc_vs.name
+          ELSE mc.name
+        END AS cust_name,
+        CASE
+          WHEN (sgr.cont_no IS NOT NULL)
+          OR pcl.is_change_vessel = 'TRUE'
+          OR pcl.is_transhipment = 'TRUE'
+          OR pcl.is_shifting = 'TRUE'
+          THEN 'OS'
+          ELSE 'GT'
+        END AS i_stat,
+        mco.name commodity,
+        pcl.status_cancel_loading
+      FROM planning_cont_load pcl
+      LEFT JOIN receiving_service rs
+      ON (pcl.no_ppkb=rs.no_ppkb
+      AND pcl.cont_no=rs.cont_no)
+      LEFT JOIN registration r
+      ON (r.no_reg=rs.no_reg)
+      LEFT JOIN m_customer mc
+      ON (r.cust_code=mc.cust_code)
+      LEFT JOIN service_gate_receiving sgr
+      ON (rs.job_slip=sgr.job_slip)
+      LEFT JOIN cancel_loading_service cls
+      ON (pcl.no_ppkb=cls.new_ppkb
+      AND pcl.cont_no=cls.cont_no)
+      LEFT JOIN registration r_cls
+      ON (r_cls.no_reg=cls.no_reg)
+      LEFT JOIN m_customer mc_cls
+      ON (r_cls.cust_code=mc_cls.cust_code)
+      LEFT JOIN service_shifting ss
+      ON (pcl.cont_no=ss.cont_no
+      AND pcl.no_ppkb=ss.no_ppkb
+      AND ss.shift_to='TOCY')
+      JOIN planning_vessel pv
+      ON (pcl.no_ppkb=pv.no_ppkb)
+      JOIN preservice_vessel prv
+      ON (prv.booking_code=pv.booking_code)
+      JOIN m_customer mc_vs
+      ON (prv.cust_code=mc_vs.cust_code)
+      JOIN m_port mp
+      ON (mp.port_code=pcl.disch_port)
+      JOIN m_container_type mct
+      ON (pcl.cont_type = mct.cont_type)
+      JOIN m_commodity mco
+      ON (mco.commodity_code=pcl.commodity_code)
+      ) loading
+    WHERE NOT loading.status_cancel_loading = 'TRUE'
+    AND loading.cont_status='MTY'
+    GROUP BY loading.cont_size,
+      loading.cont_type,
+      loading.cont_status,
+      loading.no_ppkb
+    ORDER BY loading.cont_size,
+      loading.cont_type ASC
+    )a
+  ) mty ON (container.cont_size=mty.cont_size
+AND container.no_ppkb          =mty.no_ppkb)
+LEFT JOIN
+  (SELECT a.cont_size || ' ' || a.cont_type AS cont_size,
+    a.gross,
+    a.box,
+    a.teus,
+    a.cont_status,
+    a.no_ppkb
+  FROM
+    (SELECT loading.no_ppkb,
+      loading.cont_size,
+      loading.cont_type,
+      SUM(loading.cont_gross) AS gross,
+      CASE
+        WHEN loading.cont_size = 20
+        THEN COUNT(loading.cont_size)
+        WHEN loading.cont_size >= 40
+        THEN COUNT(loading.cont_size)
+      END                       AS box ,
+      COUNT( loading.cont_size) AS teus,
+      loading.cont_status
+    FROM
+      (SELECT pcl.no_ppkb,
+        pcl.cont_no,
+        pcl.cont_size,
+        mct.type_in_general AS cont_type,
+        pcl.cont_status,
+        pcl.cont_gross,
+        pcl.seal_no,
+        pcl.v_bay,
+        pcl.v_row,
+        pcl.v_tier,
+        pcl.load_port,
+        pcl.disch_port,
+        pcl.id,
+        pcl.block,
+        pcl.y_slot,
+        pcl.y_row,
+        pcl.y_tier,
+        pcl.completed,
+        pcl.bl_no,
+        mp.name,
+        CASE
+          WHEN pcl.is_transhipment = 'TRUE'
+          THEN 'TRANSHIPMENT'
+          WHEN pcl.is_change_vessel = 'TRUE'
+          THEN 'EX CANCEL LOADING'
+          WHEN pcl.is_shifting = 'TRUE'
+          THEN 'SHIFTING'
+          ELSE 'RECEIVING'
+        END AS status,
+        CASE
+          WHEN pcl.is_change_vessel = 'TRUE'
+          THEN mc_cls.name
+          WHEN pcl.is_transhipment = 'TRUE'
+          OR pcl.is_shifting = 'TRUE'
+          THEN mc_vs.name
+          ELSE mc.name
+        END AS cust_name,
+        CASE
+          WHEN (sgr.cont_no IS NOT NULL)
+          OR pcl.is_change_vessel = 'TRUE'
+          OR pcl.is_transhipment = 'TRUE'
+          OR pcl.is_shifting = 'TRUE'
+          THEN 'OS'
+          ELSE 'GT'
+        END AS i_stat,
+        mco.name commodity,
+        pcl.status_cancel_loading
+      FROM planning_cont_load pcl
+      LEFT JOIN receiving_service rs
+      ON (pcl.no_ppkb=rs.no_ppkb
+      AND pcl.cont_no=rs.cont_no)
+      LEFT JOIN registration r
+      ON (r.no_reg=rs.no_reg)
+      LEFT JOIN m_customer mc
+      ON (r.cust_code=mc.cust_code)
+      LEFT JOIN service_gate_receiving sgr
+      ON (rs.job_slip=sgr.job_slip)
+      LEFT JOIN cancel_loading_service cls
+      ON (pcl.no_ppkb=cls.new_ppkb
+      AND pcl.cont_no=cls.cont_no)
+      LEFT JOIN registration r_cls
+      ON (r_cls.no_reg=cls.no_reg)
+      LEFT JOIN m_customer mc_cls
+      ON (r_cls.cust_code=mc_cls.cust_code)
+      LEFT JOIN service_shifting ss
+      ON (pcl.cont_no=ss.cont_no
+      AND pcl.no_ppkb=ss.no_ppkb
+      AND ss.shift_to='TOCY')
+      JOIN planning_vessel pv
+      ON (pcl.no_ppkb=pv.no_ppkb)
+      JOIN preservice_vessel prv
+      ON (prv.booking_code=pv.booking_code)
+      JOIN m_customer mc_vs
+      ON (prv.cust_code=mc_vs.cust_code)
+      JOIN m_port mp
+      ON (mp.port_code=pcl.disch_port)
+      JOIN m_container_type mct
+      ON (pcl.cont_type = mct.cont_type)
+      JOIN m_commodity mco
+      ON (mco.commodity_code=pcl.commodity_code)
+      ) loading
+    WHERE NOT loading.status_cancel_loading = 'TRUE'
+    AND loading.cont_status='LCL'
+    GROUP BY loading.cont_size,
+      loading.cont_type,
+      loading.cont_status,
+      loading.no_ppkb
+    ORDER BY loading.cont_size,
+      loading.cont_type ASC
+    )a
+  ) lcl ON (container.cont_size=lcl.cont_size
+AND container.no_ppkb          =lcl.no_ppkb)
+GROUP BY container.cont_size,
+  fcl.box,
+  fcl.teus,
+  mty.box,
+  mty.teus,
+  lcl.box,
+  lcl.teus
+ORDER BY container.cont_size
+]]>
+	</queryString>
+	<field name="cont_size" class="java.lang.String"/>
+	<field name="fcl_box" class="java.lang.String"/>
+	<field name="fcl_teus" class="java.lang.String"/>
+	<field name="mty_box" class="java.lang.String"/>
+	<field name="mty_teus" class="java.lang.String"/>
+	<field name="lcl_box" class="java.lang.String"/>
+	<field name="lcl_teus" class="java.lang.String"/>
+	<field name="gross" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="31" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="1" width="79" height="30"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Container Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="79" y="16" width="56" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Box]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="135" y="16" width="64" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Teus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="16" width="56" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Box]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="255" y="16" width="64" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Teus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="16" width="64" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Teus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="319" y="16" width="56" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Box]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="439" y="1" width="90" height="30"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL GROSS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="79" y="1" width="120" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FCL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="1" width="120" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LCL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="319" y="1" width="120" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MTY]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="16" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="79" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cont_size}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="0" width="56" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fcl_box}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="135" y="0" width="64" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fcl_teus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="199" y="0" width="56" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{lcl_box}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="255" y="0" width="64" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{lcl_teus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="319" y="0" width="56" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{mty_box}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="375" y="0" width="64" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{mty_teus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="439" y="0" width="90" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{gross}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

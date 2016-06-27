@@ -1,0 +1,139 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_owner']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_owner']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl showDetail="true" globalOnly="true"/>
+        <h:form id="ownerForm">
+            <p:dataTable value="#{masterOwnerBean.listMasterOwnerEquipments}" var="item"
+                         paginatorPosition="bottom" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" actionListener="#{masterOwnerBean.handleAdd}" update="ownerForm2" oncomplete="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Owner');"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.ownerCode}" filterMatchMode="contains" filterBy="#{item.ownerCode}" style="width: 100px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Owner Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item.ownerCode}"/>
+                </p:column>
+                <p:column sortBy="#{item.ownerName}" filterMatchMode="contains" filterBy="#{item.ownerName}" >
+                    <f:facet name="header">
+                        <h:outputText value="Owner Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item.ownerName}"/>
+                </p:column>
+                <p:column style="width: 100px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Profit Pelindo (%)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.profitpelindo}"/>
+                </p:column>
+                <p:column style="width: 100px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Profit Owner (%)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.profitowner}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton title="Edit" image="ui-icon-pencil" actionListener="#{masterOwnerBean.handleSelect}" update="ownerForm2" oncomplete="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Owner');">
+                            <f:attribute name="ownerCode" value="#{item.ownerCode}"/>
+                        </p:commandButton>
+                        <p:commandButton title="Delete" image="ui-icon-trash" actionListener="#{masterOwnerBean.handleSelect}" update="ownerForm2" oncomplete="dialogDel.show()">
+                            <f:attribute name="ownerCode" value="#{item.ownerCode}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="500" header="Master Equipment">
+            <h:form id="ownerForm2">
+                <p:panel>                    
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Owner Code *" for="ownerCode" />
+                        <h:outputText value=" : "/>
+                        <h:inputText id="ownerCode" disabled="#{not empty masterOwnerBean.masterOwnerEquipment.ownerCode}" value="#{masterOwnerBean.masterOwnerEquipment.ownerCode}" title="Owner Code" required="true" requiredMessage="Owner Code field #{msg['application.validation.required']}" size="10" maxlength="5"/>
+                        <p:message for="ownerCode" display="icon"/>
+
+                        <h:outputLabel value="Name *" for="name" />
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="name" value="#{masterOwnerBean.masterOwnerEquipment.ownerName}" title="Name" required="true" requiredMessage="Name field #{msg['application.validation.required']}" size="30"/>
+                        <p:message for="name" display="icon"/>
+
+                        <h:outputText value="Profit Pelindo (%) *"/>
+                        <h:outputLabel value=" : "/>
+                        <h:panelGroup>
+                            <h:inputText id="profitPel" value="#{masterOwnerBean.masterOwnerEquipment.profitpelindo}" title="Profit Pelindo" required="true" requiredMessage="Profit field #{msg['application.validation.required']}" size="10" maxlength="5">
+                                <f:convertNumber maxIntegerDigits="3"/>
+                            </h:inputText>
+                            <h:outputLabel value="must be numeric" style="color: red;"/>
+                        </h:panelGroup>
+                        <p:message for="profitPel" display="icon"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" image="ui-icon-check" actionListener="#{masterOwnerBean.handleSaveEdit}" update="ownerForm ownerForm2" oncomplete="validateForm(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="ownerDelForm">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterOwnerBean.handleDelete}" update="ownerForm" onsuccess="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

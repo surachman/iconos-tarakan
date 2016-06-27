@@ -1,0 +1,655 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:qt="http://www.qtasnim.com/currency"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_stuffing']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_stuffing']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        </script>
+
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+
+            function handleRequestValidation(xhr, status, args) {
+                if(!(args.validationFailed || !args.loggedIn)) {
+                    containerSelectionDialog.hide();
+                    dlgBatalNota.hide();
+                }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">            
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" onkeypress="showRegistrations();" onmousedown="showRegistrations();" value="#{stuffingBean.registration.noReg}" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showRegistrations();" type="button"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" value="#{stuffingBean.registration.masterCustomer.name}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" value="#{stuffingBean.registration.planningVessel.noPpkb}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" value="#{stuffingBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" value="#{stuffingBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" value="#{stuffingBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" value="#{stuffingBean.registration.statusService}" size="30"/>
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+        </h:form>
+
+        <h:form id="stuffingServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{stuffingBean.stuffingServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="stuffingServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{not stuffingBean.registration.statusService.equals('registrasi')}" actionListener="#{stuffingBean.handleAdd}" update="containerSelectionForm" oncomplete="containerSelectionDialog.show();"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{empty stuffingBean.registration.noReg or empty stuffingBean.stuffingServices or (stuffingBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor))}" image="ui-icon-plusthick" title="Batal Nota" update="batalNota" oncomplete="dlgBatalNota.show()" actionListener="#{stuffingBean.handleAddCancelInvoice}"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item.jobSlip}" rowspan="2" headerText="Job Slip" filterMatchMode="contains" filterBy="#{item[0]}"/>
+                        <p:column sortBy="#{item.contNo}" rowspan="2" headerText="Container No" filterMatchMode="contains" filterBy="#{item[1]}"/>
+                        <p:column sortBy="#{item.contStatus}" rowspan="2" headerText="Status" filterMatchMode="contains" filterBy="#{item[2]}"/>
+                        <p:column sortBy="#{item.contSize}" rowspan="2" headerText="Size" />
+                        <p:column sortBy="#{item.masterContainerType.masterContainerTypeInGeneral.id}" rowspan="2" headerText="Type" />
+                        <p:column rowspan="2" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column colspan="2" headerText="Charge &nbsp;(#{qt:getCurrencySymbol(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country)})" />
+                        <p:column sortBy="#{item.perhitunganStuffing.totalCharge}" rowspan="2" headerText="Total &nbsp;(#{qt:getCurrencySymbol(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country)})" />
+                        <p:column rowspan="2" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column headerText="Dg" />
+                        <p:column headerText="Label"/>
+                        <p:column headerText="Stuffing"/>
+                        <p:column headerText="Sewa Alat" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.jobSlip}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contNo}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contStatus}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contSize}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.overSize ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.dg ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.dgLabel ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, item.perhitunganStuffing.charge.add(item.perhitunganStuffing.perhitunganPassGate.totalCharge).add(item.perhitunganStuffing.perhitunganLiftService.charge), false, stuffingBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, item.perhitunganStuffing.perhitunganSewaAlat.charge, false, stuffingBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, item.perhitunganStuffing.totalCharge, false, stuffingBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" disabled="#{not stuffingBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Stuffing Service">
+                            <f:setPropertyActionListener target="#{stuffingBean.stuffingService}" value="#{item}" />
+                        </p:commandButton>
+                    </center>
+                </p:column>
+
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="11" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, stuffingBean.total, false, stuffingBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, stuffingBean.total.multiply(stuffingBean.ppnPrint), false, stuffingBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, stuffingBean.materaiPrint, false, stuffingBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Biaya Handling " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, stuffingBean.upahBuruh, false, stuffingBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(stuffingBean.masterCurrency.language, stuffingBean.masterCurrency.country, stuffingBean.total.add(stuffingBean.total.multiply(stuffingBean.ppnPrint)).add(stuffingBean.materaiPrint).add(stuffingBean.upahBuruh), false, stuffingBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{not stuffingBean.registration.statusService.equals('registrasi') or empty stuffingBean.stuffingServices}" update="registrationForm:registrationDetail registrationForm:cek stuffingServiceForm:stuffingServiceTable growl" actionListener="#{stuffingBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty stuffingBean.stuffingServices}" actionListener="#{stuffingBean.handleDownloadTransactionRecap}" update="stuffingServiceForm:stuffingServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty stuffingBean.stuffingServices or (stuffingBean.registration.invoice.validasiPrint and not loginSessionBean.supervisor) or stuffingBean.disKredit or empty stuffingBean.registration.invoice.noReg}" actionListener="#{stuffingBean.handleDownloadNota}" update="stuffingServiceForm:stuffingServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty stuffingBean.stuffingServices or stuffingBean.disKredit or stuffingBean.disDetail or empty stuffingBean.registration.invoice.noFakturPajak}" actionListener="#{stuffingBean.handleDownloadDetail}" update="stuffingServiceForm:stuffingServiceTable"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog rendered="true" header="Entry Stuffing Service"  widgetVar="containerSelectionDialog" modal="true" minWidth="720" id="dialogD">
+            <h:form id="containerSelectionForm">
+                <p:panel>
+                    <div style="overflow: auto;">
+                        <h:panelGrid columns="5" style="float:left">
+                            <h:outputLabel value="Container No *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="bl" onkeypress="showStuffAbleContainers();" onmousedown="showStuffAbleContainers();" value="#{stuffingBean.stuffingService.contNo}" readonly="true" size="20" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showStuffAbleContainers();"/>
+                            <p:message for="bl" display="icon"/>
+
+                            <h:outputLabel value="Load Vessel *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="vessel" onkeypress="showAvailableVessels();" onmousedown="showAvailableVessels();" value="#{stuffingBean.planningVessel.preserviceVessel.masterVessel.name}" disabled="#{empty stuffingBean.stuffingService.contNo}" size="20" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton onstart="freeze();" type="button" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showAvailableVessels();" disabled="#{empty stuffingBean.stuffingService.contNo}"/>
+                            <p:message for="vessel" display="icon"/>
+
+                            <h:outputLabel value="Commodity Name *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="commoditySelection" onkeypress="showCommodities();" onmousedown="showCommodities();" value="#{stuffingBean.stuffingService.masterCommodity.name}" required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{empty stuffingBean.stuffingService.contNo}"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="showCommodities();" type="button" style="font-size: x-small" disabled="#{empty stuffingBean.stuffingService.contNo}"/>
+                            <p:message for="commoditySelection" display="icon"/>
+
+                            <h:outputLabel value="Open Door *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:selectBooleanCheckbox id="openDoorSelection" value="#{stuffingBean.stuffingService.overSize}" disabled="#{empty stuffingBean.stuffingService.contNo}">
+                                <p:ajax process="@this" event="change" onstart="freeze();" listener="#{stuffingBean.handleOpenDoorChanged}" update="openDoorSelection stuffingCharge"/>
+                            </h:selectBooleanCheckbox>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{stuffingBean.stuffingService.contSize}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{stuffingBean.stuffingService.masterContainerType.masterContainerTypeInGeneral.id}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{stuffingBean.stuffingService.contStatus}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                           
+                        </h:panelGrid>
+                        <h:panelGrid columns="5" style="float: right;">
+                            <h:outputLabel value="Use Equipment" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="useEquipmentSelection" value="#{stuffingBean.paketStuffing.isUseEquipment}" disabled="#{empty stuffingBean.stuffingService.contNo}">
+                                <f:selectItem itemValue="true" itemLabel="Yes"/>
+                                <f:selectItem itemValue="false" itemLabel="No"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{stuffingBean.calculatePaketStuffing}" update="mekanikSelection equipmentSelection upahBuruhCharge sewaAlatCharge mekanikTonase"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                            <h:outputLabel value="Equipment Name" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="equipmentSelection" style="width:135px;" value="#{stuffingBean.paketStuffing.equipment}" disabled="#{not stuffingBean.paketStuffing.isUseEquipment or empty stuffingBean.stuffingService.contNo}">
+                                <f:selectItem itemValue="ForkLift3Ton" itemLabel="Forklift 3 Ton"/>
+                                <f:selectItem itemValue="ForkLift7Ton" itemLabel="Forklift 7 Ton"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{stuffingBean.calculatePaketStuffing}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                            <h:outputLabel value="Full Handling" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="fullHandlingSelection" style="width:135px;" value="#{stuffingBean.paketStuffing.fullHandling}" disabled="#{empty stuffingBean.stuffingService.contNo}">
+                                <f:selectItem itemValue="GeneralCargo" itemLabel="General Cargo"/>
+                                <f:selectItem itemValue="CurahKering" itemLabel="Curah Kering"/>
+                                <f:selectItem itemValue="CurahCair" itemLabel="Curah Cair"/>
+                                <f:selectItem itemValue="PalletsCargo" itemLabel="Pallets Cargo"/>
+                                <f:selectItem itemValue="DT_KSG_S_CONT_SKID_T" itemLabel="D/T KSG &amp; S.CONT./SKID.T"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{stuffingBean.calculatePaketStuffing}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel value=" Tonase " />
+                            <h:inputText value="#{stuffingBean.paketStuffing.fullHandlingTonage}" styleClass="countable" size="3" disabled="#{empty stuffingBean.stuffingService.contNo}">
+                                <p:ajax process="@this" event="keyup" listener="#{stuffingBean.calculatePaketStuffing}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:inputText>
+                            <h:outputLabel value="Mekanik" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="mekanikSelection" style="width:135px;" value="#{stuffingBean.paketStuffing.mekanik}" disabled="#{not stuffingBean.paketStuffing.isUseEquipment or empty stuffingBean.stuffingService.contNo}">
+                                <f:selectItem itemValue="PalletsCargo" itemLabel="Pallets Cargo"/>
+                                <f:selectItem itemValue="NonPalletsCargo" itemLabel="Non Pallets Cargo"/>
+                                <p:ajax process="@this" onstart="freeze()" event="change" listener="#{stuffingBean.calculatePaketStuffing}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel value=" Tonase " />
+                            <h:inputText id="mekanikTonase" styleClass="countable" value="#{stuffingBean.paketStuffing.mekanikTonage}" size="3" disabled="#{not stuffingBean.paketStuffing.isUseEquipment or empty stuffingBean.stuffingService.contNo}">
+                                <p:ajax process="@this" event="keyup" listener="#{stuffingBean.calculatePaketStuffing}" update="upahBuruhCharge sewaAlatCharge"/>
+                            </h:inputText>
+                        </h:panelGrid>
+                        <script type="text/javascript">
+                            jQuery(function() {
+                                jQuery('input[type=text].countable').livequery(function(){
+                                    jQuery(this).focus(function() {
+                                        jQuery(this).select();
+                                    }).mouseup(function(e) {
+                                        e.preventDefault();
+                                    });
+                                });
+                            });
+                        </script>
+                    </div>
+                    <f:facet name="footer">
+                        <div style="overflow: auto;">
+                            <h:panelGrid columns="3" style="float: right;">
+                                <h:outputLabel value="Paket Stuffing" style="font-weight: bold;"/>
+                                <h:outputLabel value=" : " />
+                                <h:inputText id="stuffingCharge" readonly="true" value="#{stuffingBean.stuffingService.perhitunganStuffing.charge.add(stuffingBean.stuffingService.perhitunganStuffing.perhitunganPassGate.totalCharge).add(stuffingBean.stuffingService.perhitunganStuffing.perhitunganLiftService.charge)}" required="true" size="25">
+                                    <f:converter converterId="idrCurrencyConverter"/>
+                                </h:inputText>
+
+                            </h:panelGrid>
+                        </div>
+                        <br />
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{stuffingBean.handleConfirm}" update="stuffingServiceForm containerSelectionForm growl" oncomplete="handleRequestValidation(xhr, status, args)" disabled="#{empty stuffingBean.stuffingService.contNo}"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="containerSelectionDialog.hide();" type="button"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="registrationsDialog" modal="true" minWidth="750">
+                <p:dataTable id="registrationsTable"  widgetVar="registrationsTable"
+                             var="item" rowIndexVar="No" value="#{stuffingBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{stuffingBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail registrationForm:cek stuffingServiceForm:stuffingServiceTable" oncomplete="registrationsDialog.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{stuffingBean.handleDelete}" update="registrationForm:registrationDetail registrationForm:cek stuffingServiceForm:stuffingServiceTable growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" visible="true" rendered="#{not stuffingBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="Stuffing.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{stuffingBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{stuffingBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{stuffingBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{stuffingBean.handleSubmitBatalNota}"
+                                                 oncomplete="dlgBatalNota.hide()" image="ui-icon-check" update="growl batalNota stuffingServiceForm"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Service Container"  widgetVar="stuffAbleContainersDialog" modal="true" minWidth="700">
+            <h:form id="stuffAbleContainersForm">
+                <p:dataTable id="stuffAbleContainersTable"  widgetVar="stuffAbleContainersTable" var="item" value="#{stuffingBean.serviceContLoads}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column sortBy="#{item[14]}" filterMatchMode="contains" filterBy="#{item[14]}">
+                        <f:facet name="header">
+                            <h:outputText value="Bl No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[14]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{stuffingBean.handleSelectStuffAbleContainer}" value="#{msg['application.operation.select']}" update="containerSelectionForm" oncomplete="stuffAbleContainersDialog.hide();" immediate="true">
+                           <f:attribute name="idCont" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Commodity Code"  widgetVar="commoditiesDialog" modal="true" minWidth="600">
+            <h:form id="commoditiesForm">
+                <p:dataTable id="commoditiesTable"  widgetVar="commoditiesTable"
+                             var="item" value="#{stuffingBean.masterCommodities}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{stuffingBean.handleSelectCommodity}" value="select" update="containerSelectionForm:commoditySelection" oncomplete="commoditiesDialog.hide();">
+                            <f:attribute name="commodityCode" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Vessel"  widgetVar="availableVesselsDialog" modal="true" minWidth="750">
+            <h:form id="availableVesselsForm">
+                <p:dataTable var="item" id="availableVesselsTable"  widgetVar="availableVesselsTable" value="#{stuffingBean.availableVessels}"
+                             rendered="#{not empty stuffingBean.stuffingService}"
+                             paginator="true" rows="10" rowIndexVar="No"
+                             paginatorPosition="bottom" lazy="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.noPpkb}" sortBy="#{item.noPpkb}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item.noPpkb}" />
+                    </p:column>
+
+                    <p:column  filterBy="#{item.preserviceVessel.masterVessel.name}" filterEvent="keyup" sortBy="#{item.preserviceVessel.masterVessel.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.masterVessel.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyIn}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyIn}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyOut}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyOut}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" immediate="true" value="#{msg['application.operation.select']}" update="containerSelectionForm growl" oncomplete="availableVesselsDialog.hide();">
+                            <f:setPropertyActionListener target="#{stuffingBean.planningVessel}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showRegistrations" immediate="true" actionListener="#{stuffingBean.handleShowRegistrations}" update="registrationsForm" onstart="freeze();" oncomplete="registrationsDialog.show();registrationsTable.clearFilters();"/>
+            <p:remoteCommand name="showStuffAbleContainers" immediate="true" actionListener="#{stuffingBean.handleShowStuffAbleContainers}" update="stuffAbleContainersForm:stuffAbleContainersTable" onstart="freeze();" oncomplete="stuffAbleContainersDialog.show();stuffAbleContainersTable.clearFilters();"/>
+            <p:remoteCommand name="showCommodities" immediate="true" update="commoditiesForm:commoditiesTable" onstart="freeze();" oncomplete="commoditiesDialog.show();commoditiesTable.clearFilters();"/>
+            <p:remoteCommand name="showAvailableVessels" immediate="true" oncomplete="availableVesselsDialog.show();availableVesselsTable.clearFilters();"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,549 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:qt="http://www.qtasnim.com/currency"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_discharge_to_load']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_discharge_to_load']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"/>
+    </ui:define>
+
+    <ui:define name="script">
+
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+            
+            function handleRequestValidation(xhr, status, args) {
+                if(!(args.validationFailed || args.isValid == false)) {
+                    containerSelectionDialog.hide();
+                    dlgBatalNota.hide();
+                }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">            
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" onkeypress="showRegistrations();" onmousedown="showRegistrations();" value="#{perhitunganDischargeToLoadBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" type="button" onclick="showRegistrations();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{perhitunganDischargeToLoadBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{perhitunganDischargeToLoadBean.registration.planningVessel.noPpkb}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{perhitunganDischargeToLoadBean.registration.planningVessel.preserviceVessel.masterVessel.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{perhitunganDischargeToLoadBean.registration.planningVessel.preserviceVessel.voyIn}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{perhitunganDischargeToLoadBean.registration.planningVessel.preserviceVessel.voyOut}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{perhitunganDischargeToLoadBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+        </h:form>
+
+        <h:form id="dischargeToLoadServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{perhitunganDischargeToLoadBean.dischargeToLoadServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="dischargeToLoadServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{perhitunganDischargeToLoadBean.handleAdd}"  disabled="#{not perhitunganDischargeToLoadBean.registration.statusService.equals('registrasi') }" oncomplete="containerSelectionDialog.show();" update="containerSelectionForm"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{empty perhitunganDischargeToLoadBean.registration.noReg or empty perhitunganDischargeToLoadBean.dischargeToLoadServices or (perhitunganDischargeToLoadBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor))}" image="ui-icon-plusthick" title="Batal Nota" update="batalNota" oncomplete="dlgBatalNota.show()" actionListener="#{perhitunganDischargeToLoadBean.handleAddCancelInvoice}"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="3" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item.jobSlip}" rowspan="3" headerText="Job Slip" filterMatchMode="contains" filterBy="#{item.jobSlip}"/>
+                        <p:column sortBy="#{item.serviceContDischarge.contNo}" rowspan="3" headerText="Container No" filterMatchMode="contains" filterBy="#{item.contNo}"/>
+                        <p:column sortBy="#{item.serviceContDischarge.contStatus}" rowspan="3" headerText="Status" filterMatchMode="contains" filterBy="#{item.contStatus}"/>
+                        <p:column sortBy="#{item.serviceContDischarge.contSize}" rowspan="3" headerText="Size" />
+                        <p:column sortBy="#{item.serviceContDischarge.masterContainerType.masterContainerTypeInGeneral.id}" rowspan="3" headerText="Type" />
+                        <p:column sortBy="#{item.serviceContDischarge.overSize}" rowspan="3" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                        <p:column colspan="3" headerText="Charge &nbsp;(#{qt:getCurrencySymbol(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country)})" />
+                        <p:column sortBy="#{item.totalCharge}" rowspan="3" headerText="Total &nbsp;(#{qt:getCurrencySymbol(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country)})" />
+                        <p:column rowspan="3" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item.serviceContDischarge.dangerous}" rowspan="2" headerText="Dg" />
+                        <p:column sortBy="#{item.serviceContDischarge.dgLabel}" rowspan="2" headerText="Label"/>
+                        <p:column sortBy="#{item.perhitunganPenumpukan.masa1}" rowspan="2" headerText="Masa 1" />
+                        <p:column sortBy="#{item.perhitunganPenumpukan.masa2}" rowspan="2" headerText="Masa 2"/>
+                        <p:column rowspan="2" headerText="Relokasi"/>
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item.perhitunganPenumpukan.chargeM1}" headerText="Masa 1" />
+                        <p:column sortBy="#{item.perhitunganPenumpukan.chargeM2}" headerText="Masa 2" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.jobSlip}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.serviceContDischarge.contNo}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.serviceContDischarge.contStatus}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.serviceContDischarge.contSize}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.serviceContDischarge.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.serviceContDischarge.overSize ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.serviceContDischarge.dangerous ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.serviceContDischarge.dgLabel ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.perhitunganPenumpukan.masa1}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.perhitunganPenumpukan.masa2}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, item.perhitunganDischargeToLoad.totalCharge, false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, item.perhitunganPenumpukan.chargeM1, false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, item.perhitunganPenumpukan.chargeM2, false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, item.totalCharge, false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" disabled="#{not perhitunganDischargeToLoadBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Discharge to Load Service">
+                            <f:setPropertyActionListener target="#{perhitunganDischargeToLoadBean.dischargeToLoadService}" value="#{item}" />
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="14" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, perhitunganDischargeToLoadBean.total, false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="14" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, perhitunganDischargeToLoadBean.total.multiply(perhitunganDischargeToLoadBean.ppnPrint), false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="14" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, perhitunganDischargeToLoadBean.materaiPrint, false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="14" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganDischargeToLoadBean.masterCurrency.language, perhitunganDischargeToLoadBean.masterCurrency.country, perhitunganDischargeToLoadBean.total.add(perhitunganDischargeToLoadBean.total.multiply(perhitunganDischargeToLoadBean.ppnPrint)).add(perhitunganDischargeToLoadBean.materaiPrint), false, perhitunganDischargeToLoadBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{not perhitunganDischargeToLoadBean.registration.statusService.equals('registrasi') or empty perhitunganDischargeToLoadBean.dischargeToLoadServices}" update="registrationForm:registrationDetail registrationForm:cek dischargeToLoadServiceForm growl" actionListener="#{perhitunganDischargeToLoadBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadServices}" actionListener="#{perhitunganDischargeToLoadBean.handleDownloadTransactionRecap}" update="dischargeToLoadServiceForm"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadServices or (perhitunganDischargeToLoadBean.registration.invoice.validasiPrint and not loginSessionBean.supervisor) or perhitunganDischargeToLoadBean.disKredit or empty perhitunganDischargeToLoadBean.registration.invoice.noReg}" actionListener="#{perhitunganDischargeToLoadBean.handleDownloadNota}" update="dischargeToLoadServiceForm"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadServices or perhitunganDischargeToLoadBean.disKredit or empty perhitunganDischargeToLoadBean.registration.invoice.noFakturPajak}" actionListener="#{perhitunganDischargeToLoadBean.handleDownloadDetail}" update="dischargeToLoadServiceForm"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Entry Discharge to Load Service"  widgetVar="containerSelectionDialog" modal="true" minWidth="360" id="containerSelectionDialog">
+            <h:form id="containerSelectionForm">
+                <p:panel>
+                    <div style="overflow: auto;">
+                        <h:panelGrid columns="5" style="float:left" id="containerInfoPanel">
+                            <h:outputLabel value="Container No *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="bl" onkeypress="showConvertableToLoadContainers();" onmousedown="showConvertableToLoadContainers();" value="#{perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contNo}" readonly="true" size="20" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showConvertableToLoadContainers();"/>
+                            <p:message for="bl" display="icon"/>
+
+                            <h:outputLabel value="Load Vessel *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="vessel" onkeypress="showAvailableVessels();" onmousedown="showAvailableVessels();" value="#{perhitunganDischargeToLoadBean.planningVessel.preserviceVessel.masterVessel.name}" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contNo}" size="20" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton onstart="freeze();" type="button" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showAvailableVessels();" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contNo}"/>
+                            <p:message for="vessel" display="icon"/>
+
+                            <h:outputLabel value="Discharge Port *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <p:autoComplete id="dischargePort" required="true" value="#{perhitunganDischargeToLoadBean.dischargePortName}" completeMethod="#{masterPortSelector.handleFilterByName}" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contNo}" size="20" />
+                            <p:message display="icon" for="dischargePort"/>
+                            <h:outputLabel value="" />
+
+                            <h:outputLabel value="Port Of Delivery *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <p:autoComplete id="pod" required="true" value="#{perhitunganDischargeToLoadBean.portOfDeliveryName}" completeMethod="#{masterPortSelector.handleFilterByName}" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contNo}" size="20" />
+                            <p:message display="icon" for="pod"/>
+                            <h:outputLabel value="" />
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contSize}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.masterContainerType.masterContainerTypeInGeneral.id}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contStatus}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contGross}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.overSize}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                    </div>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganDischargeToLoadBean.handleConfirm}" update="dischargeToLoadServiceForm containerSelectionForm growl" oncomplete="handleRequestValidation(xhr, status, args)" disabled="#{empty perhitunganDischargeToLoadBean.dischargeToLoadService.serviceContDischarge.contNo or empty perhitunganDischargeToLoadBean.planningVessel.preserviceVessel.masterVessel.name}"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="containerSelectionDialog.hide();" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Registration"  widgetVar="registrationsDialog" modal="true" minWidth="750">
+            <h:form id="registrationsForm">
+                <p:dataTable id="registrationsTable"  widgetVar="registrationsTable"
+                             var="item" value="#{perhitunganDischargeToLoadBean.registrations}" rowIndexVar="No"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{perhitunganDischargeToLoadBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail registrationForm:cek dischargeToLoadServiceForm" oncomplete="registrationsDialog.hide();" immediate="true">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{perhitunganDischargeToLoadBean.handleDelete}" update="registrationForm:registrationDetail registrationForm:cek dischargeToLoadServiceForm growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{perhitunganDischargeToLoadBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{perhitunganDischargeToLoadBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{perhitunganDischargeToLoadBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganDischargeToLoadBean.handleCancelInvoice}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="growl batalNota dischargeToLoadServiceForm"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Service Container Discharge"  widgetVar="convertableToLoadContainersDialog" modal="true" minWidth="700">
+            <h:form id="convertableToLoadContainersForm">
+                <p:dataTable id="convertableToLoadContainersTable"  widgetVar="convertableToLoadContainersTable" var="item" value="#{perhitunganDischargeToLoadBean.serviceContDischarges}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column sortBy="#{item[14]}" filterMatchMode="contains" filterBy="#{item[14]}">
+                        <f:facet name="header">
+                            <h:outputText value="Bl No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[14]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{perhitunganDischargeToLoadBean.handleSelectContPick}" value="#{msg['application.operation.select']}" update="containerSelectionForm" oncomplete="convertableToLoadContainersDialog.hide();" immediate="true">
+                            <f:attribute name="idCont" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Vessel"  widgetVar="availableVesselsDialog" modal="true" minWidth="750">
+            <h:form id="availableVesselsForm">
+                <p:dataTable var="item" id="availableVesselsTable"  widgetVar="availableVesselsTable" value="#{perhitunganDischargeToLoadBean.availableVessels}"
+                             paginator="true" rows="10" rowIndexVar="No"
+                             paginatorPosition="bottom" lazy="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column filterBy="#{item.noPpkb}" sortBy="#{item.noPpkb}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item.noPpkb}" />
+                    </p:column>
+
+                    <p:column  filterBy="#{item.preserviceVessel.masterVessel.name}" filterEvent="keyup" sortBy="#{item.preserviceVessel.masterVessel.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.masterVessel.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyIn}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyIn}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyOut}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyOut}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" immediate="true" value="#{msg['application.operation.select']}" update="containerSelectionForm growl" oncomplete="availableVesselsDialog.hide();" disabled="#{item.noPpkb == perhitunganDischargeToLoadBean.registration.planningVessel.noPpkb}">
+                            <f:setPropertyActionListener target="#{perhitunganDischargeToLoadBean.planningVessel}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" visible="true" rendered="#{not perhitunganDischargeToLoadBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="Stripping.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showRegistrations" immediate="true" actionListener="#{perhitunganDischargeToLoadBean.handleShowRegistrations}" update="registrationsForm" onstart="freeze();" oncomplete="registrationsDialog.show();registrationsTable.clearFilters();"/>
+            <p:remoteCommand name="showConvertableToLoadContainers" immediate="true" actionListener="#{perhitunganDischargeToLoadBean.findConvertableToLoadContainers}" update="convertableToLoadContainersForm:convertableToLoadContainersTable" onstart="freeze();" oncomplete="convertableToLoadContainersDialog.show();convertableToLoadContainersTable.clearFilters();"/>
+            <p:remoteCommand name="showAvailableVessels" immediate="true" oncomplete="availableVesselsDialog.show();availableVesselsTable.clearFilters();"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

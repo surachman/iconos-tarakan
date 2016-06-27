@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="beritaAcaraBongkaran" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<parameter name="tanggal" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object"/>
+	<parameter name="foreman" class="java.lang.String"/>
+	<parameter name="agen" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT mv.name,
+  (SELECT description FROM m_setting_app WHERE id='ttd_mt_foreman'
+  ) AS foreman,
+  ( SELECT get_tgl_in_bahasa(to_date( $P{tanggal} ,'DD/MM/YYYY')) FROM dual
+  ) tanggalHari
+FROM m_vessel mv ,
+  planning_vessel pv
+WHERE no_ppkb     = $P{no_ppkb}
+AND mv.vessel_code=pv.vessel_code
+AND rownum        < 2]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="foreman" class="java.lang.String"/>
+	<field name="tanggalhari" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="287" splitType="Stretch">
+			<staticText>
+				<reportElement x="11" y="4" width="170" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<text><![CDATA[TERMINAL PETIKEMAS KARIANGAU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="11" y="18" width="194" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[PT. Pelabuhan Indonesia IV (Persero)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="41" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="14"/>
+				</textElement>
+				<text><![CDATA[BERITA ACARA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="11"/>
+				</textElement>
+				<text><![CDATA[SERAH TERIMA BARANG / PETIKEMAS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="107" width="528" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[yang bertanda tangan di bawah ini masing-masing :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="127" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[PIHAK PERTAMA ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="141" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Nama]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="155" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Jabatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="169" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="228" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="214" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Jabatan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="186" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="52" y="200" width="113" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Nama]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="127" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="141" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="155" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="169" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="186" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="200" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="214" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="228" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="176" y="214" width="121" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[MUALIM I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="176" y="127" width="297" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[PT. PELABUHAN INDONESIA IV (Persero) Cabang Kariangau]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="176" y="155" width="121" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[FOREMAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="176" y="169" width="297" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[PT. PELABUHAN INDONESIA IV (Persero) Cabang Kariangau]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="266" width="528" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[PIHAK KEDUA mengaku menerima penyerahan barang / Petikemas seperti tersebut dibawah ini]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="27" y="252" width="528" height="15"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[PIHAK PERTAMA dengan ini menyatakan telah menyerahkan barang / Petikemas sebagaimana]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="27" y="93" width="528" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA['Pada Hari ini, ' +  $F{tanggalhari}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="26" y="127" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="186" width="12" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[2.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="176" y="228" width="298" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="176" y="186" width="308" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="176" y="200" width="308" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{agen}]]></textFieldExpression>
+			</textField>
+			<textField pattern="">
+				<reportElement x="176" y="141" width="298" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{foreman}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="68" splitType="Stretch">
+			<subreport>
+				<reportElement x="27" y="0" width="494" height="68"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="92" splitType="Stretch">
+			<staticText>
+				<reportElement x="385" y="9" width="121" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Yang Menyerahkan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="38" y="9" width="121" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<text><![CDATA[Yang Menerima]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="27" y="77" width="155" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{agen}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="366" y="77" width="155" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{foreman}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

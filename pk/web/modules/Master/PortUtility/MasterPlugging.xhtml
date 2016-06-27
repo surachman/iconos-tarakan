@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_plugging']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_plugging']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" life="3000" showDetail="true" globalOnly="true"/>
+
+        <h:form id="portform">
+            <p:dataTable id="tableport" var="item" value="#{masterPluggingBean.plugingReeres}"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{masterPluggingBean.handleAddButton}" update="addeditform" oncomplete="dialogAddEdit.show();" title="Add" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Plugging');"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" style="width: 100px">
+                    <f:facet name="header">
+                        <h:outputText value="Plugging Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Availability"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="width: 70px">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton actionListener="#{masterPluggingBean.handleDeleteButton}" image="ui-icon ui-icon-pencil" title="Edit" update="addeditform addeditform:tauah" oncomplete="dialogAddEdit.show();" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Port');">
+                            <f:attribute name="plugCode" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{masterPluggingBean.handleDeleteButton}" image="ui-icon ui-icon-trash" title="Delete" update="deleteconfim:opsiHidden deleteconfim:idportHidden" oncomplete="confirmation.show();">
+                            <f:attribute name="plugCode" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Master Port"  widgetVar="dialogAddEdit" modal="true" minWidth="500" id="dialogAddEdit">
+            <h:form id="addeditform">
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Port Code*"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="portCode" value="#{masterPluggingBean.masterPluggingReefer.pluggingCode}" disabled="#{masterPluggingBean.disable}" maxlength="5" size="10" required="true" requiredMessage="The port code field is required."/>
+                        <p:message for="portCode" display="icon"/>
+
+                        <h:outputLabel value="Name*"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="namePort" value="#{masterPluggingBean.masterPluggingReefer.name}" size="40" required="true" requiredMessage="The port name field is required."/>
+                        <p:message for="namePort" display="icon"/>
+
+                        <h:outputLabel value="Availability"/>
+                        <h:outputLabel value=" : "/>
+                        <h:selectOneMenu id="ava" value="#{masterPluggingBean.masterPluggingReefer.availability}" required="true" requiredMessage="The port availability field is required.">
+                            <f:selectItem itemLabel="--Pilih--" itemValue=""/>
+                            <f:selectItem itemLabel="Yes" itemValue="TRUE"/>
+                            <f:selectItem itemLabel="No" itemValue="FALSE"/>
+                        </h:selectOneMenu>
+                       <p:message for="ava" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}"  image="ui-icon-check" actionListener="#{masterPluggingBean.saveEdit}" update="portform:tableport growl addeditform" oncomplete="validateForm(xhr, status, args)"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form  id="deleteconfim">
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{masterPluggingBean.handleDelete}"  update="portform:tableport growl" onclick="confirmation.hide();" />
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

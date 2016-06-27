@@ -1,0 +1,966 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.monitoring_information_container']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="listData">
+            <table cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td rowspan="3" style="width: 40%">
+                        <p:fieldset legend="History Container List" style="width: 500px; min-height: 130px;" >
+                            <p:dataTable id="containerHistTable" var="item" value="#{containerInformationBean.historyContainerList}"
+                                             paginator="true" rows="10" paginatorPosition="bottom"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                                <f:facet name="header">
+                                    <div class="header-panel-single-left">
+                                        &nbsp;
+                                    </div>
+                                </f:facet>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+
+                                <p:column sortBy="#{item[0]}" style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="No PPKB" />
+                                    </f:facet>
+
+                                    <p:commandLink value="#{item[0]}" actionListener="#{containerInformationBean.handleDetailInfo}" onstart="freeze();" update="listData">
+                                        <f:attribute name="noppkb" value="#{item[0]}" />
+                                    </p:commandLink>
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Cont No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Position" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                    </td>
+                    <td style="text-align: right">
+                        <h:panelGrid id="containerInformation" columns="6" style="text-align: right">
+                            <h:outputLabel value="Container No" />
+                            <h:outputLabel value=" : " />
+                            <p:autoComplete id="acSimple" value="#{containerInformationBean.contNo}" completeMethod="#{containerInformationBean.setContListAutoComplete}" />
+<!--                            <h:inputText size="30" value="#{containerInformationBean.contNo}"/>-->
+                            <p:commandButton value="Find" update="listData" actionListener="#{containerInformationBean.handleFindContainerData}"/>
+                            <p:commandButton value="Clear" update="listData" actionListener="#{containerInformationBean.handleClearContainerData}"/>
+
+                        </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right">
+                        <h:panelGrid id="containerNoDetail" columns="1" style="text-align: right">
+                            <h:outputLabel style="font-size: large;font-weight: bold" value="#{containerInformationBean.contInfos}" />
+<!--                            <h:inputText rendered="false" size="30" value="#{containerInformationBean.contInfo[0]}"/>
+                            <h:inputText rendered="false" size="5" value="#{containerInformationBean.contInfo[1]}"/>
+                            <h:inputText rendered="false" size="10" value="#{containerInformationBean.contInfo[2]}"/>
+                            <h:inputText rendered="false" size="10" value="#{containerInformationBean.contInfo[3]}"/>-->
+                        </h:panelGrid>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right">
+                        <p:fieldset legend="Vessel Detail" >
+                            <p:dataTable id="vesselDetailTable" var="item" value="#{containerInformationBean.vesselDetail}"
+                                             paginator="false" rows="10" paginatorPosition="bottom"
+                                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                                <f:facet name="header">
+                                    <div class="header-panel-single-left">
+                                        &nbsp;
+                                    </div>
+                                </f:facet>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Vessel Name" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[0]}" />
+
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Voy In" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Voy Out" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Arrival Time" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Departure Time" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[4]}" />
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Last Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[5]}" />
+                                </p:column>
+
+                                <p:column style="text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Next Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[6]}" />
+                                </p:column>
+                            </p:dataTable>
+                        </p:fieldset>
+                    </td>
+                </tr>
+            </table>
+            
+            <br />
+            <p:fieldset legend="Container Detail" >
+                <p:dataTable id="containerDetailTable" var="item" value="#{containerInformationBean.containerDetail}"
+                                 paginator="false" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            &nbsp;
+                        </div>
+                    </f:facet>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="BL No" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Seal No" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Gross" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Gross Class" />
+                        </f:facet>
+                        <h:outputText />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Over Size" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Dangerous" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Dg Label" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Load Port" />
+                        </f:facet>
+                        <h:outputText value="#{item[7]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Disch Port" />
+                        </f:facet>
+                        <h:outputText value="#{item[8]}" />
+                    </p:column>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Operation" />
+                        </f:facet>
+                        <h:outputText value="#{item[9]}" />
+                    </p:column>
+                </p:dataTable>
+            </p:fieldset>
+            <p:tabView>
+                <!--LOAD-->
+                <p:tab title="Handling">
+                    <p:fieldset legend="Discharge">
+                        <p:dataTable id="handlingDischargeTable" var="item" value="#{containerInformationBean.handlingDischarges}"
+                                         paginator="false">
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;" />
+                            </f:facet>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column colspan="7" headerText="Stevedoring"/>
+                                    <p:column colspan="4" headerText="Head Truck"/>
+                                    <p:column colspan="8" headerText="Lift Off"/>
+                                </p:row>
+                                <p:row>
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="Confirm By" />
+                                    <p:column headerText="B" />
+                                    <p:column headerText="R" />
+                                    <p:column headerText="T" />
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="Confirm By" />
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="Confirm By" />
+                                    <p:column headerText="B" />
+                                    <p:column headerText="S" />
+                                    <p:column headerText="R" />
+                                    <p:column headerText="T" />
+                                </p:row>
+                            </p:columnGroup>
+                            <p:column>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[2]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[9]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[10]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[11]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[12]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[13]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[14]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[15]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[16]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[17]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[18]}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                    <br/>
+                    <p:fieldset legend="Load">
+                        <p:dataTable id="handlingLoadTable" var="item" value="#{containerInformationBean.handlingLoads}"
+                                         paginator="false" >
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;" />
+                            </f:facet>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column colspan="8" headerText="Lift On"/>
+                                    <p:column colspan="4" headerText="Head Truck"/>
+                                    <p:column colspan="7" headerText="Stevedoring"/>
+                                </p:row>
+                                <p:row>
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="Confirm By" />
+                                    <p:column headerText="B" />
+                                    <p:column headerText="S" />
+                                    <p:column headerText="R" />
+                                    <p:column headerText="T" />
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="Confirm By" />
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="Confirm By" />
+                                    <p:column headerText="B" />
+                                    <p:column headerText="R" />
+                                    <p:column headerText="T" />
+                                </p:row>
+                            </p:columnGroup>
+                            <p:column>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[2]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[9]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[10]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[11]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[12]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[13]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[14]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[15]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[16]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[17]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[18]}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </p:tab>
+                <p:tab title="Yard">
+                    <p:fieldset legend="Discharge">
+                        <p:dataTable id="yardDischarges" var="item" value="#{containerInformationBean.yardDischarges}"
+                                         paginator="true" rows="10" paginatorPosition="bottom"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;" />
+                            </f:facet>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column rowspan="2" headerText="No"/>
+                                    <p:column colspan="9" headerText="Lift Operation"/>
+                                </p:row>
+                                <p:row>
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="B" />
+                                    <p:column headerText="S" />
+                                    <p:column headerText="R" />
+                                    <p:column headerText="T" />
+                                    <p:column headerText="Ops" />
+                                    <p:column headerText="Confirm By" />
+                                </p:row>
+                            </p:columnGroup>
+                            <p:column>
+                                <h:outputText value="#{number+1}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[2]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText />
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                    <br/>
+                    <p:fieldset legend="Load">
+                        <p:dataTable id="yardLoads" var="item" value="#{containerInformationBean.yardLoads}"
+                                         paginator="true" rows="10" paginatorPosition="bottom"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;" />
+                            </f:facet>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column rowspan="2" headerText="No"/>
+                                    <p:column colspan="9" headerText="Lift Operation"/>
+                                </p:row>
+                                <p:row>
+                                    <p:column headerText="Equip" />
+                                    <p:column headerText="Opt" />
+                                    <p:column headerText="Date" />
+                                    <p:column headerText="B" />
+                                    <p:column headerText="S" />
+                                    <p:column headerText="R" />
+                                    <p:column headerText="T" />
+                                    <p:column headerText="Ops" />
+                                    <p:column headerText="Confirm By" />
+                                </p:row>
+                            </p:columnGroup>
+                            <p:column>
+                                <h:outputText value="#{number+1}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[2]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText />
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </p:tab>
+                <p:tab title="Cashier">
+                    <p:fieldset legend="Delivery">
+                        <p:dataTable id="cashierDischargeTable" var="item" value="#{containerInformationBean.cashierDischarges}"
+                                         paginator="false">
+                            <f:facet name="header">
+                                <div class="header-panel-single-left">
+                                    &nbsp;
+                                </div>
+                            </f:facet>
+
+                          <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No Reg" />
+                                </f:facet>
+                                <h:outputText value="#{item[7]}" />
+                           </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Job Slip" />
+                                </f:facet>
+                                <h:outputText value="#{item[0]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Valid Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No. Invoice" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Payment Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[3]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Loket" />
+                                </f:facet>
+                                <h:outputText value="#{item[4]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Customer" />
+                                </f:facet>
+                                <h:outputText value="#{item[5]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Filed By" />
+                                </f:facet>
+                                <h:outputText value="#{item[6]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                    <br />
+                    <p:fieldset legend="Receiving">
+                        <p:dataTable id="cashierLoadTable" var="item" value="#{containerInformationBean.cashierLoads}"
+                                         paginator="false">
+                            <f:facet name="header">
+                                <div class="header-panel-single-left">
+                                    &nbsp;
+                                </div>
+                            </f:facet>
+
+                           <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No Reg" />
+                                </f:facet>
+                                <h:outputText value="#{item[7]}" />
+                           </p:column>
+
+                           <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Job Slip" />
+                                </f:facet>
+                                <h:outputText value="#{item[0]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Valid Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No. Invoice" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Payment Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[3]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Loket" />
+                                </f:facet>
+                                <h:outputText value="#{item[4]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Customer" />
+                                </f:facet>
+                                <h:outputText value="#{item[5]}" />
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Filed By" />
+                                </f:facet>
+                                <h:outputText value="#{item[6]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </p:tab>
+                <p:tab title="Gate">
+                    <p:fieldset legend="Delivery">
+                        <p:dataTable id="gateDischargeTable" var="item" value="#{containerInformationBean.gateDischarges}"
+                                         paginator="false" >
+                            <f:facet name="header">
+                                <div class="header-panel-single-left">
+                                    &nbsp;
+                                </div>
+                            </f:facet>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Gate In Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[0]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Operator" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Gate Out Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Operator" />
+                                </f:facet>
+                                <h:outputText value="#{item[3]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                    <br />
+                    <p:fieldset legend="Receiving">
+                        <p:dataTable id="gateLoadTable" var="item" value="#{containerInformationBean.gateLoads}"
+                                         paginator="false" >
+                            <f:facet name="header">
+                                <div class="header-panel-single-left">
+                                    &nbsp;
+                                </div>
+                            </f:facet>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Gate In Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[0]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Operator" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Gate Out Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Operator" />
+                                </f:facet>
+                                <h:outputText value="#{item[3]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </p:tab>
+                <p:tab title="Cancel Loading">
+                <p:fieldset legend="Receiving History">
+                        <p:dataTable id="receivingHistoryTable" var="item" value="#{containerInformationBean.cashierLoadCancels}"
+                                         paginator="false" rows="1" >
+                            <f:facet name="header">
+                                <div class="header-panel-single-left">
+                                    &nbsp;
+                                </div>
+                            </f:facet>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Job Slip" />
+                                </f:facet>
+                                <h:outputText value="#{item[0]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Valid Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No. Invoice" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Payment Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[3]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Loket" />
+                                </f:facet>
+                                <h:outputText value="#{item[4]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Customer" />
+                                </f:facet>
+                                <h:outputText value="#{item[5]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Filed By" />
+                                </f:facet>
+                                <h:outputText value="#{item[6]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Block" />
+                                </f:facet>
+                                <h:outputText value="#{item[7]}" />
+                            </p:column>
+
+                           <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Slot" />
+                                </f:facet>
+                                <h:outputText value="#{item[8]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Row" />
+                                </f:facet>
+                                <h:outputText value="#{item[9]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Tier"/>
+                                </f:facet>
+                                <h:outputText value="#{item[10]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                    <br />
+                    <p:fieldset legend="Cancel Loading Information">
+                        <p:dataTable id="cancelLoadingTable" var="item" value="#{containerInformationBean.cashierCancelLoadings}"
+                                         paginator="false" rows="1" >
+                            <f:facet name="header">
+                                <div class="header-panel-single-left">
+                                    &nbsp;
+                                </div>
+                            </f:facet>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Job Slip" />
+                                </f:facet>
+                                <h:outputText value="#{item[0]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No. Invoice" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}" />
+                            </p:column>
+
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="Payment Date" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                </h:outputText>
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Loket" />
+                                </f:facet>
+                                <h:outputText value="#{item[3]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Customer" />
+                                </f:facet>
+                                <h:outputText value="#{item[4]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Filed By" />
+                                </f:facet>
+                                <h:outputText value="#{item[5]}" />
+                            </p:column>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Status" />
+                                </f:facet>
+                                <h:outputText value="#{item[6]}" />
+                            </p:column>
+
+                           <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="posisi" />
+                                </f:facet>
+                                <h:outputText value="#{item[7]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

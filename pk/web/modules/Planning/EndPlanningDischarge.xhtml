@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.end_planning_discharge']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.end_planning_discharge']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="vesselList">
+            <p:growl showDetail="true" globalOnly="true"/>
+            <p:panel rendered="#{endPlanningDischargeBean.listState}">
+                <p:dataTable value="#{endPlanningDischargeBean.planningVessels}" var="item"
+                             paginatorPosition="bottom" paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                    <f:facet name="header">
+                        &nbsp;
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}" style="width: 90px;text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[3]}" sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[4]}" sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Agent"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[5]}" style="width: 60px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Voy In"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[6]}" style="width: 60px; text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Voy Out"/>
+                        </f:facet>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="ETA"/>
+                        </f:facet>
+                        <h:outputText value="#{item[7]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column sortBy="#{item[8]}">
+                        <f:facet name="header">
+                            <h:outputText value="ETD"/>
+                        </f:facet>
+                        <h:outputText value="#{item[8]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column sortBy="#{item[9]}">
+                        <f:facet name="header">
+                            <h:outputText value="Open Stack"/>
+                        </f:facet>
+                        <h:outputText value="#{item[9]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column sortBy="#{item[10]}">
+                        <f:facet name="header">
+                            <h:outputText value="Closing Time"/>
+                        </f:facet>
+                        <h:outputText value="#{item[10]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column sortBy="#{item[11]}"  filterMatchMode="contains" filterBy="#{item[11]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[11]}"/>
+                    </p:column>
+                    <p:column style="width: 90px;text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" disabled="#{item[11].equals('ReadyService')}" image="ui-icon-stop" title="End Planning Vessel" actionListener="#{endPlanningDischargeBean.handleSelectTable}" update="confirmDialog" oncomplete="confirmation.show();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" actionListener="#{endPlanningDischargeBean.handlePreview}" image="ui-icon ui-icon-search" title="Preview Planning Vessel" update="vesselList detailPanel" >
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" disabled="#{item[11].equals('Approved')}" actionListener="#{endPlanningDischargeBean.handleSelectTable}" image="ui-icon-arrowreturn-1-w" title="Cancel End Planning Vessel" update="confirmDialogC" oncomplete="confirmationC.show();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:panel header="Detail Data" id="detailPanel" rendered="#{endPlanningDischargeBean.detailState}">
+                <p:tabView>
+                    <p:tab title="General Info">
+                        <h:panelGrid columns="5" width="100%">
+                            <p:fieldset legend="Vessel" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="No PPKB"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[0]}"/>
+                                    <h:outputText value="Booking Code"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[2]}"/>
+                                    <h:outputText value="Vessel Name"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[3]}"/>
+                                    <h:outputText value="GRT"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[26]}"/>
+                                    <h:outputText value="DWT"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[27]}"/>
+                                    <h:outputText value="BRT"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[28]}"/>
+                                    <h:outputText value="NRT"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[29]}"/>
+                                    <h:outputText value="LOA"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[30]}"/>
+                                    <h:outputText value="Agent"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[4]}"/>
+                                    <h:outputText value="Voy In"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[5]}"/>
+                                    <h:outputText value="Voy Out"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[6]}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="Detail Booking" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="Est. Disharge"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[13]} box"/>
+                                    <h:outputText value="Est. Load"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[14]} box"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="Port Information" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="Last Port"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[10]}"/>
+                                    <h:outputText value="Next Port"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[9]}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="Berth Info" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="Berth Name"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[33]}"/>
+                                    <h:outputText value="Fr Meter"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[11]}"/>
+                                    <h:outputText value="To Meter"/>:
+                                    <h:outputLabel value="#{endPlanningDischargeBean.pv[12]}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                    </p:tab>
+
+                    <p:tab title="Time Schedule">
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Est. Arrival Time"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[7]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Est. Berthing Time"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[15]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Est. Start Work Time"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[16]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Est. End Work Time"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[17]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Est. Departure Time"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[8]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </p:tab>
+
+                    <p:tab title="Closing Time">
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Closing Time Receiving"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[19]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Doc. Receiving"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[20]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Empty"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[21]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Reefer"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[22]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Doc. Emp/Reef"/>:
+                            <h:outputLabel value="#{endPlanningDischargeBean.pv[23]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </p:tab>
+                </p:tabView>
+                <f:facet name="footer">
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.close']}" image="ui-icon-circlesmall-close" update="vesselList" actionListener="#{endPlanningDischargeBean.setToListState}"/>
+                    </div>
+                </f:facet>
+            </p:panel>
+        </h:form>
+
+        <h:form id="confirmDialog">
+            <p:dialog header="#{msg['application.header.confirm.end_p']}"  widgetVar="confirmation" minWidth="400">
+                <p:panel>
+                    <h:inputHidden value="#{endPlanningDischargeBean.planningVessel.noPpkb}"/>
+                    <h:outputLabel value="#{msg['application.service.end_p']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{endPlanningDischargeBean.handleEndPlanning}" update="vesselList" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="confirmDialogC">
+            <p:dialog header="#{msg['application.header.confirm.rollback']}"  widgetVar="confirmationC" minWidth="400">
+                <p:panel>
+                    <h:inputHidden value="#{endPlanningDischargeBean.planningVessel.noPpkb}"/>
+                    <h:outputLabel value="#{msg['application.service.rollback']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{endPlanningDischargeBean.handleRollBack}" update="vesselList" oncomplete="confirmationC.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmationC.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,366 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.yard_operation.change_status.transhipment_delivery']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+        <h:form id="serviceVesselForm">
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB"/>:
+                <h:inputText size="30" id="noPpkb" disabled="true" value="#{transhipmentToDeliveryBean.serviceVessel[0]}" title="No PPKB"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgVessel.show();"/>
+                <h:outputLabel value="Vessel Name" for="vesselName" />:
+                <h:inputText size="30" id="vesselName" disabled="true" value="#{transhipmentToDeliveryBean.serviceVessel[1]}" title="Vessel Name"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage In" for="voyageIn" />:
+                <h:inputText size="30" id="voyageIn" disabled="true" value="#{transhipmentToDeliveryBean.serviceVessel[2]}" title="Voyage In"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                <h:inputText size="30" id="voyageOut" disabled="true" value="#{transhipmentToDeliveryBean.serviceVessel[3]}" title="Voyage Out"/>
+                <h:outputText value="&nbsp;"/>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="dialogVesselForm">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{transhipmentToDeliveryBean.serviceVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+                    <f:facet name="header">
+                        <div class="header-panel-right">
+                            &nbsp;
+                        </div>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{transhipmentToDeliveryBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="serviceVesselForm:serviceVesselDetail serviceContForm:serviceContDischForm serviceContForm:serviceContTransForm" oncomplete="dlgVessel.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="serviceContForm">
+            <p:accordionPanel autoHeight="false">
+                <p:tab title="Container Transhipment">
+                    <p:dataTable paginatorPosition="bottom" var="item" value="#{transhipmentToDeliveryBean.serviceContTranshipments}"
+                                 paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="No" id="serviceContTransForm"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                        <f:facet name="header" >
+                            <div class="header-panel-right">
+                                &nbsp;
+                            </div>
+                        </f:facet>
+                        <p:column sortBy="#{No+1}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{No+1}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[11]}" filterBy="#{item[11]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="BL No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[11]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Container No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[0]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Type"/>
+                            </f:facet>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Gross"/>
+                            </f:facet>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[12]}">
+                            <f:facet name="header">
+                                <h:outputText value="Commodity"/>
+                            </f:facet>
+                            <h:outputText value="#{item[12]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Seal No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[5]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[6]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Block"/>
+                            </f:facet>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[7]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Slot"/>
+                            </f:facet>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[8]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Row"/>
+                            </f:facet>
+                            <h:outputText value="#{item[8]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[9]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Tier"/>
+                            </f:facet>
+                            <h:outputText value="#{item[9]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[13]}">
+                            <f:facet name="header">
+                                <h:outputText value="Load Port"/>
+                            </f:facet>
+                            <h:outputText value="#{item[13]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[14]}">
+                            <f:facet name="header">
+                                <h:outputText value="Disch Port"/>
+                            </f:facet>
+                            <h:outputText value="#{item[14]}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" actionListener="#{transhipmentToDeliveryBean.handleSelectContTrans}" update="dialogForm:panelDetail" oncomplete="dlgEdit.show();" image="ui-icon ui-icon-pencil" title="Edit Service Cont Transhipment">
+                                    <f:attribute name="idCont" value="#{item[10]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Container Discharge">
+                    <p:dataTable paginatorPosition="bottom" var="item" value="#{transhipmentToDeliveryBean.changeStatusHistorys}"
+                                 paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="No" id="serviceContDischForm"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                        <f:facet name="header">
+                            &nbsp;
+                        </f:facet>
+                        <p:column sortBy="#{No+1}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{No+1}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="BL No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[1]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Container No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Type"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Gross"/>
+                            </f:facet>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Commodity"/>
+                            </f:facet>
+                            <h:outputText value="#{item[5]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Seal No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[7]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Block"/>
+                            </f:facet>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[8]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Slot"/>
+                            </f:facet>
+                            <h:outputText value="#{item[8]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[9]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Row"/>
+                            </f:facet>
+                            <h:outputText value="#{item[9]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[10]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Tier"/>
+                            </f:facet>
+                            <h:outputText value="#{item[10]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[11]}">
+                            <f:facet name="header">
+                                <h:outputText value="Load Port"/>
+                            </f:facet>
+                            <h:outputText value="#{item[11]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[12]}">
+                            <f:facet name="header">
+                                <h:outputText value="Disch Port"/>
+                            </f:facet>
+                            <h:outputText value="#{item[12]}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" actionListener="#{transhipmentToDeliveryBean.handleSelectContDisch}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Service Cont Discharge">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+            </p:accordionPanel>
+        </h:form>
+
+        <p:dialog modal="true"  widgetVar="dlgEdit" width="400" header="Transhipment to Delivery Confirm" resizable="false">
+            <h:form id="dialogForm">
+                <p:panel>
+                    <h:panelGrid id="panelDetail">
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Container No"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.contNo}" />
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText value="#{transhipmentToDeliveryBean.serviceContTranshipment.mlo.name}" disabled="true"/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.masterContainerType.contType}"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.contSize}"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.contStatus}"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.contGross}"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.sealNo}"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.masterCommodity.name}"/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="6">
+                            <h:outputText value="Location"/><p:spacer width="22" height="0"/>:
+                            <h:panelGrid columns="8">
+                                B<h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.masterYard.block}" size="3"/>
+                                S<h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.YSlot}" size="3"/>
+                                R<h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.YRow}" size="3"/>
+                                T<h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.YTier}" size="3"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <h:panelGrid columns="4">
+                            <h:outputText value="Load Port"/><p:spacer width="5" height="0"/>:
+                            <h:inputText disabled="true" value="#{transhipmentToDeliveryBean.serviceContTranshipment.loadPort}"/>
+                            <h:outputText value="Disch Port *"/><p:spacer width="5" height="0"/>:
+                            <h:selectOneMenu value="#{transhipmentToDeliveryBean.serviceContTranshipment.dischPort}">
+                                <f:selectItems value="#{transhipmentToDeliveryBean.masterPorts}" var="i" itemValue="#{i[0]}" itemLabel="#{i[1]}"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.confirm']}" actionListener="#{transhipmentToDeliveryBean.handleCopy}" update="serviceContForm:serviceContDischForm serviceContForm:serviceContTransForm growl" oncomplete="dlgEdit.hide();"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgEdit.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{transhipmentToDeliveryBean.handleDelete}" update="serviceContForm:serviceContDischForm serviceContForm:serviceContTransForm growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

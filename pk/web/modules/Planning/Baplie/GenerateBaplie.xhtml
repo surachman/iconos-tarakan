@@ -1,0 +1,313 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.baplie.generate_baplie']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.baplie.generate_baplie']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function validationInfo(args) {
+                        if(args.loggedIn) {
+                                confirmation.show();
+                        } else {
+                                dialogInfo.show();
+                        }
+                }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="pesan" showDetail="true" globalOnly="true"/>
+
+        <h:form id="formbaplie">
+            <p:dialog header="Select Planning Vessel"  widgetVar="dlgvessel" modal="true" minWidth="750">
+                <p:dataTable id="planningVesselTable" var="item" value="#{newGenerateBaplieBean.planningVessels}"
+                             paginator="true" rows="5"
+                             paginatorPosition="bottom"
+
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{newGenerateBaplieBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="formbaplie:planningVesselDetail" oncomplete="dlgvessel.hide();" >
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <p:panel style="width: 920px;">               
+                <h:panelGrid id="planningVesselDetail" columns="4">
+                    <h:outputLabel value="Operasi" />
+                    <h:outputLabel value=" : " />
+                    <h:selectOneRadio id="radio" value="#{newGenerateBaplieBean.action}" valueChangeListener="#{newGenerateBaplieBean.onChangeAction}">
+                        <f:selectItem itemValue="discharge" itemLabel="discharge" />
+                        <f:selectItem itemValue="load" itemLabel="load" />
+                        <f:ajax execute="@this" event="change" render="planningVesselTable planningVesselDetail dataBaplie total buttonSave"/>
+                    </h:selectOneRadio>
+                    <h:outputText />
+                    <h:outputLabel value="No PPKB" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{newGenerateBaplieBean.planningVessel[0]}" size="30" disabled="true"/>
+                    <p:commandButton onstart="freeze();" disabled="#{newGenerateBaplieBean.disablePPKB}" value="..." type="button" image="ui-icon-folder-open" onclick="dlgvessel.show();"/>
+                    <h:outputLabel value="Vessel Name" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{newGenerateBaplieBean.planningVessel[1]}" size="30" disabled="true"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage In" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{newGenerateBaplieBean.planningVessel[2]}" size="30" disabled="true"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage Out" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{newGenerateBaplieBean.planningVessel[3]}" size="30" disabled="true"/>
+                    <h:outputText />
+                </h:panelGrid>
+            </p:panel>            
+            <p:panel style="width: 920px;">
+                <h:panelGrid columns="4">
+                    <h:outputLabel value="Upload Baplie" />
+                    <h:outputLabel value=" : " />
+                    <p:fileUpload fileUploadListener="#{newGenerateBaplieBean.handleUpload}" auto="true" allowTypes="*.xls;" description="Excel File" label="#{msg['application.operation.open_file']}" sizeLimit="100000000" update="formbaplie:paneltabel formbaplie:properbaplie buttonSave pesan formbaplie:baplieButtonGroup container_status" />
+                    <h:outputText />
+                </h:panelGrid>
+            </p:panel>
+            <br />
+            <p:panel style="width: 920px;">
+                <p:outputPanel id="baplieButtonGroup">
+                    <div class="ui-datatable-header ui-widget-header ui-corner-tl ui-corner-tr" style="padding: 5px;">
+                        <div class="header-panel-left" >
+                            <p:commandButton onstart="freeze();" disabled="#{empty newGenerateBaplieBean.baplies}" value="#{msg['application.operation.remove_invalid_data']}" actionListener="#{newGenerateBaplieBean.handleRemoveInvalidContainer}" update="formbaplie:paneltabel formbaplie:properbaplie buttonSave formbaplie:baplieButtonGroup" image="ui-icon ui-icon-trash" />
+                        </div>
+                        <div class="header-panel-right" >
+                            <p:commandButton onstart="freeze();" disabled="#{empty newGenerateBaplieBean.baplies}" value="#{msg['application.operation.remove_all']}" action="#{newGenerateBaplieBean.clear}" update="formbaplie:paneltabel formbaplie:properbaplie buttonSave formbaplie:baplieButtonGroup" image="ui-icon ui-icon-trash" />
+                        </div>
+                    </div>
+                </p:outputPanel>
+                <div style="width: 900px; height: 400px; overflow: scroll; background-color: #dddddd;" >
+                    <h:panelGrid id="dataBaplie" columns="1">
+                        <p:panel id="paneltabel" visible="#{newGenerateBaplieBean.visible}" style="width: 1600px; height: auto;">
+                            <p:dataTable id="tableUpload" rowStyleClass="#{item[17].equals('') ? null : 'false-row'}" var="item" value="#{newGenerateBaplieBean.baplies}" update="formbaplie:paneltabel" rowIndexVar="number">
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+
+                                <p:column sortBy="#{item[0]}" style="width: 100px">
+                                    <f:facet name="header">
+                                        <h:outputText value="StowageLoc" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[0]}" />
+                                </p:column>
+                                <p:column sortBy="#{item[1]}" style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Bl No." />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+                                <p:column sortBy="#{item[2]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Cont No." />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="ISO" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Status" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[4]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="GrWt (Kg)" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[5]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Seal" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[6]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Comm" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[7]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Load Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[8]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Discharge Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[9]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Delivery Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[10]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="21f" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[11]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Export/Import" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[12]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Oversize" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[13]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Dangerous" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[14]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="Dangerous Label" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[15]}" />
+                                </p:column>
+                                <p:column style="text-align: center;">
+                                    <f:facet name="header">
+                                        <h:outputText value="MLO" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[16]}" />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Keterangan" />
+                                    </f:facet>
+                                    #{item[17]}
+                                </p:column>
+                            </p:dataTable>
+                        </p:panel>
+                    </h:panelGrid>
+                </div>                
+            </p:panel>
+            <br />
+            <p:panel id="total" visible="#{newGenerateBaplieBean.visibleTotal}" style="width: 920px;">
+                <h:panelGrid id="properbaplie" columns="3">
+                    <h:outputText value="#{newGenerateBaplieBean.atPort}" />
+                    <h:inputText value="#{newGenerateBaplieBean.disPort}" disabled="true" />
+                    <h:outputLabel value="Box" />
+                    <h:outputText value="#{newGenerateBaplieBean.otPort}" />
+                    <h:inputText value="#{newGenerateBaplieBean.otherPort}" disabled="true" />
+                    <h:outputLabel value="Box" />
+                    <h:outputLabel value="Total" />
+                    <h:inputText value="#{fn:length(newGenerateBaplieBean.baplies)}" disabled="true" />
+                    <h:outputLabel value="Box" />
+                </h:panelGrid>
+                <br/>
+                
+                
+                
+                
+                <f:facet name="footer">
+                    <div class="header-panel-single-right">
+                        <p:commandButton onstart="freeze();" id="buttonSave" disabled="#{newGenerateBaplieBean.disableSave}" action="#{newGenerateBaplieBean.validationContainer}" value="#{msg['application.operation.save']}" style="font-weight: bold;" image="ui-icon-disk"  oncomplete="validationInfo(args)"/>
+                    </div>
+                </f:facet>
+            </p:panel>
+        </h:form>
+        <p:dialog header="#{msg['application.header.confirm']}" modal="true"  widgetVar="confirmation">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.confirm.data_correct']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" action="#{newGenerateBaplieBean.saveData}" update="formbaplie:paneltabel formbaplie:properbaplie formbaplie:planningVesselTable formbaplie:planningVesselDetail formbaplie:total pesan formbaplie:buttonSave radio" onclick="confirmation.hide();"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:notificationBar effect="slide" position="bottom"  widgetVar="dialogInfo" style="opacity:0.8; background-color: #ffef8f;">
+            <f:facet name="close">
+                <p:graphicImage value="/resources/images/closebar.png" />
+            </f:facet>
+            <div class="style-notification">
+                <ul>
+                    <li>Data baplie masih berisi kontainer duplikat.</li>
+                    <li>Silahkan periksa data pada file excel anda.</li>
+                    <li>Kemudian lakukan Upload ulang.</li>
+                </ul>
+            </div>
+        </p:notificationBar>
+    </ui:define>
+
+</ui:composition>

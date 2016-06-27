@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_service.perhitungan_penumpukan_susulan_uc']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_service.perhitungan_penumpukan_susulan_uc']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();dlgBatalNota.hide();
+                    }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" />
+
+        <h:form id="registrationForm">           
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{penumpukanSusulanUcBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{penumpukanSusulanUcBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{penumpukanSusulanUcBean.registration.planningVessel.noPpkb}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{penumpukanSusulanUcBean.registration.planningVessel.preserviceVessel.masterVessel.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{penumpukanSusulanUcBean.registration.planningVessel.preserviceVessel.voyIn}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{penumpukanSusulanUcBean.registration.planningVessel.preserviceVessel.voyOut}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{penumpukanSusulanUcBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+            <h:panelGrid id="cek" columns="3">
+                <h:outputLabel value="Payment Type" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio value="#{penumpukanSusulanUcBean.invoice.paymentType}" valueChangeListener="#{penumpukanSusulanUcBean.onChangeEvent}" disabled="#{not penumpukanSusulanUcBean.registration.statusService.equals('registrasi')}">
+                    <f:selectItem itemValue="CASH" itemLabel="Cash"/>
+                    <f:selectItem itemValue="KREDIT" itemLabel="Kredit"/>
+                    <f:ajax execute="@this" event="change" render="cek"/>
+                </h:selectOneRadio>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="penumpukanSusulanServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{penumpukanSusulanUcBean.ucPenumpukanSusulanServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="penumpukanSusulanServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty penumpukanSusulanUcBean.registration.noReg}" actionListener="#{penumpukanSusulanUcBean.handleAdd}" update="dsFormDialogD:st" oncomplete="dlgD.show();"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{penumpukanSusulanUcBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor)}" oncomplete="dlgBatalNota.show()"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item[0]}" rowspan="2" headerText="Job Slip" />
+                        <p:column sortBy="#{item[1]}" rowspan="2" headerText="BL No" />
+                        <p:column sortBy="#{item[2]}" rowspan="2" headerText="Weight" />
+                        <p:column sortBy="#{item[3]}" rowspan="2" headerText="Unit" />
+                        <p:column sortBy="#{item[4]}" rowspan="2" headerText="Commodity" />
+                        <p:column sortBy="#{item[5]}" rowspan="2" headerText="Placement" />
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                        <p:column colspan="2" headerText="Charge&nbsp;(#{penumpukanSusulanUcBean.symbol})"/>
+                        <p:column sortBy="#{item[10]}" rowspan="2" headerText="Total&nbsp;(#{penumpukanSusulanUcBean.symbol})" />
+                        <p:column rowspan="2" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[6]}" headerText="Masa 1" />
+                        <p:column sortBy="#{item[7]}" headerText="Masa 2"/>
+                        <p:column sortBy="#{item[8]}" headerText="Masa 1" />
+                        <p:column sortBy="#{item[9]}" headerText="Masa 2" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[0]}" style="text-align: center"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[1]}" style="text-align: center"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[2]}" style="text-align: center"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[3]}" style="text-align: center"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[4]}" style="text-align: center"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[5]}" style="text-align: center">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[6]}" style="text-align: center"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[7]}" style="text-align: center"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[8]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[9]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[10]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column >
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{penumpukanSusulanUcBean.handleSelect}" disabled="#{not penumpukanSusulanUcBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Delivery Service">
+                            <f:attribute name="noBL" value="#{item[1]}"/>
+                            <f:attribute name="idCont" value="#{item[14]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="11" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{penumpukanSusulanUcBean.formattedTotal}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{penumpukanSusulanUcBean.formattedPpn}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{penumpukanSusulanUcBean.formattedMaterai}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{penumpukanSusulanUcBean.formattedJmlTotal}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{not penumpukanSusulanUcBean.registration.statusService.equals('registrasi') or empty penumpukanSusulanUcBean.ucPenumpukanSusulanServices}" update="registrationForm:registrationDetail registrationForm:cek penumpukanSusulanServiceForm:penumpukanSusulanServiceTable growl" actionListener="#{penumpukanSusulanUcBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty penumpukanSusulanUcBean.ucPenumpukanSusulanServices}" actionListener="#{penumpukanSusulanUcBean.handleDownloadTransactionRecap}" update="penumpukanSusulanServiceForm:penumpukanSusulanServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty penumpukanSusulanUcBean.ucPenumpukanSusulanServices or (penumpukanSusulanUcBean.disPrint and not loginSessionBean.supervisor) or penumpukanSusulanUcBean.disKredit}" actionListener="#{penumpukanSusulanUcBean.handleDownloadNota}" update="penumpukanSusulanServiceForm:penumpukanSusulanServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty penumpukanSusulanUcBean.ucPenumpukanSusulanServices or penumpukanSusulanUcBean.disKredit or penumpukanSusulanUcBean.disDetail}" actionListener="#{penumpukanSusulanUcBean.handleDownloadDetail}" update="penumpukanSusulanServiceForm:penumpukanSusulanServiceTable"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Entry Data Penumpukan Susulan UC"  widgetVar="dlgD" modal="true" minWidth="600" id="dialogD">
+            <p:panel>
+                <h:form id="dsFormDialo">
+                    <h:panelGrid columns="4" id="blNo">
+                        <h:outputText value="BL No :"/>
+                        <h:inputText value="#{penumpukanSusulanUcBean.blno}"/>
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.search']}" style="font-size: x-small" actionListener="#{penumpukanSusulanUcBean.handleFindBl}" update="dsFormDialogD growl"/>
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.show_all']}" style="font-size: x-small" actionListener="#{penumpukanSusulanUcBean.handleFindAllBl}" update="dsFormDialo:blNo dsFormDialogD growl" onsuccess="widget_dsFormDialogD_dialogContainer.clearFilters();"/>
+                    </h:panelGrid>
+                </h:form>
+            </p:panel>
+            <br/>
+            <h:form id="dsFormDialogD">
+                <p:panel>
+                    <div style="height: 300px; overflow: scroll;" >
+                        <p:dataTable id="dialogContainer" rowIndexVar="No" var="item" value="#{penumpukanSusulanUcBean.deliveryServices}" selection="#{penumpukanSusulanUcBean.deliveryContainer}">
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;"/>
+                            </f:facet>
+                            <p:column selectionMode="multiple" />
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="No." />
+                                </f:facet>
+                                <h:outputText value="#{No+1}." />
+                            </p:column>
+                            <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                                <f:facet name="header">
+                                    <h:outputText value="BL No" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[2]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Unit" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[3]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Weight" />
+                                </f:facet>
+                                <h:outputText value="#{item[3]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[4]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Commodity" />
+                                </f:facet>
+                                <h:outputText value="#{item[4]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                    <p:spacer height="15px"/>
+                    <p:fieldset legend="Batas Tanggal Penumpukan Susulan">
+                        <h:panelGrid columns="4">
+                            <h:outputText value="Tanggal Penumpukan S/D *"/>:
+                            <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="st" styleClass="cal" value="#{penumpukanSusulanUcBean.tanggalValidDate}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                            <p:message display="icon" for="st"/>
+                        </h:panelGrid>
+                    </p:fieldset>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" onsuccess="widget_dsFormDialogD_dialogContainer.clearFilters();" value="#{msg['application.operation.submit']}" actionListener="#{penumpukanSusulanUcBean.handleSave}"
+                                             image="ui-icon-check" update="penumpukanSusulanServiceForm:penumpukanSusulanServiceTable dsFormDialogD:dialogContainer growl" disabled="#{empty penumpukanSusulanUcBean.deliveryServices}"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgD.hide()" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{penumpukanSusulanUcBean.registrations}"
+                             paginator="true" rowIndexVar="No" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{No+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{penumpukanSusulanUcBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail registrationForm:cek penumpukanSusulanServiceForm:penumpukanSusulanServiceTable" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="Yes" actionListener="#{penumpukanSusulanUcBean.handleDelete}" update="registrationForm:registrationDetail registrationForm:cek penumpukanSusulanServiceForm:penumpukanSusulanServiceTable growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="No" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{penumpukanSusulanUcBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{penumpukanSusulanUcBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{penumpukanSusulanUcBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{penumpukanSusulanUcBean.handleCancelInvoice}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="registrationForm:registrationDetail registrationForm:cek penumpukanSusulanServiceForm:penumpukanSusulanServiceTable growl"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" visible="true" rendered="#{not penumpukanSusulanUcBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="PenumpukanSusulanUc.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

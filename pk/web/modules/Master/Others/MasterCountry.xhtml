@@ -1,0 +1,140 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.master_country']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.others.master_country']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();                
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl showDetail="true" life="3000" id="growl" globalOnly="true"/>
+        <h:form id="countryForm">
+            <p:dataTable id="countryTable" value="#{masterCountryBean.countryList}"  widgetVar="countryTable" var="item"
+                         paginatorPosition="bottom" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" actionListener="#{masterCountryBean.handleAdd}" update="countryForm2" oncomplete="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Country');"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Country Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="ISO Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Currency"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton title="click to edit" image="ui-icon-pencil" actionListener="#{masterCountryBean.handleSelectTable}" update="countryForm2" onsuccess="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Country');">
+                            <f:attribute name="countryCode" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton title="click to delete" image="ui-icon-trash" actionListener="#{masterCountryBean.handleSelectTable}" update="countryForm3" onsuccess="dialogDel.show()">
+                            <f:attribute name="countryCode" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="500" header="Master Country">
+            <h:form id="countryForm2">
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Country Code*" for="countryCode" />:
+                        <h:inputText id="countryCode" disabled="#{not empty masterCountryBean.country.countryCode}" value="#{masterCountryBean.country.countryCode}" title="CountryCode" required="true" requiredMessage="Country Code field  #{msg['application.validation.required']}" maxlength="2" size="5"/>
+                        <p:message for="countryCode" display="icon"/>
+
+                        <h:outputLabel value="Name*" for="name" />:
+                        <h:inputText id="name" value="#{masterCountryBean.country.name}" title="Name" required="true" requiredMessage="Name field  #{msg['application.validation.required']}" size="35"/>
+                        <p:message for="name" display="icon"/>
+
+                        <h:outputLabel value="ISO Name*" for="threeletterIsoName" />:
+                        <h:inputText id="threeletterIsoName" maxlength="3" value="#{masterCountryBean.country.threeletterIsoName}" title="ThreeletterIsoName" size="5" required="true" requiredMessage="ISO Name field #{msg['application.validation.required']}"/>
+                        <p:message for="threeletterIsoName" display="icon"/>
+
+                        <h:outputLabel value="Currency" for="currencyIsoName" />:
+                        <h:inputText id="currencyIsoName" maxlength="3" value="#{masterCountryBean.country.currencyIsoName}" title="CurrencyIsoName" size="5"/>
+                        <h:outputLabel value=""/>
+
+                        <h:outputLabel value="Flag Image Url" for="flagImgUrl" />:
+                        <h:inputText id="flagImgUrl" value="#{masterCountryBean.country.flagImgUrl}" title="FlagImgUrl" size="40" />
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" onstart="countryTable.clearFilters();" image="ui-icon-check" actionListener="#{masterCountryBean.handleSaveEdit}" update="countryForm growl countryForm2" oncomplete="validateForm(xhr, status, args)"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="countryForm3">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterCountryBean.handleDelete}" update="countryTable countryForm3 growl" onsuccess="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

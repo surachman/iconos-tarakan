@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!-- =========== FULL CONFIGURATION FILE ================================== -->
+
+<faces-config version="2.0"
+    xmlns="http://java.sun.com/xml/ns/javaee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd">
+    <application>
+         <locale-config>
+                   <default-locale>en</default-locale>
+                   <supported-locale>in</supported-locale>
+          </locale-config>
+        <resource-bundle>
+                  <base-name>messages</base-name>
+                   <var>msg</var>
+         </resource-bundle>
+    </application>
+    <navigation-rule>
+        <from-view-id>/*</from-view-id>
+        <navigation-case>
+            <from-outcome>goToHome</from-outcome>
+            <to-view-id>/modules/Home.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/*</from-view-id>
+        <navigation-case>
+            <from-outcome>goToMonitoring</from-outcome>
+            <to-view-id>/modules/Monitoring/Monitoring.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+    <navigation-rule>
+        <from-view-id>/modules/public/login.xhtml</from-view-id>
+        <navigation-case>
+            <from-outcome>navFromLogin</from-outcome>
+            <to-view-id>/modules/Home.xhtml</to-view-id>
+        </navigation-case>
+    </navigation-rule>
+   <lifecycle>
+        <phase-listener>com.pelindo.ebtos.jsf.listener.AccessControlPhaseListener</phase-listener>
+    </lifecycle>
+    <factory>
+        <exception-handler-factory>com.pelindo.ebtos.jsf.ViewExpiredExceptionExceptionHandlerFactory</exception-handler-factory>
+    </factory>
+</faces-config>

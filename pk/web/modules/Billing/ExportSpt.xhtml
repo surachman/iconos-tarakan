@@ -1,0 +1,205 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:qt="http://www.qtasnim.com/currency">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.export_spt']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="sptFilterForm">
+            <div class="ui-panel ui-widget ui-widget-content ui-corner-all" style="width:270px;">
+                <h:panelGrid columns="3" style="padding:15px;">
+                    <h:outputText value="Month"/>
+                    <h:outputText value=":"/>
+                    <p:outputPanel>
+                        <h:selectOneMenu value="#{exportSptBean.month}">
+                            <f:selectItem itemLabel="January" itemValue="01"/>
+                            <f:selectItem itemLabel="February" itemValue="02"/>
+                            <f:selectItem itemLabel="March" itemValue="03"/>
+                            <f:selectItem itemLabel="April" itemValue="04"/>
+                            <f:selectItem itemLabel="May" itemValue="05"/>
+                            <f:selectItem itemLabel="June" itemValue="06"/>
+                            <f:selectItem itemLabel="July" itemValue="07"/>
+                            <f:selectItem itemLabel="August" itemValue="08"/>
+                            <f:selectItem itemLabel="September" itemValue="09"/>
+                            <f:selectItem itemLabel="October" itemValue="10"/>
+                            <f:selectItem itemLabel="November" itemValue="11"/>
+                            <f:selectItem itemLabel="December" itemValue="12"/>
+                        </h:selectOneMenu>
+                    </p:outputPanel>
+                    <h:outputText value="Year"/>
+                    <h:outputText value=":"/>
+                    <p:inputText value="#{exportSptBean.year}"/>
+                </h:panelGrid>
+                <div class="ui-panel-footer ui-widget-content" style="overflow: visible;">
+                    <div class="header-panel-single-right">
+                        <p:outputPanel id="buttonSubForm">
+                            <p:commandButton actionListener="#{exportSptBean.handleChangeFilter}" update="sptListForm sptFilterForm:downloadButton " value="#{msg['application.operation.filter']}"/>
+                        </p:outputPanel>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <br />
+        <h:form id="sptListForm">
+            <p:tabView>
+                <p:tab title="IDR">
+                    <p:dataTable value="#{exportSptBean.sptsIdr}" var="item"
+                                 paginatorPosition="bottom"
+                                 paginator="true" rows="20"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,20,50" rowIndexVar="No">
+                        <f:facet name="header">
+                            <div class="header-panel-single-right">
+                                <p:commandButton actionListener="#{exportSptBean.handleDownloadSpt}" process="@this" rendered="#{not empty exportSptBean.sptsIdr}" ajax="false" value="#{msg['application.operation.download']}">
+                                    <f:param name="currCode" value="IDR" />
+                                    <p:fileDownload value="#{exportSptBean.fileDownload}" />
+                                </p:commandButton>
+                                <p:commandButton rendered="#{empty exportSptBean.sptsIdr}" disabled="true" value="#{msg['application.operation.download']}"/>
+                            </div>
+                        </f:facet>
+                         <p:column style="width: 20px;" >
+                            <f:facet name="header">
+                                <h:outputText value="No" />
+                            </f:facet>
+                            <h:outputText value="#{No+1}" />
+                        </p:column>
+                        <p:column filterMatchMode="contains" filterBy="#{item[7]}" sortBy="#{item[7]}">
+                            <f:facet name="header">
+                                <h:outputText value="No Faktur"/>
+                            </f:facet>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+                        <p:column filterMatchMode="contains" filterBy="#{item[5]}" sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="NPWP"/>
+                            </f:facet>
+                            <h:outputText value="#{item[5]}"/>
+                        </p:column>
+                        <p:column filterMatchMode="contains" filterBy="#{item[6]}" sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Customer"/>
+                            </f:facet>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[11]}">
+                            <f:facet name="header">
+                                <h:outputText value="Tanggal Faktur"/>
+                            </f:facet>
+                            <h:outputText value="#{item[11]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item[16]}">
+                            <f:facet name="header">
+                                <h:outputText value="DPP"/>
+                            </f:facet>
+                            <div class="header-panel-left">
+                                <h:outputText value="#{qt:getCurrencySymbol(item[19], item[20])}"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <h:outputText value="#{qt:getFormattedCurrency(item[19], item[20], item[16], false, item[21])}" style="font-weight: bold;"/>
+                            </div>
+                        </p:column>
+                        <p:column sortBy="#{item[17]}">
+                            <f:facet name="header">
+                                <h:outputText value="PPN"/>
+                            </f:facet>
+                            <div class="header-panel-left">
+                                <h:outputText value="#{qt:getCurrencySymbol(item[19], item[20])}"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <h:outputText value="#{qt:getFormattedCurrency(item[19], item[20], item[17], false, item[21])}" style="font-weight: bold;"/>
+                            </div>
+                        </p:column>
+                        <f:facet name="footer">
+                            &nbsp;
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="USD">
+                    <p:dataTable value="#{exportSptBean.sptsUsd}" var="item"
+                                 paginatorPosition="bottom"
+                                 paginator="true" rows="20"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,20,50" rowIndexVar="No">
+                        <f:facet name="header">
+                            <div class="header-panel-single-right">
+                                <p:commandButton actionListener="#{exportSptBean.handleDownloadSpt}" process="@this" rendered="#{not empty exportSptBean.sptsUsd}" ajax="false" value="#{msg['application.operation.download']}">
+                                    <f:param name="currCode" value="USD" />
+                                    <p:fileDownload value="#{exportSptBean.fileDownload}" />
+                                </p:commandButton>
+                                <p:commandButton rendered="#{empty exportSptBean.sptsUsd}" disabled="true" value="#{msg['application.operation.download']}"/>
+                            </div>
+                        </f:facet>
+                         <p:column style="width: 20px;" >
+                            <f:facet name="header">
+                                <h:outputText value="No" />
+                            </f:facet>
+                            <h:outputText value="#{No+1}" />
+                        </p:column>
+                        <p:column filterMatchMode="contains" filterBy="#{item[7]}" sortBy="#{item[7]}">
+                            <f:facet name="header">
+                                <h:outputText value="No Faktur"/>
+                            </f:facet>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+                        <p:column filterMatchMode="contains" filterBy="#{item[5]}" sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="NPWP"/>
+                            </f:facet>
+                            <h:outputText value="#{item[5]}"/>
+                        </p:column>
+                        <p:column filterMatchMode="contains" filterBy="#{item[6]}" sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Customer"/>
+                            </f:facet>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[11]}">
+                            <f:facet name="header">
+                                <h:outputText value="Tanggal Faktur"/>
+                            </f:facet>
+                            <h:outputText value="#{item[11]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column sortBy="#{item[16]}">
+                            <f:facet name="header">
+                                <h:outputText value="DPP"/>
+                            </f:facet>
+                            <div class="header-panel-left">
+                                <h:outputText value="#{qt:getCurrencySymbol(item[19], item[20])}"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <h:outputText value="#{qt:getFormattedCurrency(item[19], item[20], item[16], false, item[21])}" style="font-weight: bold;"/>
+                            </div>
+                        </p:column>
+                        <p:column sortBy="#{item[17]}">
+                            <f:facet name="header">
+                                <h:outputText value="PPN"/>
+                            </f:facet>
+                            <div class="header-panel-left">
+                                <h:outputText value="#{qt:getCurrencySymbol(item[19], item[20])}"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <h:outputText value="#{qt:getFormattedCurrency(item[19], item[20], item[17], false, item[21])}" style="font-weight: bold;"/>
+                            </div>
+                        </p:column>
+                        <f:facet name="footer">
+                            &nbsp;
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

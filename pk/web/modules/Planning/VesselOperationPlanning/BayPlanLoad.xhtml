@@ -1,0 +1,975 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.vessel_operation_planning.bay_plan_load']}"/>
+    </ui:define>
+
+    <ui:define name="bundles" >
+        <script src="./../../../resources/scripts/jquery.loupe.min.js" language="javascript" type="text/javascript"></script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.vessel_operation_planning.bay_plan_load']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleLoginRequest(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog');
+                             jQuery('#finish');
+                             jQuery('#dialogShift');
+                    } else {
+                            editDialog.hide();
+                            editDialogShift.hide();
+                            confirmationFinish.hide();
+                    }
+            }
+
+            function validateBayLocation(xhr, status, args) {
+                if(! (args.validationFailed || !args.isBayLocationValid)) {
+                    bayLocationSelectionDialog.hide();
+                    containerOnYardTable.clearFilters();
+                }
+            }
+            
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <h:form id="formLoad">
+            <p:dialog header="Select Planning Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750" >
+                <p:dataTable var="item" value="#{bayPlanLoadBean.planningVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number" id="vesselList">
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column  filterBy="#{item[0]}" sortBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterBy="#{item[1]}" sortBy="#{item[1]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{bayPlanLoadBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="formLoad:planningVesselDetail formLoad:contLoadPlanList formLoad:shiftingBayplanLoadsTable formLoad:tableTransDischarges contForm:planCont dsFormDialogD formEdit listTrans " oncomplete="dlgVessel.hide();containerOnYardTable.clearFilters();" onstart="freeze();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <br />
+            <h:panelGrid id="planningVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{bayPlanLoadBean.planningVessel[0]}" onmousedown="dlgVessel.show()" onkeypress="dlgVessel.show()" size="30"/>
+                <p:commandButton image="ui-icon-folder-open" value="..."  actionListener="#{bayPlanLoadBean.handleViewppkb}" update="formLoad:vesselList" oncomplete="dlgVessel.show()" style="font-size: x-small" onstart="freeze();"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{bayPlanLoadBean.planningVessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{bayPlanLoadBean.planningVessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{bayPlanLoadBean.planningVessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br/>
+            <br/>
+            <p:tabView dynamic="true">
+                <p:tab title="#{msg['menu.planning.vessel_operation_planning.bay_plan_load']} Container">
+                    <h:panelGrid columns="2" style="text-align: center; width: 100%" rowClasses="first-tr" id="contLoadPlanList">
+                        <p:outputPanel>
+                            <div class="header-panel-single-left">
+                                <h:panelGrid columns="2">
+                                    <h:selectBooleanCheckbox title="zoom" label="zoom" value="#{bayPlanLoadBean.enableZoom}" disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.bays}" valueChangeListener="#{bayPlanLoadBean.handleChangeZoomSetting}">
+                                        <p:ajax process="@this" event="change" onstart="freeze();" update="formLoad:contLoadPlanList"/>
+                                    </h:selectBooleanCheckbox>
+                                    <h:outputLabel style="font-size: 14px;" value="zoom"/>
+                                </h:panelGrid>
+                            </div>
+                        </p:outputPanel>
+                        <p:outputPanel>
+                            <div class="header-panel-single-right">
+                                <p:commandButton image="ui-icon-locked" value="#{msg['application.operation.finish']}" disabled="#{empty bayPlanLoadBean.planningVessel[0] or bayPlanLoadBean.disable or not empty bayPlanLoadBean.blocks or empty bayPlanLoadBean.planningContLoadList}" onstart="freeze();" immediate="true" oncomplete="confirmationFinish.show();"/>
+                            </div>
+                        </p:outputPanel>
+                        <h:panelGrid style="padding: 0px; margin: 0px;" columns="1">
+                            <p:panel style="width: 99%;">
+                                <f:facet name="header">
+                                    <h:outputText value="Container on YARD" />
+                                </f:facet>
+                                <h:panelGrid columns="8">
+                                    <h:outputText value="Blok"/>
+                                    <h:outputText value=":"/>
+                                    <p:outputPanel id="blockPanel">
+                                        <h:selectOneMenu disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.blocks}" id="blockSelect" value="#{bayPlanLoadBean.selectedBlock}" valueChangeListener="#{bayPlanLoadBean.handleChangeBlock}" label="Pilih Block">
+                                            <f:selectItems value="#{bayPlanLoadBean.blocks}" var="i" itemValue="#{i}" itemLabel="#{i}"/>
+                                            <p:ajax process="@this" event="change" onstart="freeze();" oncomplete="containerOnYardTable.clearFilters();" update="formLoad:slotPanel formLoad:podPanel formLoad:containerOnYardTable formLoad:cySideView"/>
+                                        </h:selectOneMenu>
+                                    </p:outputPanel>
+                                    <h:panelGrid columns="5" style="padding-left: 20px;">
+                                        <h:outputText value="Slot"/>
+                                        <h:outputText value=":"/>
+                                        <p:outputPanel id="slotPanel">
+                                            <h:selectOneMenu disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.slots}" id="slotSelect" value="#{bayPlanLoadBean.selectedSlot}" valueChangeListener="#{bayPlanLoadBean.handleChangeSlot}" label="Pilih Slot">
+                                                <f:selectItems value="#{bayPlanLoadBean.slots}"/>
+                                                <p:ajax process="@this" event="change" onstart="freeze();" oncomplete="containerOnYardTable.clearFilters();" update="formLoad:podPanel formLoad:containerOnYardTable formLoad:cySideView"/>
+                                            </h:selectOneMenu>
+                                        </p:outputPanel>
+                                        <p:commandButton disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.slots}" update="formLoad:slotPanel formLoad:podPanel formLoad:containerOnYardTable formLoad:cySideView" onstart="freeze();" actionListener="#{bayPlanLoadBean.handleClickPrevSlotButton}" image="ui-icon-arrowthick-1-w" value="Prev" oncomplete="containerOnYardTable.clearFilters();"/>
+                                        <p:commandButton disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.slots}" update="formLoad:slotPanel formLoad:podPanel formLoad:containerOnYardTable formLoad:cySideView" onstart="freeze();" actionListener="#{bayPlanLoadBean.handleClickNextSlotButton}" image="ui-icon-arrowthick-1-e" value="Next" oncomplete="containerOnYardTable.clearFilters();"/>
+                                    </h:panelGrid>
+                                    <h:outputText value="POD"/>
+                                    <h:outputText value=":"/>
+                                    <p:outputPanel id="podPanel">
+                                        <h:selectOneMenu disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.blocks}" id="podSelect" value="#{bayPlanLoadBean.selectedPod}" valueChangeListener="#{bayPlanLoadBean.handleChangePod}" label="Pilih POD">
+                                            <f:selectItem itemLabel="All Port" itemValue="#{null}"/>
+                                            <f:selectItems value="#{bayPlanLoadBean.pods}" var="i" itemValue="#{i}" itemLabel="#{i}"/>
+                                            <p:ajax process="@this" event="change" onstart="freeze();" oncomplete="containerOnYardTable.clearFilters();" update="formLoad:containerOnYardTable formLoad:cySideView"/>
+                                        </h:selectOneMenu>
+                                    </p:outputPanel>
+                                </h:panelGrid>
+                                <div style="width:600px; height:350px;">
+                                    <p:graphicImage id="cySideView" styleClass="cySideView" value="#{bayPlanLoadBean.cyFrontViewUrl}" rendered="#{not empty bayPlanLoadBean.planningVessel[0] and not empty bayPlanLoadBean.blocks and not empty bayPlanLoadBean.slots}" cache="false" width="600" height="350" alt="bayPlan" />
+                                </div>
+                                <p:outputPanel rendered="#{bayPlanLoadBean.enableZoom}">
+                                    <script type="text/javascript">
+                                        jQuery('[id=formLoad:cySideView]').loupe();
+                                    </script>
+                                </p:outputPanel>
+                            </p:panel>
+                            <p:dataTable id="containerOnYardTable" paginator="true" rows="10" paginatorPosition="bottom"  widgetVar="containerOnYardTable"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 value="#{bayPlanLoadBean.notPlannedContainersOnYard}" rowIndexVar="No" var="item">
+
+                                <f:facet name="header">
+                                    <div class="header-panel-single-left">
+                                        <p:commandButton onstart="freeze();" value="Print CY" actionListener="#{bayPlanLoadBean.handlePrintBayPlanLoadCY}" disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.bays}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="No" style="text-align: center; width: 15px;">
+                                    <h:outputText value="#{No+1}"/>
+                                </p:column>
+
+                                <p:column headerText="Container No" filterBy="#{item.contNo}" filterMatchMode="contains" sortBy="#{item.contNo}">
+                                    <h:outputText value="#{item.contNo}" />
+                                </p:column>
+
+                                <p:column headerText="Gross"  style="width:35px;" sortBy="#{item.contGross}">
+                                    <h:outputText value="#{item.contGross}" />
+                                </p:column>
+
+                                <p:column headerText="Type"  style="width:35px;" sortBy="#{item.masterContainerType.name}">
+                                    <h:outputText value="#{item.masterContainerType.name}" />
+                                </p:column>
+
+                                <p:column headerText="Row" style="width:25px;" sortBy="#{item.YRow}">
+                                    <h:outputText value="#{item.YRow}" />
+                                </p:column>
+
+                                <p:column headerText="Tier" style="width:25px;" sortBy="#{item.YTier}">
+                                    <h:outputText value="#{item.YTier}" />
+                                </p:column>
+
+                                <p:column headerText="Dest" filterBy="#{item.dischPort}" filterMatchMode="contains" sortBy="#{item.dischPort}">
+                                    <h:outputText value="#{item.dischPort}" />
+                                </p:column>
+
+                                <p:column headerText="Note"  style="width:60px; text-align: center;">
+                                    <h:outputText value="EXCL" rendered="#{item.isChangeVessel}"/>
+                                    <h:outputText value="TRNS" rendered="#{item.isTranshipment}"/>
+                                    <h:outputText value="SHFT" rendered="#{item.isShifting}"/>
+                                </p:column>
+
+                                <p:column headerText="Action"  style="width:25px;">
+                                    <p:commandButton process="@this" image="ui-icon-circle-triangle-e" disabled="#{bayPlanLoadBean.disable}" actionListener="#{bayPlanLoadBean.handleSelectContLoad}" update="bayLocationSelectionForm" oncomplete="bayLocationSelectionDialog.show();" title="set bay location">
+                                        <f:setPropertyActionListener target="#{bayPlanLoadBean.planningContLoad}" value="#{item}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGrid>
+                        
+                        <h:panelGrid style="padding: 0px; margin: 0px;" columns="1">
+                            <p:panel style="width: 99%;">
+                                <f:facet name="header">
+                                    <h:outputText value="Container on BAY" />
+                                </f:facet>
+                                <h:panelGrid columns="5">
+                                    <h:outputText value="Bay"/>
+                                    <h:outputText value=":"/>
+                                    <p:outputPanel id="bayPanel">
+                                        <h:selectOneMenu disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.bays}" id="baySelect" value="#{bayPlanLoadBean.selectedBay}" valueChangeListener="#{bayPlanLoadBean.handleChangeBay}" label="Pilih Bay">
+                                            <f:selectItems value="#{bayPlanLoadBean.bays}" var="i" itemValue="#{i}" itemLabel="#{i}"/>
+                                            <p:ajax process="@this" event="change" onstart="freeze();" update="formLoad:containerOnBayTable formLoad:bayPlan"/>
+                                        </h:selectOneMenu>
+                                    </p:outputPanel>
+                                    <p:commandButton disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.bays}" update="formLoad:baySelect formLoad:containerOnBayTable formLoad:bayPlan" onstart="freeze();" actionListener="#{bayPlanLoadBean.handleClickPrevBayButton}" image="ui-icon-arrowthick-1-w" value="Prev"/>
+                                    <p:commandButton disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.bays}" update="formLoad:baySelect formLoad:containerOnBayTable formLoad:bayPlan" onstart="freeze();" actionListener="#{bayPlanLoadBean.handleClickNextBayButton}" image="ui-icon-arrowthick-1-e" value="Next"/>
+                                </h:panelGrid>
+                                <div style="width:600px; height:350px;">
+                                    <p:graphicImage id="bayPlan" styleClass="shiftzoom" value="#{bayPlanLoadBean.vesselProfileUrl}" rendered="#{not empty bayPlanLoadBean.planningVessel[0] and not empty bayPlanLoadBean.bays}" cache="false" width="600" height="350" alt="bayPlan" />
+                                </div>
+                                <p:outputPanel rendered="#{bayPlanLoadBean.enableZoom}">
+                                    <script type="text/javascript">
+                                        jQuery('[id=formLoad:bayPlan]').loupe();
+                                    </script>
+                                </p:outputPanel>
+                            </p:panel>
+                            <p:dataTable id="containerOnBayTable" paginator="true" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"
+                                 value="#{bayPlanLoadBean.plannedContainersOnBay}" rowIndexVar="No" var="item">
+
+                                <f:facet name="header">
+                                    <div class="header-panel-single-right">
+                                        <p:commandButton onstart="freeze();" value="Print Bay Plan" actionListener="#{bayPlanLoadBean.handlePrintBayPlanLoad}" disabled="#{empty bayPlanLoadBean.planningVessel[0] or empty bayPlanLoadBean.bays}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                                    </div>
+                                </f:facet>
+
+                                <p:column headerText="No" style="text-align: center; width: 15px;">
+                                    <h:outputText value="#{No+1}"/>
+                                </p:column>
+
+                                <p:column headerText="Container No" filterMatchMode="contains" sortBy="#{item.contNo}">
+                                    <h:outputText value="#{item.contNo}" />
+                                </p:column>
+
+                                <p:column headerText="Gross"  style="width:35px;" sortBy="#{item.contGross}">
+                                    <h:outputText value="#{item.contGross}" />
+                                </p:column>
+
+                                <p:column headerText="Type"  style="width:35px;" sortBy="#{item.masterContainerType.name}">
+                                    <h:outputText value="#{item.masterContainerType.name}" />
+                                </p:column>
+
+                                <p:column headerText="Row" style="width:25px;" sortBy="#{item.VRow}">
+                                    <h:outputText value="#{item.VRow}" />
+                                </p:column>
+
+                                <p:column headerText="Tier" style="width:25px;" sortBy="#{item.VTier}">
+                                    <h:outputText value="#{item.VTier}" />
+                                </p:column>
+
+                                <p:column headerText="Dest" sortBy="#{item.dischPort}">
+                                    <h:outputText value="#{item.dischPort}" />
+                                </p:column>
+
+                                <p:column headerText="Note"  style="width:60px;">
+                                    <h:outputText value="EXCL" rendered="#{item.isChangeVessel}"/>
+                                    <h:outputText value="TRNS" rendered="#{item.isTranshipment}"/>
+                                    <h:outputText value="SHFT" rendered="#{item.isShifting}"/>
+                                </p:column>
+
+                                <p:column headerText="Action"  style="width:25px;">
+                                    <p:commandButton onstart="freeze();" process="@this" disabled="#{bayPlanLoadBean.disable}" image="ui-icon-trash" update="formLoad:contLoadPlanList" actionListener="#{bayPlanLoadBean.handleDeleteContainerOnBay}" oncomplete="containerOnYardTable.clearFilters();" title="delete">
+                                        <f:param name="index" value="#{No}" />
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:tab>
+
+                <p:tab title="#{msg['menu.planning.vessel_operation_planning.bay_plan_load']} Uncontainerized">
+                    <p:dataTable id="tableTransDischarges" var="item" value="#{bayPlanLoadBean.uncontainerizedList}"
+                                 paginator="true" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number" >
+
+                        <f:facet name="header">
+                            <div class="header-panel-single-left">
+                                <p:commandButton value="add" disabled="#{empty bayPlanLoadBean.planningVessel[0]}" oncomplete="createPlanUc.show()" update="formLoad:planningBayplanLoadsTable growl" image="ui-icon-plusthick" immediate="true"  title="Add"  onstart="freeze();"/>
+
+                            </div>
+                        </f:facet>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{number+1}." />
+                        </p:column>
+
+                        <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Bl No" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Comodity" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Weight" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Unit" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Truck Loosing" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Block" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[7]}" filterBy="#{item[7]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Load Port" />
+                            </f:facet>
+                            <h:outputText value="#{item[7]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[8]}" filterBy="#{item[8]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Disch Port" />
+                            </f:facet>
+                            <h:outputText value="#{item[8]}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" actionListener="#{bayPlanLoadBean.handleSelectDeleteUc}" disabled="#{item[9].equals('VESSEL') or item[9].equals('STV')}" image="ui-icon-trash" title="Delete PlanningTransDischarge" oncomplete="confirmation2.show();">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-right">
+                                <h:outputLabel value=""/>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+
+                <p:tab title="#{msg['menu.planning.vessel_operation_planning.bay_plan_load']} To CY">
+                    <p:dataTable id="shiftingBayplanLoadsTable" var="item" value="#{bayPlanLoadBean.serviceShftingList}"
+                                 paginator="true" rows="10"
+                                 paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                        <f:facet name="header">
+                            <div class="header-panel-single-left">
+                                <h:outputLabel value="">&nbsp;</h:outputLabel>
+                            </div>
+                        </f:facet>
+
+                        <p:columnGroup type="header">
+                            <p:row>
+                                <p:column rowspan="2" headerText="No" />
+                                <p:column sortBy="#{item[16]}" filterMatchMode="contains" filterBy="#{item[16]}"  style="text-align: center" rowspan="2" headerText="Bl No" />
+                                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}"  style="text-align: center" rowspan="2" headerText="Container No" />
+                                <p:column sortBy="#{item[1]}" rowspan="2" headerText="Size" />
+                                <p:column sortBy="#{item[2]}" rowspan="2" headerText="Type" />
+                                <p:column sortBy="#{item[3]}" rowspan="2" headerText="Status"/>
+                                <p:column sortBy="#{item[4]}" rowspan="2" headerText="Gross" />
+                                <p:column sortBy="#{item[5]}" rowspan="2" headerText="Seal No"/>
+                                <p:column colspan="2" headerText="Port"/>
+                                <p:column colspan="4" headerText="Yard Position" />
+                                <p:column colspan="3" headerText="Vessel Position" />
+                                <p:column rowspan="2" headerText="Action" />
+                            </p:row>
+                            <p:row>
+                                <p:column sortBy="#{item[17]}" headerText="Load" />
+                                <p:column sortBy="#{item[18]}" headerText="Disch" />
+                                <p:column sortBy="#{item[12]}" headerText="Block" filterMatchMode="contains" filterBy="#{item[12]}"/>
+                                <p:column sortBy="#{item[13]}" headerText="Slot" />
+                                <p:column sortBy="#{item[14]}" headerText="Row" />
+                                <p:column sortBy="#{item[15]}" headerText="Tier" />
+                                <p:column sortBy="#{item[6]}" headerText="Bay" />
+                                <p:column sortBy="#{item[7]}" headerText="Row" />
+                                <p:column sortBy="#{item[8]}" headerText="Tier" />
+                            </p:row>
+                        </p:columnGroup>
+
+                        <p:column>
+                            <h:outputText value="#{number+1}."/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[16]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[0]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[1]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[3]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[5]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[17]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[18]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[12]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[13]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[14]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[15]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item[8]}"/>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton actionListener="#{bayPlanLoadBean.handleEditDeleteButtonShift}" disabled="#{item[21].equals('3')}"  update="formEditShift" oncomplete="editDialogShift.show();"
+                                                 image="ui-icon-pencil" title="Edit">
+                                    <f:attribute name="idPlan" value="#{item[19]}"/>
+                                    <f:attribute name="idService" value="#{item[20]}"/>
+                                </p:commandButton>                               
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+
+            </p:tabView>
+        </h:form>
+
+        <!--dialog untuk konfirmasi menghapus-->
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation2">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="Are you sure you want to delete this file?" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{bayPlanLoadBean.deleteUc}"  update="formLoad:tableTransDischarges dsFormDialogD growl" onclick="confirmation2.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation2.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="createPlanUc" header="Add Bay Plan Load Uncontainerized" modal="true" width="900">
+            <h:form id="dsFormDialogD">
+                <p:panel>
+                    <div style="height: 300px; overflow: scroll;" >
+                        <p:dataTable id="dialogContainer"  widgetVar="serviceContDiscTable" rowIndexVar="No" var="item" value="#{bayPlanLoadBean.uncontainerizedSelect}" selection="#{bayPlanLoadBean.bayplanUncontainerized}">
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;"/>
+                            </f:facet>
+                            <p:column selectionMode="multiple" />
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No" />
+                                </f:facet>
+                                <h:outputText value="#{No+1}" />
+                            </p:column>
+                            <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Bl No"/>
+                                </f:facet>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Comodity No"/>
+                                </f:facet>
+                                <h:outputText value="#{item[2]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[3]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Weight"/>
+                                </f:facet>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[5]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Unit"/>
+                                </f:facet>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[6]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Block"/>
+                                </f:facet>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[7]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Load Port"/>
+                                </f:facet>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[8]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Disch Port"/>
+                                </f:facet>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" onsuccess="serviceContDiscTable.clearFilters();" actionListener="#{bayPlanLoadBean.handleSaveUc}"
+                                             image="ui-icon-check" update="formLoad:tableTransDischarges dsFormDialogD growl" disabled="#{empty bayPlanLoadBean.uncontainerizedSelect}"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="createPlanUc.hide()" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog id="bayPlanPreview-dialog" draggable="true" closable="true" resizable="false" modal="true" header="BayPlan" position="'center',50"  widgetVar="bayPlanPreviewDialog"  width="900">
+            <h:form id="formdischarge">
+                <br/>
+                <br/>
+                <p:remoteCommand name="updateAfterBayChanged" update="formdischarge:bayPlanPreview-buttonsSubForm formdischarge:bayPlanPreview-imageSubForm"/>
+
+                <p:outputPanel id="bayPlanPreview-content">
+                    <p:panel rendered="#{not empty bayPlanLoadBean.bays}">
+                        <h:panelGrid columns="4">
+                            <h:outputText value="Bay"/>
+                            <h:outputText value=":"/>
+                            <p:outputPanel id="bayPlanPreview-baysSubForm">
+                                <h:selectOneMenu value="#{bayPlanLoadBean.selectedBayIndex}" onchange="updateAfterBayChanged();" label="Pilih Bay">
+                                    <f:selectItems value="#{bayPlanLoadBean.bays}"/>
+                                </h:selectOneMenu>
+                            </p:outputPanel>
+                            <p:outputPanel id="bayPlanPreview-buttonsSubForm">
+                                <p:commandButton onstart="freeze();" actionListener="#{bayPlanLoadBean.handleClickPrevButton}" update="formdischarge:bayPlanPreview-content" value="prev"/>
+                                <p:commandButton onstart="freeze();" actionListener="#{bayPlanLoadBean.handleClickNextButton}" update="formdischarge:bayPlanPreview-content" value="next"/>
+                            </p:outputPanel>
+                        </h:panelGrid>
+                        <p:outputPanel id="bayPlanPreview-imageSubForm">
+                            <p:graphicImage value="#{bayPlanLoadBean.vesselProfileUrl}" cache="false"/>
+                        </p:outputPanel>
+                        <f:facet name="footer">
+                            <p:commandButton onstart="freeze();" value="refresh" update="formdischarge:bayPlanPreview-content"/>
+                        </f:facet>
+                    </p:panel>
+                    <p:panel rendered="#{empty bayPlanLoadBean.bays}">
+                        <br/>
+                        <br/>
+                        <br/>
+                        <center>
+                            <p>Vessel profile is not available for vessel <b><h:outputText value="#{bayPlanLoadBean.planningVessel[10]}"/></b><br/>
+                                please fill out the data on the <b>Master Vessel Profile Menu</b>
+                            </p>
+                        </center>
+                        <br/>
+                        <br/>
+                        <br/>
+                    </p:panel>
+                </p:outputPanel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  header="#{msg['application.header.confirm.finish']}"  widgetVar="confirmationFinish" id="finish">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.finish_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{bayPlanLoadBean.clearYardCordinat}" update="formLoad:contLoadPlanList growl" oncomplete="confirmationFinish.hide()" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmationFinish.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']} bayplan load" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{bayPlanLoadBean.delete}"  update="fmAddYard:add formLoad:planningBayplanLoadsTable growl ListPlan listTrans contForm" onclick="confirmation.hide();" onstart="freeze();"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="editDialog" header="Update Planning Cont Allocation" width="400" modal="true" id="dialog">
+            <h:form id="formEdit">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputText value="Container No"/>
+                        <h:outputText value=":"/>
+                        <h:outputText value="#{bayPlanLoadBean.planningContLoad.contNo}"/>
+                    </h:panelGrid>
+                    <br/>
+                    <br/>
+                    <h:outputText value="Yard Allocation" style="font-weight: bold" />
+                    <h:panelGrid columns="12" width="350">
+                        <h:outputText value="Bay"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu value="#{bayPlanLoadBean.planningContLoad.VBay}" valueChangeListener="#{bayPlanLoadBean.onChangeBay}">
+                            <f:selectItems value="#{bayPlanLoadBean.bayChoices}" />
+                            <f:ajax execute="@this" event="change" render="rowChoices tierChoices"/>
+                        </h:selectOneMenu>
+
+                        <h:outputText value="Row"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="rowChoices" value="#{bayPlanLoadBean.planningContLoad.VRow}" valueChangeListener="#{bayPlanLoadBean.onChangeRow}">
+                            <f:selectItems value="#{bayPlanLoadBean.rowChoices}" />
+                            <f:ajax execute="@this" event="change" render="tierChoices"/>
+                        </h:selectOneMenu>
+
+                        <h:outputText value="Tier"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="tierChoices" value="#{bayPlanLoadBean.planningContLoad.VTier}">
+                            <f:selectItems value="#{bayPlanLoadBean.tierChoices}" />
+                        </h:selectOneMenu>
+
+                    </h:panelGrid>
+
+
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.submit']}" actionListener="#{bayPlanLoadBean.handleSubmit}"
+                                                 oncomplete="handleLoginRequest(xhr, status, args)" update="fmAddYard:add formLoad:planningBayplanLoadsTable growl" image="ui-icon-check" onstart="freeze();"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="editDialog.hide()" onstart="freeze();" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!-- shifting to cy       -->
+
+        <p:dialog  widgetVar="editDialogShift" header="Update Bay Plan Allocation" width="400" modal="true" id="dialogShift">
+            <h:form id="formEditShift">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputText value="Container No"/>
+                        <h:outputText value=":"/>
+                        <h:outputText value="#{bayPlanLoadBean.serviceShifting.contNo}"/>
+                    </h:panelGrid>
+                    <br/>
+                    <br/>
+                    <h:outputText value="Yard Allocation" style="font-weight: bold" />
+                    <h:panelGrid columns="12" width="350">
+                        <h:outputText value="Bay"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu value="#{bayPlanLoadBean.serviceShifting.VBay}" valueChangeListener="#{bayPlanLoadBean.onChangeBay}">
+                            <f:selectItems value="#{bayPlanLoadBean.bayChoices}" />
+                            <f:ajax execute="@this" event="change" render="rowChoices tierChoices"/>
+                        </h:selectOneMenu>
+
+                        <h:outputText value="Row"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="rowChoices" value="#{bayPlanLoadBean.serviceShifting.VRow}" valueChangeListener="#{bayPlanLoadBean.onChangeRow}">
+                            <f:selectItems value="#{bayPlanLoadBean.rowChoices}" />
+                            <f:ajax execute="@this" event="change" render="tierChoices"/>
+                        </h:selectOneMenu>
+
+                        <h:outputText value="Tier"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="tierChoices" value="#{bayPlanLoadBean.serviceShifting.VTier}">
+                            <f:selectItems value="#{bayPlanLoadBean.tierChoices}"/>
+                        </h:selectOneMenu>
+
+                        <h:outputText value="Tier"/>
+                        <h:outputText value=":"/>
+                        <h:outputText value="#{bayPlanLoadBean.serviceShifting.VTier}"/>
+                    </h:panelGrid>
+
+
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.submit']}" actionListener="#{bayPlanLoadBean.handleSubmitShift}"
+                                                 oncomplete="handleLoginRequest(xhr, status, args)" update="formLoad:shiftingBayplanLoadsTable formEditShift growl" image="ui-icon-check" onstart="freeze();"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="editDialogShift.hide()" onstart="freeze();" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Add Bay Plan"  widgetVar="dlg" modal="true" minWidth="500" id="dialogg">
+            <h:form id="fmYard">
+                <p:panel>                    
+                    <h:panelGrid columns="5" id="cont">
+                        <h:outputLabel value="Container No * " />
+                        <h:outputLabel value=" : " />
+                        <h:inputText onkeypress="cont.show()" onmousedown="cont.show()" id="ContNo" value="#{bayPlanLoadBean.serviceContTranshipment.contNo}" requiredMessage="Container No field #{msg['application.validation.required']}" required="true"/>
+                        <p:commandButton onclick="cont.show()" value="..." image="ui-icon-folder-open" title="Browse for Container no" style="font-size: x-small" onstart="freeze();"/>
+                        <p:message for="ContNo" display="icon"/>
+
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.mlo.name}"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Type" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.masterContainerType.name}"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Size" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.contSize}"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Status" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.contStatus}"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Gross" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.contGross}" />
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Seal No" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.sealNo}" />
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Comodity" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.masterCommodity.commodityCode}"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="OH/OW/OL" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.overSize ? 'Y' : 'N'}"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="21 ft" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.twentyOneFeet ? 'Y' : 'N'}"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                        <h:outputLabel value="Dangerous " />
+                        <h:outputLabel value=" : " />                        
+                        <h:inputText disabled="true" value="#{bayPlanLoadBean.serviceContTranshipment.dangerous ? bayPlanLoadBean.serviceContTranshipment.masterCommodity.masterDangerousClass : 'N'}"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}" actionListener="#{bayPlanLoadBean.submitNewPpkb}" oncomplete="handleLoginRequestt(xhr, status, args)" update="formLoad:planningBayplanLoadsTable growl contForm:planCont fmYard contForm" onstart="freeze();"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" update="fmYard:cont" actionListener="#{bayPlanLoadBean.handleAdd}" onstart="freeze();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Preview Container"  widgetVar="bayLocationSelectionDialog" modal="true" minWidth="500" id="bayLocationSelectionDialog">
+            <h:form id="bayLocationSelectionForm">
+                <p:panel>
+                    <p:message for="tierChoices" id="tierChoices_Messages"/>
+                    <h:panelGrid columns="2" id="cont">
+                        <h:panelGrid columns="5">
+                            <h:outputLabel value="Container No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{bayPlanLoadBean.planningContLoad.contNo}" disabled="true"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.masterContainerType.name}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.contGross}" />
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                        </h:panelGrid>
+                        <h:panelGrid columns="5">
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.sealNo}" />
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Comodity" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.masterCommodity.commodityCode}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.overSize ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="21 ft" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Dangerous " />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{bayPlanLoadBean.planningContLoad.dg ? bayPlanLoadBean.planningContLoad.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="7" width="350">
+                        <h:outputText value="Row"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="rowChoices" value="#{bayPlanLoadBean.planningContLoad.VRow}" valueChangeListener="#{bayPlanLoadBean.onChangeRow}">
+                            <f:selectItems value="#{bayPlanLoadBean.rowChoices}" />
+                            <p:ajax process="@this" event="change" onstart="freeze();" update="tierChoices"/>
+                        </h:selectOneMenu>
+
+                        <h:outputText value="Tier"/>
+                        <h:outputText value=":"/>
+                        <h:selectOneMenu id="tierChoices" value="#{bayPlanLoadBean.planningContLoad.VTier}">
+                            <f:selectItems value="#{bayPlanLoadBean.tierChoices}" />
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.exit']}" oncomplete="bayLocationSelectionDialog.hide();containerOnYardTable.clearFilters();" onstart="freeze();" immediate="true"/>
+                                <p:commandButton actionListener="#{bayPlanLoadBean.handleChangeBayLocation}" value="#{msg['application.operation.submit']}" update="formLoad:contLoadPlanList growl bayLocationSelectionForm:tierChoices_Messages" oncomplete="validateBayLocation(xhr, status, args);" onstart="freeze();"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+              function handleLoginRequestt(xhr, status, args) {
+                      if(args.validationFailed || !args.loggedIn) {
+                              jQuery('#dialogg');
+                      } else {
+                              dlg.hide();
+                      }
+              }
+        </script>
+
+    </ui:define>
+
+</ui:composition>

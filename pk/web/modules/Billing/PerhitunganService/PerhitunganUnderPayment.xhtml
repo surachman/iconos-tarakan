@@ -1,0 +1,849 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode"
+                xmlns:qt="http://www.qtasnim.com/currency">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_cancel_document']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_cancel_document']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"></script>
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.blink.js" />
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+        <script type="text/javascript">
+            function validateUnderPaymentConfirm(xhr, status, args) {
+                if(args.validationFailed || args.isValid == false) {
+                   
+                } else {
+                    if (args.underpaymentConfirmationRequired == true) {
+                        genTitle('underpaymentConfirmationDialog','Under Payments Confirmation');
+                        underpaymentConfirmationDialog.show();
+                    } else {
+                        batalNotaDialog.hide();
+                        underpaymentConfirmationDialog.hide();
+                        cancelDocumentServiceEntryDialog.hide();
+                    }
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.registration.noReg}" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showRegistrations();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.registration.masterCustomer.name}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.registration.planningVessel.noPpkb}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.registration.statusService}" size="30"/>
+                <h:outputLabel/>
+            </h:panelGrid>
+        </h:form>
+        
+        <br/>
+        <h:form id="cancelDocumentsForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{perhitunganUnderPaymentBean.cancelDocumentServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="cancelDocumentsTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty perhitunganUnderPaymentBean.registration.noReg or not perhitunganUnderPaymentBean.registration.statusService.equals('registrasi')}" update="cancelDocumentServiceEntryForm" oncomplete="cancelDocumentServiceEntryDialog.show();" actionListener="#{perhitunganUnderPaymentBean.handleAdd}" onclick="genTitle('cancelDocumentServiceEntryDialog','#{msg['application.operation.add']} Cancel Loading');"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{true or empty perhitunganUnderPaymentBean.registration.noReg or empty perhitunganUnderPaymentBean.cancelDocumentServices or (perhitunganUnderPaymentBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor))}" image="ui-icon-plusthick" title="Batal Nota" update="batalNota" oncomplete="batalNotaDialog.show()" actionListener="#{perhitunganUnderPaymentBean.handleAddCancelInvoice}"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="3" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item.jobSlip}" rowspan="2" headerText="Job Slip"/>
+                        <p:column sortBy="#{item.contNo}" rowspan="2" headerText="Container No"/>
+                        <p:column sortBy="#{item.contStatus}" rowspan="2" headerText="Status"/>
+                        <p:column sortBy="#{item.contSize}" rowspan="2" headerText="Size" />
+                        <p:column sortBy="#{item.masterContainerType.masterContainerTypeInGeneral.id}" rowspan="3" headerText="Type" />
+                        <p:column sortBy="#{item.overSize}" rowspan="2" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column colspan="2" headerText="Charge (#{empty perhitunganUnderPaymentBean.masterCurrency.language ? '-' : qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)})"/>
+                        <p:column rowspan="2" headerText="Total (#{empty perhitunganUnderPaymentBean.masterCurrency.language ? '-' : qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)})"/>
+                        <p:column rowspan="2" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item.dg}" headerText="Dg" />
+                        <p:column sortBy="#{item.setDgLabel}" headerText="Label"/>
+                        <p:column headerText="Under Payment" />
+                        <p:column headerText="Adm Charge"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.jobSlip}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contNo}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contStatus}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contSize}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.overSize ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.dg ? item.masterCommodity.masterDangerousClass : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.dgLabel ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, item.totalCharge - item.charge - item.perhitunganUpahBuruh.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, item.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, item.totalCharge - item.perhitunganUpahBuruh.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{perhitunganUnderPaymentBean.handleSelectJobSlip}" disabled="#{not perhitunganUnderPaymentBean.registration.statusService.equals('registrasi')}" oncomplete="deleteConfirmationDialog.show();" image="ui-icon-trash" title="Delete">
+                            <f:attribute name="jobSlip" value="#{item.jobSlip}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{perhitunganUnderPaymentBean.handleViewUnderPaymentDetail}" disabled="#{(item.totalCharge - item.charge) eq 0}" oncomplete="underpaymentConfirmationDialog.show();" onclick="genTitle('underpaymentConfirmationDialog','Under Payments Detail');" image="ui-icon-search" title="Under Payments Detail" update="underpaymentConfirmationForm">
+                            <f:attribute name="jobSlip" value="#{item.jobSlip}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="11" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.total, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.ppn, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.materaiPrint, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Biaya Handling (Under Payment) " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.additionalCharge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.total + perhitunganUnderPaymentBean.ppn + perhitunganUnderPaymentBean.materaiPrint + perhitunganUnderPaymentBean.additionalCharge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{not perhitunganUnderPaymentBean.registration.statusService.equals('registrasi') or empty perhitunganUnderPaymentBean.cancelDocumentServices}" update="growl registrationForm:registrationDetail cancelDocumentsForm:cancelDocumentsTable" actionListener="#{perhitunganUnderPaymentBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentServices}" actionListener="#{perhitunganUnderPaymentBean.handleDownloadTransactionRecap}" update="cancelDocumentsForm:cancelDocumentsTable growl"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentServices or (perhitunganUnderPaymentBean.registration.invoice.validasiPrint and not loginSessionBean.supervisor) or empty perhitunganUnderPaymentBean.registration.invoice.noReg}" actionListener="#{perhitunganUnderPaymentBean.handleDownloadNota}" update="cancelDocumentsForm:cancelDocumentsTable growl"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentServices or empty perhitunganUnderPaymentBean.registration.invoice.noFakturPajak}" actionListener="#{perhitunganUnderPaymentBean.handleDownloadDetail}" update="cancelDocumentsForm:cancelDocumentsTable growl"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+
+        <!--dialog cancel loading-->
+        <p:dialog header="Entry Cancel Document Service"  widgetVar="cancelDocumentServiceEntryDialog" width="600" modal="true" id="cancelDocumentServiceEntryDialog">
+            <h:form id="cancelDocumentServiceEntryForm">
+                <h:panelGrid columns="2">
+                    <h:panelGrid columns="5" style="font-weight: bold;">
+                        <h:outputLabel value="Job Slip *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="jobSlip" value="#{perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}" size="25"/>
+                        <p:commandButton onstart="freeze();" image="ui-icon-search" value="Find" style="font-size: x-small" process="@this cancelDocumentServiceEntryForm:jobSlip" actionListener="#{perhitunganUnderPaymentBean.handleLookupReceivingJobSlip}" update="cancelDocumentServiceEntryForm growl"/>
+                        <p:message for="jobSlip" display="icon"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="4" style="font-weight: bold;">
+                        <h:outputLabel value="Change Vessel" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{perhitunganUnderPaymentBean.changeVessel}"
+                                         disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"
+                                         valueChangeListener="#{perhitunganUnderPaymentBean.handleChangeVessel}">
+                            <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            <p:ajax process="@this" event="change" update="cancelDocumentServiceEntryForm:changeVesselPanel cancelDocumentServiceEntryForm:oldContainerPanel cancelDocumentServiceEntryForm:newContainerPanel"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+
+                </h:panelGrid>
+
+                <br />
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid columns="5" id="oldContainerPanel">
+                            <h:outputLabel value="Cont No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.contNo}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Is Export"/>:
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.isExport ? 'yes' : 'no'}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Bl No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.blNo}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.sealNo}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Discharge Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.masterPort.name}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Delivery Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.portOfDelivery.name}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.masterContainerType.masterContainerTypeInGeneral.id}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.contSize}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.contStatus}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.contGross}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.dg ? perhitunganUnderPaymentBean.receivingService.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Dg Label"/>:
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.dgLabel ? 'Y' : 'N'}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.overSize ? 'Y' : 'N'}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="21 ft" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.receivingService.twentyOneFeet ? 'Y' : 'N'}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                        <h:panelGrid columns="5" id="newContainerPanel">
+                            <h:outputLabel value="Cont No *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="contNo" value="#{perhitunganUnderPaymentBean.cancelDocumentService.contNo}" onkeyup="javascript:this.value=this.value.toUpperCase();" required="true" size="25" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}" maxlength="11"/>
+                            <p:message display="icon" for="contNo"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Is Export"/>:
+                            <h:selectOneMenu value="#{perhitunganUnderPaymentBean.cancelDocumentService.isExport}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}">
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Bl No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{perhitunganUnderPaymentBean.cancelDocumentService.blNo}" size="25" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{perhitunganUnderPaymentBean.cancelDocumentService.sealNo}" size="25" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Discharge Port" />
+                            <h:outputLabel value=" : " />
+                                <h:panelGrid columns="2">
+                                    <p:autoComplete id="autoPort1" value="#{perhitunganUnderPaymentBean.selectedPort1}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"
+                                                    completeMethod="#{masterPortSelector.handleFilterByName}" size="20" style="width:150px;" />
+                                    <p:message display="icon" for="autoPort1"/>
+                                </h:panelGrid>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Delivery Port" />
+                            <h:outputLabel value=" : " />
+                                <h:panelGrid columns="2">
+                                    <p:autoComplete id="autoPort2" value="#{perhitunganUnderPaymentBean.selectedPort2}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"
+                                                    completeMethod="#{masterPortSelector.handleFilterByName}" size="20" style="width:150px;" />
+                                    <p:message display="icon" for="autoPort2"/>
+                                </h:panelGrid>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{perhitunganUnderPaymentBean.cancelDocumentService.masterContainerType.contType}" valueChangeListener="#{perhitunganUnderPaymentBean.handleContainerTypeChanged}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}">
+                                <f:selectItem itemLabel="20 BLK" itemValue="20" />
+                                <f:selectItem itemLabel="20 DRY" itemValue="1" />
+                                <f:selectItem itemLabel="20 FLT" itemValue="14" />
+                                <f:selectItem itemLabel="20 HC" itemValue="21" />
+                                <f:selectItem itemLabel="20 OPS" itemValue="65" />
+                                <f:selectItem itemLabel="20 OPT" itemValue="12" />
+                                <f:selectItem itemLabel="20 RFR" itemValue="2" />
+                                <f:selectItem itemLabel="20 TNK" itemValue="19" />
+                                <f:selectItem itemLabel="40 BLK" itemValue="36" />
+                                <f:selectItem itemLabel="40 DRY" itemValue="26" />
+                                <f:selectItem itemLabel="40 FLT" itemValue="32" />
+                                <f:selectItem itemLabel="40 HC" itemValue="37" />
+                                <f:selectItem itemLabel="40 OPS" itemValue="98" />
+                                <f:selectItem itemLabel="40 OPT" itemValue="30" />
+                                <f:selectItem itemLabel="40 RFR" itemValue="29" />
+                                <f:selectItem itemLabel="40 TNK" itemValue="83" />
+                                <f:selectItem itemLabel="45 DRY" itemValue="1752" />
+                                <f:selectItem itemLabel="45 HC" itemValue="99" />
+                                <f:ajax execute="@this" event="change" render="containerSize"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Size *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="containerSize" value="#{perhitunganUnderPaymentBean.cancelDocumentService.contSize}" disabled="true" style="width: 20px;"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{perhitunganUnderPaymentBean.cancelDocumentService.contStatus}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}">
+                                <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                                <f:selectItem itemValue="MTY" itemLabel="MTY" />
+                                <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Commodity *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="commodity" value="#{perhitunganUnderPaymentBean.cancelDocumentService.masterCommodity}" onmousedown="showCommodities();" onkeyup="showCommodities();" required="true" size="25" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"/>
+                            <p:commandButton type="button" onclick="showCommodities();" value="..." style="font-size: x-small"/>
+                            <p:message display="icon" for="commodity"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText id="dangerous" value="#{perhitunganUnderPaymentBean.cancelDocumentService.dg ? perhitunganUnderPaymentBean.cancelDocumentService.masterCommodity.masterDangerousClass : 'no'}" readonly="true" style="width: 20px;"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Gross *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="gross" value="#{perhitunganUnderPaymentBean.cancelDocumentService.contGross}" size="25" required="true" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"/>
+                            <p:message display="icon" for="gross"/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Dg Label"/>:
+                            <h:selectOneMenu value="#{perhitunganUnderPaymentBean.cancelDocumentService.dgLabel}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}">
+                                <f:selectItem itemValue="false" itemLabel="no" />
+                                <f:selectItem itemValue="true" itemLabel="yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{perhitunganUnderPaymentBean.cancelDocumentService.overSize}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}">
+                                <f:selectItem itemValue="false" itemLabel="no" />
+                                <f:selectItem itemValue="true" itemLabel="yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="21 ft" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{perhitunganUnderPaymentBean.cancelDocumentService.twentyOneFeet}" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}">
+                                <f:selectItem itemValue="false" itemLabel="no" />
+                                <f:selectItem itemValue="true" itemLabel="yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+
+                        <p:outputPanel id="changeVesselPanel">
+                            <h:panelGrid rendered="#{not empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip and perhitunganUnderPaymentBean.changeVessel}" columns="1">
+                                <h:panelGrid columns="5">
+                                    <h:outputLabel value="No PPKB *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText id="noPpkb" required="true" onkeypress="showNewVesselsDialog();" onmousedown="showNewVesselsDialog();" value="#{perhitunganUnderPaymentBean.cancelDocumentService.newPlanningVessel.noPpkb}" size="25"/>
+                                    <p:commandButton image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showNewVesselsDialog();" type="button"/>
+                                    <p:message for="noPpkb" display="icon"/>
+
+                                    <h:outputLabel value="Vessel" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.cancelDocumentService.newPlanningVessel.preserviceVessel.masterVessel.name}" size="25"/>
+                                    <h:outputText/>
+                                    <h:outputText/>
+
+                                    <h:outputLabel value="Voy In" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.cancelDocumentService.newPlanningVessel.preserviceVessel.voyIn}" size="25"/>
+                                    <h:outputText/>
+                                    <h:outputText/>
+
+                                    <h:outputLabel value="Voy Out" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText disabled="true" value="#{perhitunganUnderPaymentBean.cancelDocumentService.newPlanningVessel.preserviceVessel.voyOut}" size="25"/>
+                                    <h:outputText/>
+                                    <h:outputText/>
+                                    
+                                    <h:outputText/><h:outputText/><p:spacer height="200" width="10"/><h:outputText/><h:outputText/>
+                                </h:panelGrid>
+                                <script type="text/javascript" >
+                                    jQuery('.blink').blink();
+                                    jQuery('#cancelDocumentServiceEntryDialog').parent().effect("size", { to: {width: 900} }, 1000);
+                                </script>
+                            </h:panelGrid>
+                            <h:panelGrid rendered="#{not (not empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip and perhitunganUnderPaymentBean.changeVessel)}" columns="5">
+                                <script type="text/javascript" >
+                                    if (jQuery('#cancelDocumentServiceEntryDialog').is(':visible')) {
+                                        jQuery('#cancelDocumentServiceEntryDialog').parent().effect("size", { to: {width: 600} }, 1000);
+                                    }
+                                </script>
+                            </h:panelGrid>
+                        </p:outputPanel>
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganUnderPaymentBean.handleConfirm}" update="cancelDocumentServiceEntryForm growl cancelDocumentsForm underpaymentConfirmationForm" oncomplete="validateUnderPaymentConfirm(xhr, status, args)" disabled="#{empty perhitunganUnderPaymentBean.cancelDocumentService.jobSlip}"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="cancelDocumentServiceEntryDialog.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+            <h:form>
+                <p:remoteCommand name="showNewVesselsDialog" onstart="freeze();" immediate="true"
+                                 oncomplete="newVesselsDialog.show();newVesselsTable.clearFilters();"
+                                 update="newVesselsForm:newVesselsTable"
+                                 actionListener="#{perhitunganUnderPaymentBean.handleShowVessels}"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Vessel"  widgetVar="newVesselsDialog" modal="true" minWidth="750">
+            <h:form id="newVesselsForm">
+                <p:dataTable value="#{perhitunganUnderPaymentBean.vessels}" var="item"
+                             id="newVesselsTable"  widgetVar="newVesselsTable"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="width: 20px;" >
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{perhitunganUnderPaymentBean.handleSelectVessel}" disabled="#{item[0].equals(perhitunganUnderPaymentBean.registration.planningVessel.noPpkb)}" value="select" update="cancelDocumentServiceEntryForm:changeVesselPanel cancelDocumentServiceEntryForm:newContainerPanel" oncomplete="newVesselsDialog.hide();" immediate="true">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="batalNotaDialog" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{perhitunganUnderPaymentBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{perhitunganUnderPaymentBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{perhitunganUnderPaymentBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganUnderPaymentBean.handleSubmitBatalNota}"
+                                                 oncomplete="handleFormValidation(xhr, status, args)" image="ui-icon-check" update="growl batalNota cancelDocumentsForm"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="batalNotaDialog.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Registration"  widgetVar="registrationsDialog" modal="true" minWidth="750">
+            <h:form id="registrationsForm">
+                <p:dataTable var="item" value="#{perhitunganUnderPaymentBean.registrations}"
+                             id="registrationsTable"  widgetVar="registrationsTable"
+                             paginator="true" rowIndexVar="No" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{perhitunganUnderPaymentBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm cancelDocumentsForm:cancelDocumentsTable" process="@this" immediate="true" oncomplete="registrationsDialog.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="Master Commodities"  widgetVar="commoditiesDialog" modal="true" minWidth="600">
+            <h:form id="commoditiesForm">
+                <p:dataTable var="item" value="#{masterCommoditySelector.masterCommodities}"
+                             id="commoditiesTable"  widgetVar="commoditiesTable"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" lazy="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item.commodityCode}" filterMatchMode="contains" filterBy="#{item.commodityCode}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.commodityCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.masterCommodityType.name}" filterMatchMode="contains" filterBy="#{item.masterCommodityType.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Type" />
+                        </f:facet>
+                        <h:outputText value="#{item.masterCommodityType.name}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" action="#{perhitunganUnderPaymentBean.handleSelectCommodity}" value="select" update="cancelDocumentServiceEntryForm:commodity cancelDocumentServiceEntryForm:dangerous" oncomplete="commoditiesDialog.hide();">
+                            <f:setPropertyActionListener target="#{perhitunganUnderPaymentBean.cancelDocumentService.masterCommodity}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog id="underpaymentConfirmationDialog"  widgetVar="underpaymentConfirmationDialog" header="Under Payment Confirmation" width="550" closable="false" closeOnEscape="false" resizable="false" modal="true">
+            <h:form id="underpaymentConfirmationForm">
+                <p:panel rendered="#{not empty perhitunganUnderPaymentBean.underpaymentHistory}">
+                    <table style="text-align: left; width: 500px;" border="0" cellpadding="5" cellspacing="0">
+                        <tbody>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227);"></td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227);" colspan="2" rowspan="1">ACTIVITY</td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: right;">OLD CHARGE</td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: right;">NEW CHARGE</td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);">1.</td>
+                                <td style="background-color: rgb(242, 245, 247);">LIFT</td>
+                                <td style="background-color: rgb(242, 245, 247);"><h:outputText value="#{qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)}"/></td>
+                                <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargeLift, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                <td style="text-align: right; background-color: rgb(242, 245, 247);"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargeLift + perhitunganUnderPaymentBean.cancelDocumentService.perhitunganLiftService.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);">2.</td>
+                                <td style="background-color: rgb(215, 235, 249);">HANDLING</td>
+                                <td style="background-color: rgb(215, 235, 249);"><h:outputText value="#{qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargeHandling, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                <td style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargeHandling + perhitunganUnderPaymentBean.cancelDocumentService.perhitunganHandlingDischarge.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);">3.</td>
+                                <td style="background-color: rgb(242, 245, 247);">PENUMPUKAN</td>
+                                <td style="background-color: rgb(242, 245, 247);"><h:outputText value="#{qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)}"/></td>
+                                <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargePenumpukan, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                <td style="text-align: right; background-color: rgb(242, 245, 247);"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargePenumpukan + perhitunganUnderPaymentBean.cancelDocumentService.perhitunganPenumpukan.totalCharge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);">4.</td>
+                                <td style="background-color: rgb(215, 235, 249);">PASS KENDARAAN</td>
+                                <td style="background-color: rgb(215, 235, 249);"><h:outputText value="#{qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargePassGate, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                <td style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargePassGate + perhitunganUnderPaymentBean.cancelDocumentService.perhitunganPassGate.totalCharge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);">5.</td>
+                                <td style="background-color: rgb(242, 245, 247);">BIAYA HANDLING</td>
+                                <td style="background-color: rgb(242, 245, 247);"><h:outputText value="#{qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)}"/></td>
+                                <td style="background-color: rgb(242, 245, 247); text-align: right;"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargeBiayaHandling, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                <td style="text-align: right; background-color: rgb(242, 245, 247);"><div style="float: right"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.chargeBiayaHandling + perhitunganUnderPaymentBean.cancelDocumentService.perhitunganUpahBuruh.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"></td>
+                                <td style="background-color: rgb(215, 235, 249);">JUMLAH</td>
+                                <td style="background-color: rgb(215, 235, 249);"><h:outputText value="#{qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); text-align: right;"><div style="float: right; font-weight: bold;"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.totalCharge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                                <td style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: right; font-weight: bold;"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.underpaymentHistory.totalCharge + perhitunganUnderPaymentBean.cancelDocumentService.totalCharge - perhitunganUnderPaymentBean.cancelDocumentService.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"></td>
+                                <td style="background-color: rgb(242, 245, 247);">UNDER PAYMENT</td>
+                                <td style="background-color: rgb(242, 245, 247);"><h:outputText value="#{qt:getCurrencySymbol(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country)}"/></td>
+                                <td style="background-color: rgb(242, 245, 247); text-align: right;"></td>
+                                <td style="text-align: right; background-color: rgb(242, 245, 247);"><div style="float: right; font-weight: bold;"><h:outputText value="#{qt:getFormattedCurrency(perhitunganUnderPaymentBean.masterCurrency.language, perhitunganUnderPaymentBean.masterCurrency.country, perhitunganUnderPaymentBean.cancelDocumentService.totalCharge - perhitunganUnderPaymentBean.cancelDocumentService.charge, false, perhitunganUnderPaymentBean.masterCurrency.defaultFractionDigits)}"/></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:outputPanel rendered="#{not empty perhitunganUnderPaymentBean.receivingService}">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganUnderPaymentBean.handleSubmitUnderPaymentConfirmation}" update="cancelDocumentsForm:cancelDocumentsTable underpaymentConfirmationForm cancelDocumentServiceEntryForm growl" oncomplete="validateUnderPaymentConfirm(xhr, status, args)" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="underpaymentConfirmationDialog.hide()"/>
+                            </p:outputPanel>
+                            <p:outputPanel rendered="#{empty perhitunganUnderPaymentBean.receivingService}">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="underpaymentConfirmationDialog.hide()"/>
+                            </p:outputPanel>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="deleteConfirmationDialog">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{perhitunganUnderPaymentBean.handleDelete}" update="cancelDocumentsForm:cancelDocumentsTable growl" oncomplete="deleteConfirmationDialog.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="deleteConfirmationDialog.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" visible="true" rendered="#{not perhitunganUnderPaymentBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="PerhitunganUnderPayment.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand onstart="freeze();" name="showCommodities" immediate="true" oncomplete="commoditiesDialog.show();commoditiesTable.filter();"/>
+            <p:remoteCommand name="showRegistrations" onstart="freeze();" immediate="true" oncomplete="registrationsDialog.show();registrationsTable.clearFilters();" update="registrationsForm:registrationsTable" actionListener="#{perhitunganUnderPaymentBean.handleShowRegistrations}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

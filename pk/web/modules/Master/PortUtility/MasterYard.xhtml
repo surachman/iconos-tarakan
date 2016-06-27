@@ -1,0 +1,182 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_yard']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_yard']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" />
+        <div style="text-align: center; width: 100%;">
+            <p:ajaxStatus style="width:100%;height:16px;">
+                <f:facet name="start">
+                    <h:graphicImage value="/resources/images/ajaxloader.gif" style="padding-top: 200px;"/>
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+        </div>
+        <h:form id="yardform">
+            <p:dataTable id="tableyard" var="item" value="#{masterYardBean.masterYards}"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{masterYardBean.handleAddButton}" update="addeditform" oncomplete="dlg.show();"/>
+                        <p:commandButton image="ui-icon ui-icon-trash" value="#{msg['application.operation.delete_all']}" actionListener="#{masterYardBean.handleDeleteAll}" update="deleteconfim" oncomplete="confirmation.show();" />
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Block"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}" style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Slot"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}" filterMatchMode="contains" filterBy="#{item[3]}" style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Row"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}" style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Tier"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column sortBy="#{item[9]}" filterMatchMode="contains" filterBy="#{item[9]}" style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Yard"/>
+                    </f:facet>
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <p:commandButton actionListener="#{masterYardBean.handleEditButton}" image="ui-icon ui-icon-pencil" title="Edit MasterYard" update="addeditform addeditform:tauah tauah" oncomplete="dlg.show();">
+                        <f:attribute name="idYard" value="#{item[0]}"/>
+                    </p:commandButton>
+                    <p:commandButton actionListener="#{masterYardBean.handleDeleteButton}" image="ui-icon ui-icon-trash" title="Delete MasterYard" update="deleteconfim:opsiHidden opsiHidden deleteconfim:idyardHidden idyardHidden" oncomplete="confirmation.show();">
+                        <f:attribute name="idYard" value="#{item[0]}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+        <p:dialog header="Master Yard"  widgetVar="dlg" modal="true" minWidth="450" >
+            <h:form id="addeditform">
+                <h:inputHidden id="tauah" value="#{masterYardBean.masterYard.block}" />
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Block"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterYardBean.masterYard.block}" disabled="#{masterYardBean.disable}" maxlength="5"/>
+                        <h:outputLabel value="Description"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputTextarea value="#{masterYardBean.masterYard.description}" rows="3"/>
+                        <h:outputLabel value="Slot"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterYardBean.masterYard.slot}" maxlength="4" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="Row"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterYardBean.masterYard.row}" maxlength="4" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="Tier"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterYardBean.masterYard.tier}" maxlength="2" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="Yard"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterYardBean.masterYard.masterCy.yard}" maxlength="5"/>
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}"  actionListener="#{masterYardBean.saveEdit}"  update="yardform yardform:tableyard tableyard growl" oncomplete="handleRequestValidation(xhr, status, args)" />
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="button" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+        <p:dialog showEffect="bounce"  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form  id="deleteconfim">
+                <p:panel>
+                    <h:outputText value="Are you sure you want to delete this file?" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <h:inputHidden id="idyardHidden" value="#{masterYardBean.idYard}" />
+                            <h:inputHidden id="opsiHidden" value="#{masterYardBean.delete}" />
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{masterYardBean.delete}"  update="yardform yardform:tableyard tableyard growl" onclick="confirmation.hide();" />
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>

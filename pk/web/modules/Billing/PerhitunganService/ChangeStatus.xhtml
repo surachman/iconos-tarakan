@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+       <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_change_status']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_change_status']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form>
+            <h:panelGrid columns="4">
+                <h:panelGrid columns="4">
+                    <h:outputLabel value="No Registrasi:"/>
+                    <h:inputText id="noRegistrasi" value="#{changeStatusBean.registration.noReg}" title="No PPKB"/>
+                    <p:commandButton value="..." update="#" actionListener="#" style="font-size: x-small"/>
+                    <p:commandButton value="#{msg['application.operation.done']}" update="#" actionListener="#" style="font-size: x-small"/>
+                    <h:outputLabel value="Customer:" />
+                    <h:inputText id="customer" value="#{changeStatusBean.masterCustomer.custCode}" title="Type"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="No PPKB"/>
+                    <h:inputText id="noPpkb" value="#{changeStatusBean.planningVessel.noPpkb}" title="Dimension"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="Vessel Name:" />
+                    <h:inputText id="vesselName" value="#{changeStatusBean.planningVessel.vesselName}" title="Eta"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="Voy In:"/>
+                    <h:inputText id="voyyagein" value="#{changeStatusBean.planningVessel.voyIn}" title="Eta"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="Voy Out:"/>
+                    <h:inputText id="voyyageOut" value="#{changeStatusBean.planningVessel.voyOut}" title="Eta"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputText value="&nbsp;"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <div class="header-panel-single-right">
+                <h:outputText value="Status : ............................... " ></h:outputText>
+            </div>
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{changeStatusBean.changeStatusServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+                <p:column selectionMode="multiple" />
+                <p:column sortBy="#{item.contNo}">
+                    <f:facet name="header">
+                        <h:outputText value="Container No"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contNo}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.contSize}">
+                    <f:facet name="header">
+                        <h:outputText value="Size"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contSize}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.masterContainerType.contType}">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterContainerType.contType}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.contStatus}">
+                    <f:facet name="header">
+                        <h:outputText value="Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contStatus}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.contGross}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contGross}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.overSize}">
+                    <f:facet name="header">
+                        <h:outputText value="OH/OW/OL"/>
+                    </f:facet>
+                    <h:outputText value="#{item.overSize}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.overSize}">
+                    <f:facet name="header">
+                        <h:outputText value="Position"/>
+                    </f:facet>
+                    <h:outputText value="#{item.overSize}"/>
+                </p:column>
+
+                <p:column sortBy="">
+                    <f:facet name="header">
+                        <h:outputText value="Change To"/>
+                    </f:facet>
+                    <h:outputText value=""/>
+                </p:column>
+
+                 <p:column sortBy="">
+                    <f:facet name="header">
+                        <h:outputText value="Service Charge"/>
+                    </f:facet>
+                    <h:outputText value=""/>
+                </p:column>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-right">
+                        <p:commandButton value="#{msg['application.operation.confirm']}" update="#" actionListener="#"/>
+                        <p:commandButton value="#{msg['application.operation.edit']}" update="#" actionListener="#" />
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

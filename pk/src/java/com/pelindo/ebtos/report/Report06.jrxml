@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report06" language="groovy" pageWidth="934" pageHeight="608" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="894" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="bulan" class="java.lang.Integer"/>
+	<parameter name="tahun" class="java.lang.Integer"/>
+	<parameter name="owner" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object"/>
+	<parameter name="SUBREPORT_DIR1" class="java.lang.Object"/>
+	<parameter name="equipCode" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select UPPER(description) as namaOP,value_string as nippOP,
+	(select UPPER(owner_name) from m_owner_equipment mq where owner_code=$P{owner})as owner_name,
+(select UPPER(description) from m_setting_app where id='ttd_gm_tpb') as namaGM,
+(select UPPER(value_string) from m_setting_app where id='ttd_gm_tpb') as nippGM,
+(select UPPER(description) from m_setting_app where id='ttd_gm_csn') as namaCSN,
+(select description from m_setting_app where id='ebtos.cabang.kota') kota,
+(select UPPER(value_string) from m_setting_app where id='ttd_gm_csn') as nippCSN
+from m_setting_app where id='ttd_mo_tpb']]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="namaop" class="java.lang.String"/>
+	<field name="nippop" class="java.lang.String"/>
+	<field name="owner_name" class="java.lang.String"/>
+	<field name="namagm" class="java.lang.String"/>
+	<field name="nippgm" class="java.lang.String"/>
+	<field name="namacsn" class="java.lang.String"/>
+	<field name="nippcsn" class="java.lang.String"/>
+	<variable name="RECEIVING_TOTAL_20_FULL" class="java.lang.Integer" calculation="Sum">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="DELIVERY_TOTAL_20_FULL" class="java.lang.Integer" calculation="Sum">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="RECEIVING_TOTAL_40_FULL" class="java.lang.Integer">
+		<variableExpression><![CDATA[0]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="DELIVERY_TOTAL_40_FULL" class="java.lang.Integer">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="DELIVERY_TOTAL_20_MTY" class="java.lang.Integer">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="RECEIVING_TOTAL_20_MTY" class="java.lang.Integer">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="DELIVERY_TOTAL_40_MTY" class="java.lang.Integer">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="RECEIVING_TOTAL_40_MTY" class="java.lang.Integer">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_AMOUNT_DELIVERY_FULL" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_AMOUNT_RECEIVING_FULL" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_AMOUNT_DELIVERY" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_AMOUNT_RECEIVING" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_AMOUNT_DELIVERY_MTY" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="TOTAL_AMOUNT_RECEIVING_MTY" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalProfiPelindoDelivery" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalProvitOwnerDelivry" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalProfitPelindoReceiving" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalProfitOwnerReceiving" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="44" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="-1" width="894" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REKAP LAPORAN PRODUKSI DAN PENDAPATAN RECEIVING / DELIVERY]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="10" width="894" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA['YANG DILAYANI ALAT MILIK' +' '+ $F{owner_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="21" width="895" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA['LAPORAN BULAN :' + ($P{bulan} == 1 ? "JANUARI" : $P{bulan} == 2 ? "FEBRUARI" : $P{bulan} == 3 ? "MARET" : $P{bulan} == 4 ? "APRIL" : $P{bulan} == 5 ? "MEI" : $P{bulan} == 6 ? "JUNI" : $P{bulan} == 7 ? "JULI" : $P{bulan} == 8 ? "AGUSTUS" : $P{bulan} == 9 ? "SEPTEMBER" : $P{bulan} == 10 ? "OKTOBER" : $P{bulan} == 11 ? "NOVEMBER" : "DESEMBER") + " " +$P{tahun}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="42" splitType="Stretch">
+			<subreport>
+				<reportElement x="-1" y="0" width="896" height="42"/>
+				<subreportParameter name="owner">
+					<subreportParameterExpression><![CDATA[$P{owner}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="bulan">
+					<subreportParameterExpression><![CDATA[$P{bulan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="equipCode">
+					<subreportParameterExpression><![CDATA[$P{equipCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tahun">
+					<subreportParameterExpression><![CDATA[$P{tahun}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="juml20f_1" toVariable="DELIVERY_TOTAL_20_FULL"/>
+				<returnValue subreportVariable="juml40f_1" toVariable="DELIVERY_TOTAL_40_FULL"/>
+				<returnValue subreportVariable="juml20m_1" toVariable="DELIVERY_TOTAL_20_MTY"/>
+				<returnValue subreportVariable="juml40m_1" toVariable="DELIVERY_TOTAL_40_MTY"/>
+				<returnValue subreportVariable="full20_1" toVariable="TOTAL_AMOUNT_DELIVERY_FULL"/>
+				<returnValue subreportVariable="jumlahTotal" toVariable="TOTAL_AMOUNT_DELIVERY"/>
+				<returnValue subreportVariable="mty20_1" toVariable="TOTAL_AMOUNT_DELIVERY_MTY"/>
+				<returnValue subreportVariable="totalProfitOwner" toVariable="totalProvitOwnerDelivry"/>
+				<returnValue subreportVariable="totalProfitPelindo" toVariable="totalProfiPelindoDelivery"/>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR1}]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="56">
+			<subreport>
+				<reportElement x="-1" y="15" width="896" height="41"/>
+				<subreportParameter name="owner">
+					<subreportParameterExpression><![CDATA[$P{owner}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="bulan">
+					<subreportParameterExpression><![CDATA[$P{bulan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="equipCode">
+					<subreportParameterExpression><![CDATA[$P{equipCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tahun">
+					<subreportParameterExpression><![CDATA[$P{tahun}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="juml20f_1" toVariable="RECEIVING_TOTAL_20_FULL"/>
+				<returnValue subreportVariable="juml40f_1" toVariable="RECEIVING_TOTAL_40_FULL"/>
+				<returnValue subreportVariable="juml20m_1" toVariable="RECEIVING_TOTAL_20_MTY"/>
+				<returnValue subreportVariable="juml40m_1" toVariable="RECEIVING_TOTAL_40_MTY"/>
+				<returnValue subreportVariable="full20_1" toVariable="TOTAL_AMOUNT_RECEIVING_FULL"/>
+				<returnValue subreportVariable="jumlahTotal" toVariable="TOTAL_AMOUNT_RECEIVING"/>
+				<returnValue subreportVariable="mty20_1" toVariable="TOTAL_AMOUNT_RECEIVING_MTY"/>
+				<returnValue subreportVariable="totalProfitOwner" toVariable="totalProfitOwnerReceiving"/>
+				<returnValue subreportVariable="totalProfitPelindo" toVariable="totalProfitPelindoReceiving"/>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+			<staticText>
+				<reportElement x="-1" y="0" width="859" height="15"/>
+				<box leftPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RECEIVING]]></text>
+			</staticText>
+		</band>
+		<band height="149">
+			<textField>
+				<reportElement x="222" y="0" width="50" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{RECEIVING_TOTAL_20_FULL} + $V{DELIVERY_TOTAL_20_FULL}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="-1" y="0" width="223" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[JUMLAH KESELERUHAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="272" y="0" width="50" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{RECEIVING_TOTAL_40_FULL} + $V{DELIVERY_TOTAL_40_FULL}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="322" y="0" width="50" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{RECEIVING_TOTAL_20_MTY} + $V{DELIVERY_TOTAL_20_MTY}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="372" y="0" width="50" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{DELIVERY_TOTAL_40_MTY} + $V{RECEIVING_TOTAL_40_MTY}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="422" y="0" width="83" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTAL_AMOUNT_DELIVERY_FULL} + $V{TOTAL_AMOUNT_RECEIVING_FULL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="594" y="0" width="113" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTAL_AMOUNT_DELIVERY}+ $V{TOTAL_AMOUNT_RECEIVING}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="505" y="0" width="89" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TOTAL_AMOUNT_DELIVERY_FULL} + $V{TOTAL_AMOUNT_RECEIVING_FULL}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement x="707" y="0" width="76" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalProfiPelindoDelivery} + $V{totalProfitPelindoReceiving}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="783" y="0" width="76" height="16"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totalProvitOwnerDelivry} + $V{totalProfitOwnerReceiving}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="30" y="39" width="148" height="26"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GENERAL MANAGER]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="740" y="37" width="118" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{kota}.substring(0, 1)+$F{kota}.substring(1, $F{kota}.length()).toLowerCase()+', '+ ($P{bulan} == 1 ? "JANUARI" : $P{bulan} == 2 ? "FEBRUARI" : $P{bulan} == 3 ? "MARET" : $P{bulan} == 4 ? "APRIL" : $P{bulan} == 5 ? "MEI" : $P{bulan} == 6 ? "JUNI" : $P{bulan} == 7 ? "JULI" : $P{bulan} == 8 ? "AGUSTUS" : $P{bulan} == 9 ? "SEPTEMBER" : $P{bulan} == 10 ? "OKTOBER" : $P{bulan} == 11 ? "NOVEMBER" : "DESEMBER") + " " +$P{tahun}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="740" y="50" width="118" height="15"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MANAGER OPERASIONAL]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="30" y="107" width="148" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nippgm}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="740" y="97" width="118" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{namaop}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="740" y="107" width="118" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nippop}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="30" y="97" width="148" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{namagm}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

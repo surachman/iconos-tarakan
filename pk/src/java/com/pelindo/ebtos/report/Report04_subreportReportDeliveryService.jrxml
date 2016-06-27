@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report06_subreportReportDeliveryService" language="groovy" pageWidth="860" pageHeight="608" orientation="Landscape" columnWidth="860" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="owner" class="java.lang.String"/>
+	<parameter name="tahun" class="java.lang.Integer"/>
+	<parameter name="bulan" class="java.lang.Integer"/>
+	<parameter name="equipCode" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT p.no_ppkb,
+  mv.name AS vessel_name,
+  p.arrival_time,
+  mc.name,
+  (SELECT o.profitPelindo FROM m_owner_equipment o WHERE o.owner_code=$P{owner}
+  ) AS profitPelindo,
+  (SELECT o.profitowner FROM m_owner_equipment o WHERE o.owner_code=$P{owner}
+  ) AS profitowner,
+  (SELECT o.owner_name FROM m_owner_equipment o WHERE o.owner_code=$P{owner}
+  ) AS owner_name,
+  (SELECT GET_TARIF_LIFT(20, 'FCL', 'L', 'FAlSE', 'CC') 
+  from dual
+  ) AS full20,
+  (SELECT GET_TARIF_LIFT(40, 'FCL', 'L', 'FAlSE', 'CC') 
+  from dual
+  ) AS full40,
+  (SELECT GET_TARIF_LIFT(20, 'MTY', 'L', 'FAlSE', 'CC') 
+  from dual
+  ) AS mty20,
+  (SELECT GET_TARIF_LIFT(40, 'MTY', 'L', 'FAlSE', 'CC') 
+  from dual
+  ) AS mty40,
+  (SELECT COUNT(e.cont_no) AS juml40f
+  FROM equipment e,
+    service_cont_discharge scd,
+    m_equipment m,
+    m_owner_equipment o
+  WHERE scd.no_ppkb                        =p.no_ppkb
+  AND e.no_ppkb                            =scd.no_ppkb
+  AND e.cont_no                            =scd.cont_no
+  AND equipment_act_code                   ='DELIVERY'
+  AND scd.cont_size                        =40
+  AND scd.cont_status                      ='FCL'
+  AND extract(MONTH FROM scd.payment_date) = $P{bulan}
+  AND extract(YEAR FROM scd.payment_date)  = $P{tahun}
+  AND m.equip_code                         =e.equip_code
+  AND m.equipment_type_code                ='003'
+  AND m.owner_code                         =o.owner_code
+  AND o.owner_code                         =$P{owner}
+  ) AS juml40f,
+  (SELECT COUNT(e.cont_no) AS juml20f
+  FROM equipment e,
+    service_cont_discharge scd,
+    m_equipment m,
+    m_owner_equipment o
+  WHERE scd.no_ppkb                        =p.no_ppkb
+  AND e.no_ppkb                            =scd.no_ppkb
+  AND e.cont_no                            =scd.cont_no
+  AND equipment_act_code                   ='DELIVERY'
+  AND scd.cont_size                        =20
+  AND scd.cont_status                      ='FCL'
+  AND extract(MONTH FROM scd.payment_date) = $P{bulan}
+  AND extract(YEAR FROM scd.payment_date)  = $P{tahun}
+  AND m.equip_code                         =e.equip_code
+  AND m.equipment_type_code                ='003'
+  AND m.owner_code                         =o.owner_code
+  AND o.owner_code                         =$P{owner}
+  ) AS juml20f,
+  (SELECT COUNT(e.cont_no) AS juml40m
+  FROM equipment e,
+    service_cont_discharge scd,
+    m_equipment m,
+    m_owner_equipment o
+  WHERE scd.no_ppkb                        =p.no_ppkb
+  AND e.no_ppkb                            =scd.no_ppkb
+  AND e.cont_no                            =scd.cont_no
+  AND equipment_act_code                   ='DELIVERY'
+  AND scd.cont_size                        =40
+  AND scd.cont_status                      ='MTY'
+  AND extract(MONTH FROM scd.payment_date) = $P{bulan}
+  AND extract(YEAR FROM scd.payment_date)  = $P{tahun}
+  AND m.equip_code                         =e.equip_code
+  AND m.equipment_type_code                ='003'
+  AND m.owner_code                         =o.owner_code
+  AND o.owner_code                         =$P{owner}
+  ) AS juml40m,
+  (SELECT COUNT(e.cont_no) AS juml20m
+  FROM equipment e,
+    service_cont_discharge scd,
+    m_equipment m,
+    m_owner_equipment o
+  WHERE scd.no_ppkb                        =p.no_ppkb
+  AND e.no_ppkb                            =scd.no_ppkb
+  AND e.cont_no                            =scd.cont_no
+  AND equipment_act_code                   ='DELIVERY'
+  AND scd.cont_size                        =20
+  AND scd.cont_status                      ='MTY'
+  AND extract(MONTH FROM scd.payment_date) = $P{bulan}
+  AND extract(YEAR FROM scd.payment_date)  = $P{tahun}
+  AND m.equip_code                         =e.equip_code
+  AND m.equipment_type_code                ='003'
+  AND m.owner_code                         =o.owner_code
+  AND o.owner_code                         =$P{owner}
+  ) AS juml20m
+FROM m_customer mc ,
+  preservice_vessel pp,
+  m_vessel mv,
+  service_vessel p
+WHERE pp.cust_code =mc.cust_code
+AND pp.vessel_code = mv.vessel_code
+AND p.booking_code =pp.booking_code
+AND p.no_ppkb     IN
+  (SELECT r.no_ppkb
+  FROM service_cont_discharge r
+  WHERE p.no_ppkb                        = r.no_ppkb
+  AND extract(MONTH FROM r.payment_date) = $P{bulan}
+  AND extract(YEAR FROM r.payment_date)  = $P{tahun}
+  )
+GROUP BY p.no_ppkb,
+  mv.name,
+  p.arrival_time,
+  mc.name		
+		]]>
+	</queryString>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="vessel_name" class="java.lang.String"/>
+	<field name="arrival_time" class="java.sql.Timestamp"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="profitpelindo" class="java.math.BigDecimal"/>
+	<field name="profitowner" class="java.math.BigDecimal"/>
+	<field name="owner_name" class="java.lang.String"/>
+	<field name="full20" class="java.math.BigDecimal"/>
+	<field name="full40" class="java.math.BigDecimal"/>
+	<field name="mty20" class="java.math.BigDecimal"/>
+	<field name="mty40" class="java.math.BigDecimal"/>
+	<field name="juml40f" class="java.lang.Long"/>
+	<field name="juml20f" class="java.lang.Long"/>
+	<field name="juml40m" class="java.lang.Long"/>
+	<field name="juml20m" class="java.lang.Long"/>
+	<variable name="juml20f_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{juml20f}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="juml40f_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{juml40f}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="juml20m_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{juml20m}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="juml40m_1" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{juml40m}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="full20_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[($F{full20} * $F{juml20f}) + ($F{full40} * $F{juml40f})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="mty20_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[($F{mty20} * $F{juml20m}) + ($F{mty40} * $F{juml40m})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="jumlahTotal" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[($V{full20_1} == null ? 0 : $V{full20_1}) + ($V{mty20_1} == null ? 0 : $V{mty20_1})]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalProfitOwner" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[((($F{mty20} * $F{juml20m}) + ($F{mty40} * $F{juml40m})) + (($F{full20} * $F{juml20f}) + ($F{full40} * $F{juml40f}))) * ($F{profitowner} / 100)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalProfitPelindo" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[((($F{mty20} * $F{juml20m}) + ($F{mty40} * $F{juml40m})) + (($F{full20} * $F{juml20f}) + ($F{full40} * $F{juml40f}))) * ($F{profitpelindo} / 100)]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<summary>
+		<band height="16" splitType="Stretch"/>
+	</summary>
+</jasperReport>

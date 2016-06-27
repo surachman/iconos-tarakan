@@ -1,0 +1,265 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                >
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.container.container_load']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.container.container_load']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <h:form id="formLoad">
+            <p:dialog header="Select No PPKB"  widgetVar="dlgVessel" modal="true" minWidth="750" >
+                <p:dataTable var="item" value="#{monitoringContainerLoadBean.serviceVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}"/>
+                    </p:column>
+
+                    <p:column  filterBy="#{item[0]}" sortBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterBy="#{item[1]}" sortBy="#{item[1]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Est. Load" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{monitoringContainerLoadBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="formList" oncomplete="dlgVessel.hide()" onstart="freeze();">
+                            <f:attribute name="noppkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <br />
+        </h:form>
+        <h:form id="formList">
+            <h:panelGrid id="planningVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{monitoringContainerLoadBean.serviceVessel[0]}" onmousedown="dlgVessel.show()" onkeypress="dlgVessel.show()" size="30"/>
+                <p:commandButton image="ui-icon-folder-open" value="..."  type="button" onclick="dlgVessel.show()" style="font-size: x-small" onstart="freeze();"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{monitoringContainerLoadBean.serviceVessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{monitoringContainerLoadBean.serviceVessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{monitoringContainerLoadBean.serviceVessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Est. Discharge" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{monitoringContainerLoadBean.serviceVessel[5]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Closing Time" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{monitoringContainerLoadBean.serviceVessel[6]}" disabled="true" size="30">
+                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                </h:inputText>
+                <h:outputText />
+                <h:outputLabel value="Position Filter" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio id="filter" value="#{monitoringContainerLoadBean.filter}" valueChangeListener="#{monitoringContainerLoadBean.OnChangeFilter}">
+                    <f:selectItem itemValue="03" itemLabel="CY"/>
+                    <f:selectItem itemValue="02" itemLabel="H/T"/>
+                    <f:selectItem itemValue="01" itemLabel="VESSEL"/>
+                    <p:ajax update="planningBayplanLoadsTable" process="@this" onstart="freeze();" />
+                </h:selectOneRadio>
+                <h:outputLabel />
+            </h:panelGrid>
+            <br/>
+
+            <p:fieldset >
+
+                <div align="center">
+                    <table style="text-align: left; width: 500px;" cellpadding="5" cellspacing="0" border="0">
+                        <tbody>
+                            <tr style="font-weight: bold; text-align: center;"> CONTAINER LOAD SUMMARY </tr>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;"></td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;">20 FULL</td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;">20 EMPTY</td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;">40 FULL</td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;">40 EMPTY</td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;">TOTAL</td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227);">CY</td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[1]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[2]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[3]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[4]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[1] + monitoringContainerLoadBean.summaryContLoad[2] + monitoringContainerLoadBean.summaryContLoad[3] + monitoringContainerLoadBean.summaryContLoad[4]}"/></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227);">TRUCK</td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[5]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[6]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[7]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[8]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[5] + monitoringContainerLoadBean.summaryContLoad[6] + monitoringContainerLoadBean.summaryContLoad[7] + monitoringContainerLoadBean.summaryContLoad[8]}"/></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227);">VESSEL</td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[9]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[10]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[11]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[12]}"/></td>
+                                <td style="background-color: rgb(215, 235, 249); font-weight: bold; text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[9] + monitoringContainerLoadBean.summaryContLoad[10] + monitoringContainerLoadBean.summaryContLoad[11] + monitoringContainerLoadBean.summaryContLoad[12]}"/></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227);">TOTAL</td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[1] + monitoringContainerLoadBean.summaryContLoad[5] + monitoringContainerLoadBean.summaryContLoad[9]}"/></td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[2] + monitoringContainerLoadBean.summaryContLoad[6] + monitoringContainerLoadBean.summaryContLoad[10]}"/></td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[3] + monitoringContainerLoadBean.summaryContLoad[7] + monitoringContainerLoadBean.summaryContLoad[11]}"/></td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[4] + monitoringContainerLoadBean.summaryContLoad[8] + monitoringContainerLoadBean.summaryContLoad[12]}"/></td>
+                                <td style="font-weight: bold; background-color: rgb(59, 170, 227); text-align: center;"><h:outputText value="#{monitoringContainerLoadBean.summaryContLoad[13]}"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </p:fieldset>
+
+            <br/>
+            <p:dataTable id="planningBayplanLoadsTable" var="item" value="#{monitoringContainerLoadBean.planningContReceiving}"
+                         paginator="true" rows="10"
+                         paginatorPosition="bottom" rowIndexVar="No"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" >
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;"/>
+                </f:facet>
+
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No" />
+                    </f:facet>
+                    <h:outputText value="#{No+1}"/>
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Bl No" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}" style="text-align: center"  filterBy="#{item[3]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[4]}" style="text-align: center"  filterBy="#{item[4]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Gross" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}" style="text-align: center"  filterBy="#{item[6]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}" style="text-align: center"  filterBy="#{item[7]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="POD" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+<!--                <p:column style="text-align: center; width: 80px;">
+                    <f:facet name="header">
+                        <h:outputText value="Posisi" />
+                    </f:facet>
+                    <img src="./../../../resources/images/status/#{item[9]}.png"/>
+                </p:column>-->
+
+<!--          <p:column sortBy="#{item[10]}" style="text-align: center"  filterBy="#{item[10]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Position" />
+                    </f:facet>
+                     <h:outputText value="#{item[10]}" />
+                </p:column> -->
+
+            </p:dataTable>
+         
+       
+            
+        </h:form>
+    </ui:define>
+
+</ui:composition>

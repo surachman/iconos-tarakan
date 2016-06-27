@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.prime.com.tr/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+
+  <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="id" required="true"/>
+        <cc:attribute name="disabled" type="java.lang.Boolean"/>
+        <cc:attribute name="immediate" type="java.lang.Boolean" default="false"/>
+        <cc:attribute name="process" type="java.lang.String" default="@all"/>
+        <cc:attribute name="value" type="java.lang.String" required="true"/>
+        <cc:attribute name="onstart" type="java.lang.String"/>
+        <cc:attribute name="update" type="java.lang.String"/>
+        <cc:attribute name="actionListener" method-signature="void actionListener(javax.faces.event.ActionEvent)" required="true"/>
+    </cc:interface>
+
+  <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <iframe id="#{cc.attrs.id}" src="" style="display:none;"></iframe>
+        <p:commandButton id="#{cc.attrs.id}commandButton" onstart="#{cc.attrs.onstart}" process="#{cc.attrs.process}" update="#{cc.attrs.update}" disabled="#{cc.attrs.disabled}" actionListener="#{cc.attrs.actionListener}" immediate="#{cc.attrs.immediate}" oncomplete="handlePrintRequest(args);" value="#{cc.attrs.value}">
+            <cc:insertChildren />
+            <f:attribute name="target" value="#{cc.attrs.id}"/>
+        </p:commandButton>
+    </cc:implementation>
+</html>

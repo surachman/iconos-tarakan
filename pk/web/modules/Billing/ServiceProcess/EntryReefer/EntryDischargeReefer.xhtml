@@ -1,0 +1,349 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_reefers.entry_discharge_reefer']}" />
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_reefers.entry_discharge_reefer']}" />
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">
+            <h:panelGrid columns="4" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryDischargeReeferBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryDischargeReeferBean.registration.masterCustomer.custCode}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryDischargeReeferBean.registration.planningVessel.noPpkb}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryDischargeReeferBean.registration.planningVessel.preserviceVessel.masterVessel.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryDischargeReeferBean.registration.planningVessel.preserviceVessel.voyIn}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryDischargeReeferBean.registration.planningVessel.preserviceVessel.voyOut}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryDischargeReeferBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+        </h:form>
+
+        <h:form id="reeferServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{entryDischargeReeferBean.reeferDischargeServices}"
+                         paginator="true" rows="10" id="reeferServiceTable" rowsPerPageTemplate="5,10,15"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty entryDischargeReeferBean.registration.noReg or not entryDischargeReeferBean.registration.statusService.equals('registrasi')}" actionListener="#{entryDischargeReeferBean.handleAdd}" update="dsFormDialog:servContD" oncomplete="dlg.show();"/>
+                    </div>
+                </f:facet>
+                <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Job Slip" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="OH/OW/OL" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Plug On Date" />
+                    </f:facet>
+                    <h:outputText value="#{item[8]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[9]}">
+                    <f:facet name="header">
+                        <h:outputText value="Shift Planning" />
+                    </f:facet>
+                    <h:outputText value="#{item[9]}" />
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryDischargeReeferBean.handleEditDelete}" disabled="#{not entryDischargeReeferBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Delivery Service">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>
+                            <f:attribute name="noCont" value="#{item[2]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="dsFormDialog">
+            <p:dialog header="Entry Discharge Reefer"  widgetVar="dlg" modal="true" minWidth="400" >
+                <p:panel>
+                    <h:panelGrid columns="4" id="servContD">
+                        <h:outputLabel value="Container No" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="cont" onkeypress="dlgCont.show();" onmousedown="dlgCont.show();"  value="#{entryDischargeReeferBean.reeferDischargeService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+                            <p:message display="icon" for="cont"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.mlo.name}"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Size" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.contSize}" />
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Type" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.masterContainerType.name}" />
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Status" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.contStatus}" />
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Gross" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.contGross}" />
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="OH/OW/OL" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.overSize}" />
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Plug On Date" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.plugOnDate}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Shift Planning" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{entryDischargeReeferBean.reeferDischargeService.shiftPlanning}" />
+                        <h:outputLabel/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryDischargeReeferBean.handleConfirm}" update="reeferServiceForm:reeferServiceTable serviceContDiscForm:serviceContDisc dsFormDialog:servContD growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{entryDischargeReeferBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{entryDischargeReeferBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail reeferServiceForm:reeferServiceTable serviceContDiscForm:serviceContDisc" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="serviceContDiscForm">
+            <p:dialog header="Select Service Container Discharge"  widgetVar="dlgCont" modal="true" minWidth="600">
+                <p:dataTable id="serviceContDisc" var="item" value="#{entryDischargeReeferBean.serviceContDischarges}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Seal No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryDischargeReeferBean.handleSelectContPick}" value="#{msg['application.operation.select']}" update="dsFormDialog:servContD" oncomplete="dlgCont.hide();">
+                            <f:attribute name="idCont" value="#{item[6]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{entryDischargeReeferBean.handleDelete}" update="reeferServiceForm:reeferServiceTable serviceContDiscForm:serviceContDisc growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

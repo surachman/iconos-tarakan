@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage.load_recap']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage.load_recap']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true"/>
+
+        <h:form id="dischargeMonitoring">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{loadRecapBean.serviceVessels}"
+                             paginator="true" rows="10" rowIndexVar="No"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{loadRecapBean.handleSelectNoPPKB}" value="select" update="dischargeMonitoring:serviceVesselDetail dischargeMonitoring:dischargeMonitoringTable" oncomplete="dlgVessel.hide();statusDialog.hide();">
+                            <f:attribute name="noPPKB" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadRecapBean.serviceVessel[0]}" disabled="true" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgVessel.show();"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadRecapBean.serviceVessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadRecapBean.serviceVessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadRecapBean.serviceVessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br/>
+            <!-- LIST DATA DISCHARGE MONITORING  -->
+            <p:dataTable id="dischargeMonitoringTable" paginatorPosition="bottom" var="item" value="#{loadRecapBean.loadRecaps}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;" />
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="3" headerText="No" sortBy=""/>
+                        <p:column rowspan="3" headerText="Container No" sortBy="" filterBy="#{item[0]}" filterMatchMode="contains"/>
+                        <p:column rowspan="3" headerText="Size" sortBy=""/>
+                        <p:column rowspan="3" headerText="Type" sortBy=""/>
+                        <p:column rowspan="3" headerText="Status" sortBy=""/>
+                        <p:column rowspan="3" headerText="Receiving Date" sortBy=""/>
+                        <p:column rowspan="3" headerText="Lift On Date" sortBy=""/>
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                        <p:column colspan="3" headerText="Charge"/>
+                        <p:column rowspan="3" headerText="Total"/>
+                    </p:row>
+                    <p:row>
+                        <p:column rowspan="2" sortBy="" headerText="Masa I" />
+                        <p:column rowspan="2" sortBy="" headerText="Masa II" />
+                        <p:column colspan="2" sortBy="" headerText="Penumpukan" />
+                        <p:column rowspan="2" sortBy="" headerText="Jasa Dermaga" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="" headerText="Masa I" />
+                        <p:column sortBy="" headerText="Masa II" />
+                    </p:row>
+                </p:columnGroup>                
+                <p:column>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[13]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[9]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[13]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[10]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[13]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[11]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[13]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[12]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>                
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="12" footerText="Total Charge" style="text-align: right;"/>
+                        <p:column footerText="#{loadRecapBean.formattedTotal}"/>
+                    </p:row>
+                </p:columnGroup>
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <!--                        <a href="{loadRecapBean.urlPenumpukan}" class="ui-button-text">
+                                                    <p:button disabled="{empty loadRecapBean.loadRecaps}" value="{msg['application.operation.download_as_pdf']}"/>
+                                                </a>-->
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.preview']}" actionListener="#{loadRecapBean.handleDownload}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" disabled="#{empty loadRecapBean.loadRecaps}" />
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

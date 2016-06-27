@@ -1,0 +1,476 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:qt="http://www.qtasnim.com/currency"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_change_status']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_change_status']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                if(!(args.validationFailed || args.loggedIn == false)) {
+                    dlg.hide();
+                    dlgBatalNota.hide();
+                }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+        </script>
+    </ui:define>
+    
+    
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        
+        <h:form id="registrationForm">           
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText onkeypress="showRegistrations();" onmousedown="showRegistrations();" size="30" readonly="true" value="#{changeStatusBean.registration.noReg}" />
+                <p:commandButton image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showRegistrations();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{changeStatusBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{changeStatusBean.registration.planningVessel.noPpkb}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{changeStatusBean.registration.planningVessel.preserviceVessel.masterVessel.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{changeStatusBean.registration.planningVessel.preserviceVessel.voyIn}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{changeStatusBean.registration.planningVessel.preserviceVessel.voyOut}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{changeStatusBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+            <h:panelGrid id="cek" columns="3">
+                <h:outputLabel value="Payment Type" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio value="#{changeStatusBean.invoice.paymentType}" valueChangeListener="#{changeStatusBean.onChangeEvent}" disabled="#{not changeStatusBean.registration.statusService.equals('registrasi')}">
+                    <f:selectItem itemValue="CASH" itemLabel="Cash"/>
+                    <f:selectItem itemValue="KREDIT" itemLabel="Kredit"/>
+                    <f:ajax execute="@this" event="change" render="cek"/>
+                </h:selectOneRadio>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="changeStatussesForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{changeStatusBean.changeStatuses}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="changeStatussesTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" 
+                                         immediate="true" disabled="#{empty changeStatusBean.registration.noReg or not changeStatusBean.registration.statusService.equals('registrasi')}" 
+                                         actionListener="#{changeStatusBean.handleAdd}" update="dsFormDialog:servContD serviceContDiscForm:serviceContDisc" oncomplete="dlg.show();"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{changeStatusBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor)}" oncomplete="dlgBatalNota.show()"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center" />
+                        <p:column sortBy="#{item[0]}" rowspan="2" headerText="Job Slip" filterMatchMode="contains" filterBy="#{item[0]}"/>
+                        <p:column sortBy="#{item[1]}" rowspan="2" headerText="Container No" filterMatchMode="contains" filterBy="#{item[1]}"/>
+                        <p:column sortBy="#{item[2]}" rowspan="2" headerText="Size" />
+                        <p:column sortBy="#{item[3]}" rowspan="2" headerText="Type" />
+                        <p:column sortBy="#{item[4]}" rowspan="2" headerText="Status" filterMatchMode="contains" filterBy="#{item[2]}"/>
+                        <p:column sortBy="#{item[5]}" rowspan="2" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column colspan="3" headerText="Charge (#{qt:getCurrencySymbol(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country)})" />
+                        <p:column rowspan="2" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[6]}" headerText="Dg" />
+                        <p:column sortBy="#{item[7]}" headerText="Label"/>
+                        <p:column headerText="Adm" />
+                        <p:column headerText="Change Status"/>
+                        <p:column headerText="Total (#{qt:getCurrencySymbol(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country)})"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country, item[8], false, changeStatusBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country, item[9], false, changeStatusBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country, item[10], false, changeStatusBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{changeStatusBean.handleSelect}" 
+                                         disabled="#{not changeStatusBean.registration.statusService.equals('registrasi')}" 
+                                         oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Change Status Service">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="11" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country, changeStatusBean.total, false, changeStatusBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country, changeStatusBean.total.multiply(changeStatusBean.ppnPrint), false, changeStatusBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country, changeStatusBean.materaiPrint, false, changeStatusBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(changeStatusBean.masterCurrency.language, changeStatusBean.masterCurrency.country, changeStatusBean.total.add(changeStatusBean.total.multiply(changeStatusBean.ppnPrint)).add(changeStatusBean.materaiPrint), false, changeStatusBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" 
+                                         disabled="#{not changeStatusBean.registration.statusService.equals('registrasi') or empty changeStatusBean.changeStatuses}" 
+                                         update="registrationForm:registrationDetail registrationForm:cek changeStatussesForm:changeStatussesTable growl"
+                                         actionListener="#{changeStatusBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" 
+                                            value="#{msg['application.operation.preview']}" 
+                                            disabled="#{empty changeStatusBean.changeStatuses}" 
+                                            actionListener="#{changeStatusBean.handleDownloadTransactionRecap}" 
+                                            update=":changeStatussesForm:changeStatussesTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" 
+                                            value="#{msg['application.operation.print_nota']}" 
+                                            disabled="#{empty changeStatusBean.changeStatuses or (changeStatusBean.disPrint and not loginSessionBean.supervisor) or empty changeStatusBean.registration.invoice.noReg or changeStatusBean.disKredit}"
+                                            actionListener="#{changeStatusBean.handleDownloadNota}" 
+                                            update="changeStatussesForm:changeStatussesTable"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" 
+                                            value="#{msg['application.operation.detail']}" 
+                                            actionListener="#{changeStatusBean.handleDownloadDetail}"
+                                            disabled="#{empty changeStatusBean.changeStatuses or empty changeStatusBean.registration.invoice.noReg or empty changeStatusBean.registration.invoice.noInvoice}"
+                                            update="changeStatussesForm:changeStatussesTable"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="dsFormDialog">
+            <p:dialog header="Entry Change Status Service"  widgetVar="dlg" modal="true" minWidth="450" >
+                <p:panel>
+                    <h:panelGrid columns="5" id="servContD">
+                        <h:outputLabel value="Container No *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="bl" onkeypress="dlgCont.show();" onmousedown="dlgCont.show();" value="#{changeStatusBean.changeStatusService.contNo}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:commandButton onstart="freeze();"  image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+                        <p:message for="bl" display="icon"/>
+
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{changeStatusBean.changeStatusService.mlo.name}"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Size" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{changeStatusBean.changeStatusService.contSize}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Type" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{changeStatusBean.changeStatusService.masterContainerType.name}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Status" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{changeStatusBean.changeStatusService.contStatus}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Gross" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{changeStatusBean.changeStatusService.contGross}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="OH/OW/OL" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{changeStatusBean.changeStatusService.overSize}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" 
+                                                 actionListener="#{changeStatusBean.handleConfirm}" 
+                                                 update=":changeStatussesForm:changeStatussesTable serviceContDiscForm:serviceContDisc dsFormDialog:servContD growl"
+                                                 oncomplete="dlg.hide();"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog header="Select Registration"  widgetVar="registrationsDialog" modal="true" minWidth="750">
+            <h:form id="registrationsForm">
+                <p:dataTable id="registrationsTable"  widgetVar="registrationsTable"
+                             var="item" value="#{changeStatusBean.registrations}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{changeStatusBean.handleSelectRegistration}" 
+                                             value="#{msg['application.operation.select']}" 
+                                             update="registrationForm:registrationDetail registrationForm:cek :changeStatussesForm:changeStatussesTable serviceContDiscForm:serviceContDisc" oncomplete="registrationsDialog.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="serviceContDiscForm">
+            <p:dialog header="Select Service Container Discharge"  widgetVar="dlgCont" modal="true" minWidth="600">
+                <p:dataTable id="serviceContDisc"  widgetVar="serviceContDiscTable" var="item" value="#{changeStatusBean.serviceContDischarges}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" onsuccess="serviceContDiscTable.clearFilters();" 
+                                         actionListener="#{changeStatusBean.handleSelectContPick}" 
+                                         value="#{msg['application.operation.select']}" 
+                                         update="dsFormDialog:servContD" oncomplete="dlgCont.hide();">
+                            <f:attribute name="idCont" value="#{item[5]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" 
+                                             actionListener="#{changeStatusBean.handleDelete}" 
+                                             update="registrationForm:registrationDetail registrationForm:cek changeStatussesForm:changeStatussesTable serviceContDiscForm:serviceContDisc growl"
+                                oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{changeStatusBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{changeStatusBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{changeStatusBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{changeStatusBean.handleCancelInvoice}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="registrationForm:registrationDetail registrationForm:cek changeStatussesForm:changeStatussesTable serviceContDiscForm:serviceContDisc growl"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand id="showRegistrations" name="showRegistrations" actionListener="#{changeStatusBean.handleShowRegistration}" update="registrationsForm:registrationsTable" onstart="freeze();" oncomplete="registrationsDialog.show();registrationsTable.clearFilters();"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,590 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.ship_arrival_planning']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.ship_arrival_planning']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+
+        <h:form id="bookingList">
+            <p:growl id="growl" showDetail="true"/>
+            <p:dataTable value="#{shipArrivalPlanning.preserviceVesselss}" var="item"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="booking">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{shipArrivalPlanning.handleAdd}" oncomplete="addEditDialog.show();" update="formAddEdit" title="Add Booking"/>
+                    </div>
+                </f:facet>
+
+                <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="Vessel Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+
+                <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Agent"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+
+                <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Voy In"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+
+                <p:column filterMatchMode="contains" filterBy="#{item[3]}" sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Voy Out"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+
+                <p:column filterMatchMode="contains" filterBy="#{item[4]}" sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="ETA"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="ETD"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Last Port"/>
+                    </f:facet>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Next Port"/>
+                    </f:facet>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+
+                <p:column filterMatchMode="contains" filterBy="#{item[8]}" sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton disabled="#{not item[8].equals('Booking')}" actionListener="#{shipArrivalPlanning.handleEditDeleteButton}" update="bookingList formAddEdit" oncomplete="addEditDialog.show();" image="ui-icon ui-icon-pencil" title="Edit Booking">
+                            <f:attribute name="booking_code" value="#{item[9]}"/>
+                        </p:commandButton>                        
+                        <p:commandButton disabled="#{not item[8].equals('Booking')}" actionListener="#{shipArrivalPlanning.handleEditDeleteButton}" update="bookingList confirmation" oncomplete="confirmation.show();" image="ui-icon-arrowreturn-1-w" title="Cancel Booking">
+                            <f:attribute name="booking_code" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Cancel Booking" id="confirmation"  widgetVar="confirmation" minWidth="400">
+            <h:form>
+                <p:panel>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.bookingCode}"/>
+                    <h:outputLabel value="Are you sure you want to cancel this record?"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{shipArrivalPlanning.handleCancelButton}"  update="bookingList bookingList:booking" oncomplete="confirmation.hide();" />
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--  ADD & EDIT  -->
+        <p:dialog modal="true" header="Booking" width="800"  widgetVar="addEditDialog">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.bookingCode}"/>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid>
+                            <p:fieldset legend="Vessel Detail" style="height: 250px;">
+                                <h:panelGrid columns="1">
+                                    <h:panelGrid columns="4" id="vesselField">
+                                        <h:outputText value="Vessel Code"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText required="true" requiredMessage="The Vessel Code field is required." onclick="pilih.show();return false;" disabled="false" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.vesselCode}"/>
+                                        <p:commandButton image="ui-icon-folder-open" value="..." onclick="pilih.show()" style="font-size: x-small"/>
+
+                                        <h:outputText value="Vessel Name"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText disabled="true" required="true" id="vesselname" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.name}"/>
+                                        <h:outputText value=""/>
+
+                                        <h:outputText value="GRT"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.grt}"/>
+                                        <h:outputText value=""/>
+
+                                        <h:outputText value="DWT"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.dwt}"/>
+                                        <h:outputText value=""/>
+
+                                        <h:outputText value="BRT"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.brt}"/>
+                                        <h:outputText value=""/>
+
+                                        <h:outputText value="NRT"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.nrt}"/>
+                                        <h:outputText value=""/>
+
+                                        <h:outputText value="LOA"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText  disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.loa}"/>
+                                        <h:outputText value=""/>
+
+                                        <h:outputText value="Voy In *"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText id="voyin" required="true" value="#{shipArrivalPlanning.preserviceVessel.voyIn}" requiredMessage="The Voy In field is required.">
+                                            <f:validateLength maximum="10" />
+                                        </h:inputText>
+                                        <h:outputText value=""/>
+
+                                        <h:outputText value="Voy Out *"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText id="voyout" required="true" value="#{shipArrivalPlanning.preserviceVessel.voyOut}" requiredMessage="The Voy Out field is required.">
+                                            <f:validateLength maximum="10" />
+                                        </h:inputText>
+                                        <h:outputText value=""/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:spacer height="10"/>
+
+                            <p:fieldset legend="Agent Detail" style="height: 120px;" id="agentField">
+                                <h:panelGrid columns="4">
+                                    <h:outputText value="Agent Code"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText required="true" requiredMessage="The Agent Code field is required." id="agentcode"  value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.custCode}" onfocus="pilih2.show();return false;"/>
+                                    <p:commandButton image="ui-icon-folder-open" value="..." onclick="pilih2.show()" style="font-size: x-small"/>
+
+                                    <h:outputText value="Name"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.name}"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="Phone"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.phone1}"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="Address"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.address}"/>
+                                    <h:outputText value=""/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+
+                        <p:spacer width="10"/>
+
+                        <h:panelGrid>
+                            <p:fieldset legend="Estimation" style="height: 430px;">
+                                <h:panelGrid>
+                                    <h:panelGrid columns="4">
+                                        <h:outputText value="Activity"/>
+                                        <p:spacer width="31"/>
+                                        <h:outputText value=":"/>
+                                        <h:selectOneRadio value="#{shipArrivalPlanning.preserviceVessel.activity}" id="activity" valueChangeListener="#{shipArrivalPlanning.onChangeEvent}">
+                                            <f:selectItem itemValue="1" itemLabel="Discharge"/>
+                                            <f:selectItem itemValue="2" itemLabel="Load"/>
+                                            <f:selectItem itemValue="3" itemLabel="Discharge/Load"/>
+                                            <f:ajax execute="@this" event="change" render="bookingVessel2"/>
+                                        </h:selectOneRadio>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid columns="4" id="bookingVessel2">
+                                        <h:outputText value="Est. Discharge"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText maxlength="4" required="true" value="#{shipArrivalPlanning.preserviceVessel.estDischarge}" disabled="#{shipArrivalPlanning.visibleHiji}" onkeyup="javascript:cekAlphabet(this);"/>
+                                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+
+                                        <h:outputText value="Est. Load"/>
+                                        <h:outputText value=":"/>
+                                        <h:inputText maxlength="4" required="true" value="#{shipArrivalPlanning.preserviceVessel.estLoad}" disabled="#{shipArrivalPlanning.visibleDua}" onkeyup="javascript:cekAlphabet(this);"/>
+                                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                    </h:panelGrid>
+
+                                    <h:panelGrid columns="5">
+                                        <h:outputText style="padding-right: 40px;" value="ETA *"/>
+                                        <p:spacer width="5"/>
+                                        <h:outputText value=":"/>
+                                        <p:inputMask id="eta" required="true" mask="99/99/9999 99:99" value="#{shipArrivalPlanning.preserviceVessel.eta}" requiredMessage="The ETA field is required.">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </p:inputMask>
+                                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+
+                                        <h:outputText value="ETD *"/>
+                                        <p:spacer width="5"/>
+                                        <h:outputText value=":"/>
+                                        <p:inputMask id="etd" required="true" mask="99/99/9999 99:99" value="#{shipArrivalPlanning.preserviceVessel.etd}" requiredMessage="The ETD field is required.">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </p:inputMask>
+                                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+
+                                        <h:outputText value="Last Port"/>
+                                        <p:spacer width="5"/>
+                                        <h:outputText value=":"/>
+                                        <h:selectOneMenu value="#{shipArrivalPlanning.preserviceVessel.masterPort1.portCode}">
+                                            <f:selectItems value="#{shipArrivalPlanning.masterPorts}" var="i" itemValue="#{i.portCode}" itemLabel="#{i.name}"/>
+                                        </h:selectOneMenu>
+                                        <h:outputLabel />
+
+                                        <h:outputText value="Next Port"/>
+                                        <p:spacer width="5"/>
+                                        <h:outputText value=":"/>
+                                        <h:selectOneMenu value="#{shipArrivalPlanning.preserviceVessel.masterPort.portCode}">
+                                            <f:selectItems value="#{shipArrivalPlanning.masterPorts}" var="i" itemValue="#{i.portCode}" itemLabel="#{i.name}"/>
+                                        </h:selectOneMenu>
+                                        <h:outputLabel />
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-check" value="#{msg['application.operation.save']}" update="bookingList, bookingList:booking" actionListener="#{shipArrivalPlanning.handleSaveEdit}" oncomplete="handleRequestValidation(xhr, status, args)" />
+                            <p:commandButton value="#{msg['application.operation.cancel']}" onclick="addEditDialog.hide();"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            addEditDialog.hide();confirm.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^-?[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+
+        <!--  CONFIRM  -->
+        <h:form id="formConfirm">
+            <p:dialog modal="true" header="Confirm Booking" width="800" id="confirm"  widgetVar="confirm">
+                <p:panel>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.bookingCode}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.masterPort.portCode}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.masterPort1.portCode}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.custCode}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.masterVessel.vesselCode}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.activity}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.openStack}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:inputHidden>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.closingTime}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:inputHidden>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.voyIn}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.voyOut}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.estDischarge}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.estLoad}"/>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.eta}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:inputHidden>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.etd}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:inputHidden>
+                    <h:inputHidden value="#{shipArrivalPlanning.preserviceVessel.status}"/>
+                    <h:panelGrid>
+                        <h:panelGrid columns="3">
+                            <p:fieldset legend="Master Vessel" style="height: 240px; width: 220px;">
+                                <h:panelGrid columns="3" >
+                                    <h:outputText value="Vessel Code"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.vesselCode}"/>
+
+                                    <h:outputText value="Vessel Name"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.name}"/>
+
+                                    <h:outputText value="GRT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.grt}"/>
+
+                                    <h:outputText value="DWT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.dwt}"/>
+
+                                    <h:outputText value="BRT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.brt}"/>
+
+                                    <h:outputText value="NRT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.nrt}"/>
+
+                                    <h:outputText value="LOA"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterVessel.loa}"/>
+
+                                    <h:outputText value="Voy In"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.voyIn}"/>
+
+                                    <h:outputText value="Voy Out"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.voyOut}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:spacer width="20"/>
+
+                            <p:fieldset legend="Estimation" style="height: 240px; width: 400px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="Activity"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneRadio disabled="true" layout="LINE_DIRECTION" value="#{shipArrivalPlanning.preserviceVessel.activity}" >
+                                        <f:selectItem itemValue="1" itemLabel="Discharge"/>
+                                        <f:selectItem itemValue="2" itemLabel="Load"/>
+                                        <f:selectItem itemValue="3" itemLabel="Discharge/Load"/>
+                                    </h:selectOneRadio>
+
+                                    <h:outputText value="Est. Discharge"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.estDischarge}"/>
+
+                                    <h:outputText value="Est. Load"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.estLoad}"/>
+
+                                    <h:outputText value="ETA"/>
+                                    <h:outputText value=":"/>
+                                    <p:inputMask disabled="true" mask="99/99/9999 99:99" value="#{shipArrivalPlanning.preserviceVessel.eta}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </p:inputMask>
+
+                                    <h:outputText value="ETD"/>
+                                    <h:outputText value=":"/>
+                                    <p:inputMask disabled="true" mask="99/99/9999 99:99" value="#{shipArrivalPlanning.preserviceVessel.etd}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </p:inputMask>
+
+                                    <h:outputText value="Last Port"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterPort1.portCode}">
+                                        <f:selectItems value="#{shipArrivalPlanning.masterPorts}" var="i" itemValue="#{i.portCode}" itemLabel="#{i.name}"/>
+                                    </h:selectOneMenu>
+
+                                    <h:outputText value="Next Port"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterPort.portCode}">
+                                        <f:selectItems value="#{shipArrivalPlanning.masterPorts}" var="i" itemValue="#{i.portCode}" itemLabel="#{i.name}"/>
+                                    </h:selectOneMenu>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                        <p:spacer height="10"/>
+                        <h:panelGrid columns="3">
+                            <p:fieldset legend="Master Agent" style="height: 150px; width: 220px;">
+                                <h:panelGrid columns="3" >
+                                    <h:outputText value="Agent Code"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.custCode}" />
+
+                                    <h:outputText value="Name"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.name}"/>
+
+                                    <h:outputText value="Phone"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.phone1}"/>
+
+                                    <h:outputText value="Address"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{shipArrivalPlanning.preserviceVessel.masterCustomer.address}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:spacer width="20"/>
+
+                            <p:fieldset legend="Booking Confirm" style="height: 150px; width: 400px;">
+                                <h:panelGrid columns="4" >
+                                    <h:outputText value="Booking Code"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{shipArrivalPlanning.preserviceVessel.bookingCode}" size="30"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="Open Stack"/>
+                                    <h:outputText value=":"/>
+                                    <p:inputMask disabled="#{shipArrivalPlanning.bookingActivity}" mask="99/99/9999 99:99" value="#{shipArrivalPlanning.preserviceVessel.openStack}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </p:inputMask>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="Status"/>
+                                    <h:outputText value=":"/>
+                                    <h:outputText value="Status Akan Berubah Menjadi Confirm"/>
+                                    <h:outputText value=""/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-check" value="#{msg['application.operation.confirm']}" update="bookingList, bookingList:booking" actionListener="#{shipArrivalPlanning.handleSaveConfirm}" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" onclick="confirm.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog modal="true" header="Booking Vessel"  widgetVar="pilih" id="dialogBooking" width="700">
+                <p:dataTable value="#{shipArrivalPlanning.masterVessels}" var="itemm"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[0]}" sortBy="#{itemm[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Code"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[0]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[1]}" sortBy="#{itemm[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[1]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[2]}" sortBy="#{itemm[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="GRT"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[2]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton actionListener="#{shipArrivalPlanning.handleSelectVesselCode}" value="#{msg['application.operation.select']}" update="formAddEdit:vesselField" oncomplete="pilih.hide();">
+                                <f:attribute name="vessel_code" value="#{itemm[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog modal="true" header="Booking Agent"  widgetVar="pilih2" id="dialogAgent" width="700">
+                <p:dataTable value="#{shipArrivalPlanning.masterCustomers}" var="itemm"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[0]}" sortBy="#{itemm[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer Code"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[0]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[1]}" sortBy="#{itemm[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Agent Name"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[1]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[2]}" sortBy="#{itemm[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Phone"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[2]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[3]}" sortBy="#{itemm[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Address"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[3]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton actionListener="#{shipArrivalPlanning.handleSelectVesselCustCode}" value="#{msg['application.operation.select']}" update="formAddEdit:agentField" oncomplete="pilih2.hide();">
+                                <f:attribute name="cust_code" value="#{itemm[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

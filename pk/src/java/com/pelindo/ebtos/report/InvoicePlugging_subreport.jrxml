@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PerhitunganDeliveryBarang_subreport" language="groovy" pageWidth="555" pageHeight="514" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_reg" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT ds.cont_no,
+  ds.cont_status,
+  ds.cont_size,
+  ds.cont_type,
+  NVLN(pp.total_charge) AS total_charge,
+  NVLN(pm.total_charge) AS totalMon
+FROM plugging_reefer_service ds,
+  plugging_only_rekap pr,
+  perhitungan_plugging pp,
+  perhitungan_monitoring pm
+WHERE pp.cont_no = ds.cont_no
+AND pm.cont_no   = ds.cont_no
+AND pp.no_reg    = pr.no_reg
+AND pr.job_slip  =ds.job_slip
+AND pm.no_reg    = pr.no_reg
+AND pr.no_reg    = $P{no_reg}
+and rownum < 11]]>
+	</queryString>
+	<field name="cont_no" class="java.lang.String"/>
+	<field name="cont_status" class="java.lang.String"/>
+	<field name="cont_size" class="java.lang.Integer"/>
+	<field name="cont_type" class="java.lang.Integer"/>
+	<field name="total_charge" class="java.math.BigDecimal"/>
+	<field name="totalmon" class="java.math.BigDecimal"/>
+	<variable name="charge_equipmet_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_charge}]]></variableExpression>
+	</variable>
+	<variable name="total_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalmon}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="13">
+			<staticText>
+				<reportElement x="89" y="0" width="22" height="13"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[ISI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="0" width="15" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="192" y="0" width="54" height="13"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[MON]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="111" y="0" width="30" height="13"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[TIPE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="16" y="0" width="54" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[NO CONT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="141" y="0" width="51" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[PLUG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="19" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[UKR]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="70" y="0" width="19" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{cont_size}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="141" y="0" width="51" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{total_charge}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="15" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{REPORT_COUNT} + "."]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="192" y="0" width="54" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{totalmon}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="12" width="246" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="89" y="0" width="22" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cont_status}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="16" y="0" width="54" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cont_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="111" y="0" width="30" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{cont_type}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="13">
+			<textField pattern="#,##0.00">
+				<reportElement x="192" y="0" width="54" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{total_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="141" y="0" width="51" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{charge_equipmet_2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

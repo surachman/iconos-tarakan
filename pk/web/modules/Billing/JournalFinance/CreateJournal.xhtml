@@ -1,0 +1,350 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns:qt="http://www.qtasnim.com/currency">
+    
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.journal.create_journal']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.journal.create_journal']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+        <p:growl id="growl" showDetail="true"/>
+        <p:tabView>
+            <p:tab title="Create JKM">
+                <h:form id="jkmCandidatesForm">
+                    <p:dataTable var="item" value="#{createJournalBean.journalCandidates}" rowIndexVar="index"
+                                 paginator="true" rows="20" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="20,50,100"
+                                 selection="#{createJournalBean.selectedJournalCandidates}" id="jkmCandidatesTable">
+
+                        <f:facet name="header">
+                            <div class="header-panel-single-left">
+                                <p:commandButton oncomplete="createJournalConfirm.show()" update="createJournalConfirmForm:createJournalConfirmPanel" value="#{msg['application.operation.create_jkm']}"/>
+                            </div>
+                        </f:facet>
+
+                        <p:column selectionMode="multiple"/>
+
+                        <p:column style="text-align: center;" rendered="#{not createJournalBean.isJKMGroupingByCustomer}">
+                            <f:facet name="header">
+                                <h:outputText value="No Invoice" />
+                            </f:facet>
+                            <h:outputText value="#{item[13]}" />
+                        </p:column>
+
+                        <p:column style="text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="Customer Code" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Customer Name" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column style="text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="Currency" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column style="text-align: center;" rendered="#{not createJournalBean.isJKMGroupingByCustomer}">
+                            <f:facet name="header">
+                                <h:outputText value="Payment Date" />
+                            </f:facet>
+                            <h:outputText value="#{item[15]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column style="text-align: right;">
+                            <f:facet name="header">
+                                <h:outputText value="Total" />
+                            </f:facet>
+                            <div class="header-panel-left">
+                                <h:outputText value="#{qt:getCurrencySymbol(item[9], item[10])}"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <h:outputText value="#{qt:getFormattedCurrency(item[9], item[10], item[7], false, item[11])}" style="font-weight: bold;"/>
+                            </div>
+                        </p:column>
+
+                        <p:column style="width:200px; text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="Action"/>
+                            </f:facet>
+                            <center>
+                                <p:commandButton id="invoicesButton" actionListener="#{createJournalBean.handleSelectJournal}" rendered="#{createJournalBean.isJKMGroupingByCustomer}" value="#{msg['application.operation.invoices']}" update="invoicesForm" onsuccess="dlgInvoices.show();" onstart="freeze()">
+                                    <f:param name="list" value="journalCandidates" />
+                                    <f:param name="index" value="#{index}" />
+                                </p:commandButton>
+                                <p:commandButton id="detailButton" actionListener="#{createJournalBean.handleSelectJournal}" value="#{msg['application.operation.journal_detail']}" update="detailForm" onsuccess="dlgJournalDetail.show();" onstart="freeze()">
+                                    <f:param name="list" value="journalCandidates" />
+                                    <f:param name="index" value="#{index}" />
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            &nbsp;
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+            <p:tab title="JKM Recap">
+                <h:form id="journalFilterForm">
+                    <div class="ui-panel ui-widget ui-widget-content ui-corner-all" style="width:270px;">
+                        <h:panelGrid columns="3" style="padding:15px;">
+                            <h:outputText value="Month"/>
+                            <h:outputText value=":"/>
+                            <p:calendar size="15" onselect="freeze();" pattern="dd/MM/yyyy" value="#{createJournalBean.dateFilter}" showOn="button"/>
+                        </h:panelGrid>
+                        <div class="ui-panel-footer ui-widget-content" style="overflow: visible;">
+                            <div class="header-panel-single-right">
+                                <p:outputPanel id="buttonSubForm">
+                                    <p:commandButton onstart="freeze();" update="jkmsForm:jkmsTable" actionListener="#{createJournalBean.handleJKMFilter}" value="#{msg['application.operation.filter']}"/>
+                                </p:outputPanel>
+                            </div>
+                        </div>
+                    </div>
+                </h:form>
+                <br />
+                <h:form id="jkmsForm">
+                    <p:dataTable var="item" value="#{createJournalBean.journals}"
+                                 paginator="true" rows="20" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="20,50,100"
+                                 rowIndexVar="index" id="jkmsTable">
+                        <f:facet name="header">
+                            &nbsp;
+                        </f:facet>
+
+                        <p:column style="text-align: center;" rendered="#{not createJournalBean.isJKMGroupingByCustomer}">
+                            <f:facet name="header">
+                                <h:outputText value="No Invoice" />
+                            </f:facet>
+                            <h:outputText value="#{item[13]}" />
+                        </p:column>
+
+                        <p:column style="text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="Sumber" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" />
+                        </p:column>
+
+                        <p:column style="text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="Customer Code" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Customer Name" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column style="text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="Currency" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column style="text-align: right;">
+                            <f:facet name="header">
+                                <h:outputText value="Total" />
+                            </f:facet>
+                            <div class="header-panel-left">
+                                <h:outputText value="#{qt:getCurrencySymbol(item[9], item[10])}"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <h:outputText value="#{qt:getFormattedCurrency(item[9], item[10], item[7], false, item[11])}" style="font-weight: bold;"/>
+                            </div>
+                        </p:column>
+
+                        <p:column style="text-align: center;">
+                            <f:facet name="header">
+                                <h:outputText value="Status" />
+                            </f:facet>
+                            <h:outputText rendered="#{empty item[12]}" style="color: red;" value="Not Journaled" />
+                            <h:outputText rendered="#{not empty item[12]}" style="color: blue;" value="Journaled" />
+                        </p:column>
+
+                        <p:column style="width:250px;">
+                            <f:facet name="header">
+                                <h:outputText value="Action"/>
+                            </f:facet>
+                            <center>
+                                <p:commandButton id="invoicesButton" actionListener="#{createJournalBean.handleSelectJournal}" rendered="#{createJournalBean.isJKMGroupingByCustomer}" value="#{msg['application.operation.invoices']}" update="invoicesForm" onsuccess="dlgInvoices.show();" onstart="freeze()">
+                                    <f:param name="list" value="journals" />
+                                    <f:param name="index" value="#{index}" />
+                                </p:commandButton>
+                                <p:commandButton id="detailButton" actionListener="#{createJournalBean.handleSelectJournal}" value="#{msg['application.operation.journal_detail']}" update="detailForm" onsuccess="dlgJournalDetail.show();" onstart="freeze()">
+                                    <f:param name="list" value="journals" />
+                                    <f:param name="index" value="#{index}" />
+                                </p:commandButton>
+                                <p:commandButton id="printButton" disabled="#{empty item[6] or empty item[12]}" actionListener="#{createJournalBean.handlePrintJournal}" oncomplete="handleDownloadRequest(args)" value="#{msg['application.operation.print']}" onstart="freeze()">
+                                    <f:attribute name="sumber" value="#{item[6]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+
+                        <f:facet name="footer">
+                            &nbsp;
+                        </f:facet>
+                    </p:dataTable>
+                </h:form>
+            </p:tab>
+        </p:tabView>
+
+        <p:dialog header="#{msg['application.operation.invoices']}"  widgetVar="dlgInvoices" width="450" modal="true" resizable="false">
+            <h:form id="invoicesForm">
+                <h:panelGrid columns="3" style="margin-top: 10px; margin-bottom: 10px;" rendered="#{not empty createJournalBean.selectedJournal}">
+                    <h:outputText value="Master Code"/>:
+                    <h:outputText value="#{createJournalBean.selectedJournal[4]}"/>
+                    <h:outputText value="Customer Name"/>:
+                    <h:outputText value="#{createJournalBean.selectedJournal[5]}"/>
+                </h:panelGrid>
+                <p:dataTable value="#{createJournalBean.invoices}" var="item">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align:center;">
+                        <f:facet name="header">
+                            <h:outputText value="Payment Date"/>
+                        </f:facet>
+                        <h:outputText rendered="#{not empty item.paymentDate}" value="#{item.paymentDate}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                        <h:outputText rendered="#{empty item.paymentDate}" value="-"/>
+                    </p:column>
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="No Invoice"/>
+                        </f:facet>
+                        <h:outputText value="#{item.noInvoice}"/>
+                    </p:column>
+                    <p:column style="text-align: right;">
+                        <f:facet name="header">
+                            <h:outputText value="Total"/>
+                        </f:facet>
+                        <div class="header-panel-left">
+                            <h:outputText value="#{qt:getCurrencySymbol(createJournalBean.selectedJournal[9], createJournalBean.selectedJournal[10])}"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <h:outputText value="#{qt:getFormattedCurrency(createJournalBean.selectedJournal[9], createJournalBean.selectedJournal[10], item.totalTagihan, false, createJournalBean.selectedJournal[11])}" style="font-weight: bold;"/>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.operation.journal_detail']}"  widgetVar="dlgJournalDetail" width="450" modal="true" resizable="false">
+            <h:form id="detailForm">
+                <h:panelGrid columns="3" style="margin-top: 10px; margin-bottom: 10px;" rendered="#{not empty createJournalBean.selectedJournal}">
+                    <h:outputText value="Master Code"/>:
+                    <h:outputText value="#{createJournalBean.selectedJournal[4]}"/>
+                    <h:outputText value="Customer Name"/>:
+                    <h:outputText value="#{createJournalBean.selectedJournal[5]}"/>
+                </h:panelGrid>
+                <p:dataTable value="#{createJournalBean.journalDetail}" var="item">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Rekening"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="text-align: right;">
+                        <f:facet name="header">
+                            <h:outputText value="Debit"/>
+                        </f:facet>
+                        <div class="header-panel-left">
+                            <h:outputText value="#{qt:getCurrencySymbol(createJournalBean.selectedJournal[9], createJournalBean.selectedJournal[10])}"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <h:outputText value="#{qt:getFormattedCurrency(createJournalBean.selectedJournal[9], createJournalBean.selectedJournal[10], item[1], false, createJournalBean.selectedJournal[11])}" style="font-weight: bold;"/>
+                        </div>
+                    </p:column>
+                    <p:column style="text-align: right;">
+                        <f:facet name="header">
+                            <h:outputText value="Kredit"/>
+                        </f:facet>
+                        <div class="header-panel-left">
+                            <h:outputText value="#{qt:getCurrencySymbol(createJournalBean.selectedJournal[9], createJournalBean.selectedJournal[10])}"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <h:outputText value="#{qt:getFormattedCurrency(createJournalBean.selectedJournal[9], createJournalBean.selectedJournal[10], item[2], false, createJournalBean.selectedJournal[11])}" style="font-weight: bold;"/>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="createJournalConfirmForm">
+            <p:dialog modal="true" header="Create Journal Confirm"  widgetVar="createJournalConfirm">
+                <p:panel id="createJournalConfirmPanel">
+                    <h:outputText value="#{msg['message.confirmation.create_journal']}" />
+                    <br />
+                    <div style="margin-top: 15px;font-weight: bold;">
+                        <p style="padding-left: 50px;">
+                            Info: <h:outputText value="#{fn:length(createJournalBean.selectedJournalCandidates)}"/> JKM's
+                        </p>
+                    </div>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" disabled="#{fn:length(createJournalBean.selectedJournalCandidates) == 0}" actionListener="#{createJournalBean.handleCreateJurnal}" update="jkmCandidatesForm:jkmCandidatesTable jkmsForm:jkmsTable growl" onstart="freeze();" onsuccess="createJournalConfirm.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="createJournalConfirm.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

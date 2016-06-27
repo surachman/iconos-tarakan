@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report04_subreportHandlingBM" language="groovy" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="bulan" class="java.lang.Integer"/>
+	<parameter name="tahun" class="java.lang.Integer"/>
+	<parameter name="owner" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT r.* 
+FROM TABLE(REKAP_PRDKS_PDPT_PRKPL_PPKB($P{bulan},$P{tahun},$P{owner})) r 
+		]]>
+	</queryString>
+	<field name="v_ppkb" class="java.lang.String"/>
+	<field name="npel" class="java.lang.String"/>
+	<field name="tgl" class="java.sql.Date"/>
+	<field name="murnil" class="java.lang.Integer"/>
+	<field name="stvl" class="java.lang.Integer"/>
+	<field name="htl" class="java.lang.Integer"/>
+	<field name="ool" class="java.lang.Integer"/>
+	<field name="murnid" class="java.lang.Integer"/>
+	<field name="stvd" class="java.lang.Integer"/>
+	<field name="htd" class="java.lang.Integer"/>
+	<field name="ood" class="java.lang.Integer"/>
+	<field name="murni" class="java.lang.Integer"/>
+	<field name="stv" class="java.lang.Integer"/>
+	<field name="ht" class="java.lang.Integer"/>
+	<field name="oo" class="java.lang.Integer"/>
+	<field name="totl" class="java.math.BigDecimal"/>
+	<field name="pell" class="java.math.BigDecimal"/>
+	<field name="csnl" class="java.math.BigDecimal"/>
+	<field name="totd" class="java.math.BigDecimal"/>
+	<field name="peld" class="java.math.BigDecimal"/>
+	<field name="csnd" class="java.math.BigDecimal"/>
+	<field name="tot" class="java.math.BigDecimal"/>
+	<field name="pel" class="java.math.BigDecimal"/>
+	<field name="csn" class="java.math.BigDecimal"/>
+	<field name="profitp" class="java.math.BigDecimal"/>
+	<field name="profito" class="java.math.BigDecimal"/>
+	<field name="nves" class="java.lang.String"/>
+	<field name="owname" class="java.lang.String"/>
+	<variable name="totalBM" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{tot}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalPel" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{pel}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="totalCsn" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{csn}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<summary>
+		<band height="28" splitType="Stretch"/>
+	</summary>
+</jasperReport>

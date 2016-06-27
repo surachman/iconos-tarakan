@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_operator']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_operator']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl showDetail="true" globalOnly="true"/>
+        <h:form id="listOperatorForm">
+            <p:dataTable id="listOperator" value="#{masterOperatorBean.masterOperators}" var="item" paginatorPosition="bottom" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick"  actionListener="#{masterOperatorBean.handleAdd}" update="operatorForm" oncomplete="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Operator');"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.optCode}" filterMatchMode="contains" filterBy="#{item.optCode}" style="width: 100px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Operator Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item.optCode}"/>
+                </p:column>
+                <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Is Outsource"/>
+                    </f:facet>
+                    <h:outputText value="#{item.isOutsource}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton title="Edit" image="ui-icon-pencil" actionListener="#{masterOperatorBean.handleSelectTable}" update="operatorForm" oncomplete="dialogAddEdit.show()" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Operator');">
+                            <f:attribute name="opCode" value="#{item.optCode}"/>
+                        </p:commandButton>
+                        <p:commandButton title="Delete" image="ui-icon-trash" actionListener="#{masterOperatorBean.handleSelectTable}" update="operatorFormDelete" oncomplete="dialogDel.show()">
+                            <f:attribute name="opCode" value="#{item.optCode}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="500" header="">
+            <h:form id="operatorForm">
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Operator Code *" for="opCode" />
+                        <h:outputText value=" : "/>
+                        <h:inputText id="opCode" disabled="#{not empty masterOperatorBean.masterOperator.optCode}" value="#{masterOperatorBean.masterOperator.optCode}" title="Operator Code" required="true" requiredMessage="Operator Code field #{msg['application.validation.required']}" size="10" maxlength="5"/>
+                        <p:message for="opCode" display="icon"/>
+
+                        <h:outputLabel value="Operator Name *" for="opName" />
+                        <h:outputText value=" : "/>
+                        <h:inputText id="opName" value="#{masterOperatorBean.masterOperator.name}" title="Operator Name" required="true" requiredMessage="Operator Name field #{msg['application.validation.required']}" />
+                        <p:message for="opName" display="icon"/>
+
+                        <h:outputLabel value="Is Outsource" />
+                        <h:outputText value=" : "/>
+                        <h:selectBooleanCheckbox id="opOutputSource" title="is outsource?" value="#{masterOperatorBean.masterOperator.isOutsource}" />
+                        <h:outputText/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" actionListener="#{masterOperatorBean.handleSaveEdit}" image="ui-icon-check" update="listOperatorForm operatorForm" oncomplete="validateForm(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="operatorFormDelete">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterOperatorBean.handleDelete}" update="listOperatorForm operatorFormDelete" onsuccess="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

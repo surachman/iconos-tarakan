@@ -1,0 +1,1280 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.yard_operation.delivery_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.yard_operation.delivery_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+        <script type="text/javascript">
+//             window.onload = function() {
+//           AddDialog.show();
+//        }
+//   
+            
+        function handleRequestValidation(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                    
+                } else {
+                        AddDialog.hide();
+                        dlgAddEditUC.hide();
+                        cancelLoadingDeliveryConfirmDialog.hide();
+                }
+        }
+        
+        function tes (){
+            
+            document.forms['dialogForm'].reset();
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="serviceVesselForm">
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB"/>:
+                <h:inputText size="30" id="noPpkb" disabled="true" value="#{deliveryConfirm.planningVessel.noPpkb}" title="No PPKB"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showServiceVessels();"/>
+                <h:outputLabel value="Vessel Name" for="vesselName" />:
+                <h:inputText size="30" id="vesselName" disabled="true" value="#{deliveryConfirm.planningVessel.preserviceVessel.masterVessel.name}" title="Vessel Name"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage In" for="voyageIn" />:
+                <h:inputText size="30" id="voyageIn" disabled="true" value="#{deliveryConfirm.planningVessel.preserviceVessel.voyIn}" title="Voyage In"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                <h:inputText size="30" id="voyageOut" disabled="true" value="#{deliveryConfirm.planningVessel.preserviceVessel.voyOut}" title="Voyage Out"/>
+                <h:outputText value="&nbsp;"/>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        
+            
+            <p:tabView style="width: 100%;">
+                <p:tab title="Discharge">
+
+<h:form id="dialogForm">
+            <p:panel style="width:65%">
+                    <h:panelGrid id="panelDetail" columns="3">
+                        <h:panelGrid id="detail" columns="5">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="bl" onkeypress="showServiceContDischarges();" onmousedown="showServiceContDischarges();" value="#{deliveryConfirm.serviceContDischarge.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{deliveryConfirm.serviceContDischarge.isDelivery}"/>
+                            <p:commandButton immediate="true" onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showServiceContDischarges();" disabled="#{deliveryConfirm.serviceContDischarge.isDelivery}"/>
+                            <p:message for="bl" display="icon"/>
+                            
+                            
+                <h:outputLabel value="No PPKB"/>:
+                <h:inputText size="30" id="noPpkb" disabled="true" value="#{deliveryConfirm.serviceContDischarge.noPpkb}" title="No PPKB"/>                
+                <h:outputLabel/>
+                <h:outputLabel/>
+                
+                <h:outputLabel value="Vessel Name" for="vesselName" />:
+                <h:inputText size="30" id="vesselName" disabled="true" value="#{deliveryConfirm.serviceContDischarge.planningVessel.preserviceVessel.masterVessel.name}" title="Vessel Name"/>
+                <h:outputLabel/>
+                <h:outputLabel/>
+                
+                <h:outputLabel value="Voyage In" for="voyageIn" />:
+                <h:inputText size="30" id="voyageIn" disabled="true" value="#{deliveryConfirm.serviceContDischarge.planningVessel.preserviceVessel.voyIn}" title="Voyage In"/>
+                <h:outputLabel/>
+                            <h:outputLabel/>
+                
+                <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                <h:inputText size="30" id="voyageOut" disabled="true" value="#{deliveryConfirm.serviceContDischarge.planningVessel.preserviceVessel.voyOut}" title="Voyage Out"/>
+                <h:outputLabel/>
+                            <h:outputLabel/>
+                            
+                            
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.mlo.name}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.masterContainerType.name}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.contSize}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.contGross}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.sealNo}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.masterCommodity.name}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.overSize ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.dangerous ? deliveryConfirm.serviceContDischarge.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                        </h:panelGrid>
+                        <p:spacer width="20"/>
+                        <h:panelGrid>
+                            <h:panelGrid id="loc" columns="5">
+                                <h:outputText value="Location *"/>:
+                                <h:panelGrid columns="8">
+                                    B<h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.masterYard.block}" size="5"/>
+                                    S<h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.YSlot}" size="5"/>
+                                    R<h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.YRow}" size="5"/>
+                                    T<h:inputText disabled="true" value="#{deliveryConfirm.serviceContDischarge.YTier}" size="5"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <p:spacer height="20"/>
+                            <h:panelGrid id="equipOpPanel" columns="5">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="tt" onkeypress="showEquipments();" onmousedown="showEquipments();" value="#{deliveryConfirm.equipment.masterEquipment.name}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" type="button" onclick="showEquipments();"/>
+                                <p:message for="tt" display="icon"/>
+
+                                <h:outputText value="Opt Code *"/>:
+                                <h:inputText id="ot" onkeypress="showOperators();" onmousedown="showOperators();" disabled="#{empty deliveryConfirm.equipment.masterEquipment.equipCode}" value="#{deliveryConfirm.equipment.masterOperator.name}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{empty deliveryConfirm.equipment.masterEquipment.equipCode}" style="font-size: x-small" type="button" onclick="showOperators();"/>
+                                <p:message for="ot" display="icon"/>
+                            </h:panelGrid>
+                            <p:spacer height="20"/>
+                            <h:panelGrid columns="4">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText id="dates" required="true" readonly="true" requiredMessage="#{msg['application.validation.required']}" styleClass="" value="#{deliveryConfirm.equipment.startTime}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                    <p:message display="icon" for="dates"/>
+                                </h:panelGrid>
+                                <h:outputLabel value="End Time *" />
+                                <h:outputLabel value=" : " />
+                                <h:inputText id="datee" required="true" readonly="true" requiredMessage="#{msg['application.validation.required']}" styleClass="" value="#{deliveryConfirm.equipment.endTime}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                    <p:message display="icon" for="datee"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <p:spacer height="30"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.confirm']}"
+                               actionListener="#{deliveryConfirm.handleConfirm}" 
+                               update="serviceContForm:serviceContDischarge serviceContForm:growl dialogForm:panelDetail dialogContForm:contDischarge" 
+                               onclick="viewListDischarge()"/>                            
+                            
+                            <p:commandButton onstart="freeze();" value="reset" update="dialogForm" action="#{deliveryConfirm.resetForm()}" />
+                                
+                            
+                        </div>
+                    </f:facet>
+                </p:panel>
+</h:form>
+       
+                    
+                    <h:outputText value="&nbsp;"/><h:outputText value="&nbsp;"/>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+      <h:form id="serviceContForm">              
+          <p:growl id="growl" showDetail="true" globalOnly="true"/>
+                    <h:panelGrid id="serviceContDischarge" width="100%">
+                        <p:dataTable id="serviceContDischarge2" paginatorPosition="bottom" var="item" value="#{deliveryConfirm.serviceContDischargeList}"
+                                     paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="No"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                            <f:facet name="header">
+                                <div class="header-panel-left">
+                                    <p:commandButton style="display:none" onstart="freeze();" value="#{msg['application.operation.add']}" image="ui-icon-plusthick" immediate="true" disabled="#{empty deliveryConfirm.planningVessel.noPpkb}" update="dialogContForm:contDischarge dialogForm:panelDetail" actionListener="#{deliveryConfirm.handleAdd}" oncomplete="AddDialog.show()" onclick="genTitle('dlgDelivery','#{msg['application.operation.add']} Container to Deliver');" />
+                                </div>
+                                <div class="header-panel-right">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.refresh']}" image="ui-icon-refresh" immediate="true" disabled="#{empty deliveryConfirm.planningVessel.noPpkb}" update="serviceContForm:serviceContDischarge" actionListener="#{deliveryConfirm.handleRefresh}" />
+                                </div>
+                            </f:facet>
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No"/>
+                                </f:facet>
+                                <h:outputText value="#{No+1}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Container No"/>
+                                </f:facet>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+
+                            <p:column sortBy="#{item[1]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Size"/>
+                                </f:facet>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[2]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Type"/>
+                                </f:facet>
+                                <h:outputText value="#{item[2]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[3]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Status"/>
+                                </f:facet>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[4]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Gross"/>
+                                </f:facet>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[10]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Seal No"/>
+                                </f:facet>
+                                <h:outputText value="#{item[10]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[5]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Blok"/>
+                                </f:facet>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[6]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Slot"/>
+                                </f:facet>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[7]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Row"/>
+                                </f:facet>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[8]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Tier"/>
+                                </f:facet>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Action" />
+                                </f:facet> 
+                                <center>
+                                    <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleSelectCont}" disabled="#{item[14].equals('04')}" update="dialogForm:panelDetail dialogForm" image="ui-icon ui-icon-pencil" title="Edit Service Cont Discharge" >
+                                        <f:attribute name="idCont" value="#{item[9]}"/>
+                                    </p:commandButton>
+                                    <p:commandButton onstart="freeze();"  actionListener="#{deliveryConfirm.handleSelectCont}"  disabled="#{item[14].equals('04')}"  oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Service Cont Discharge">
+                                        <f:attribute name="idCont" value="#{item[9]}"/>
+                                    </p:commandButton>
+                                </center>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGrid>
+      </h:form>  
+                </p:tab>
+
+                <p:tab title="Uncontanerized">
+                    
+                    
+                    
+                    
+                    
+               
+                    
+                    
+                       
+                    <!-- dialog Uncontainerized -->
+        <!--<p:dialog header="Uncontainerized"  widgetVar="dlgAddEditUC" modal="true" minWidth="750" id="dlgUc">-->
+<h:form id="formAddEditUC">
+                <p:panel style="width:65%">
+                    <h:panelGrid columns="3" rowClasses="first-tr">
+                        <h:panelGrid id="containerPropertiesUC" columns="4">
+                            <h:outputLabel value="Container Details" style="font-weight: bold"/>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="BL No *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="blno" value="#{deliveryConfirm.uncontainerizedService.blNo}" required="true" requiredMessage="#{msg['application.validation.required']}" onmousedown="showUncontainerizedContainers();" onkeypress="showUncontainerizedContainers();"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="showUncontainerizedContainers();"/>
+                                <p:message for="blno" display="icon"/>
+                            </h:panelGrid>
+                            
+                            
+                            
+                            <h:outputLabel value="No PPKB"/>:
+                <h:inputText size="30" id="noPpkbUC" disabled="true" value="#{deliveryConfirm.uncontainerizedService.noPpkb}" title="No PPKB"/>                
+                <h:outputLabel/>
+                
+                
+                <h:outputLabel value="Vessel Name" for="vesselName" />:
+                <h:inputText size="30" id="vesselNameUC" disabled="true" value="#{deliveryConfirm.uncontainerizedService.planningVessel.preserviceVessel.masterVessel.name}" title="Vessel Name"/>
+                <h:outputLabel/>
+                
+                
+                <h:outputLabel value="Voyage In" for="voyageIn" />:
+                <h:inputText size="30" id="voyageInUC" disabled="true" value="#{deliveryConfirm.uncontainerizedService.planningVessel.preserviceVessel.voyIn}" title="Voyage In"/>
+                <h:outputLabel/>
+                
+                
+                <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                <h:inputText size="30" id="voyageOutUC" disabled="true" value="#{deliveryConfirm.uncontainerizedService.planningVessel.preserviceVessel.voyOut}" title="Voyage Out"/>
+                <h:outputLabel/>
+                
+                            
+                            
+                            <h:outputLabel value="Commodity" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{deliveryConfirm.uncontainerizedDetail[1]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Unit" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{deliveryConfirm.uncontainerizedDetail[2]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Weight" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{deliveryConfirm.uncontainerizedDetail[3]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Truck Lossing" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{deliveryConfirm.uncontainerizedDetail[4]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Disch Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{deliveryConfirm.uncontainerizedDetail[5]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Load Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{deliveryConfirm.uncontainerizedDetail[6]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Block" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{deliveryConfirm.uncontainerizedDetail[7]}" disabled="true"/>
+                            <h:outputText />
+                        </h:panelGrid>
+
+                        <p:spacer height="0" width="20" />
+
+                        <h:panelGrid columns="1">
+                            <h:outputLabel value="Equipment" style="font-weight: bold"/>
+                            <h:panelGrid columns="1">
+                                <h:panelGrid id="equipmentPropertiesUC" columns="3">
+                                    <h:outputLabel value="TT Code *" rendered="#{not deliveryConfirm.uncontainerizedService.truckLoosing}"/>
+                                    <h:outputLabel value="CC Code *" rendered="#{deliveryConfirm.uncontainerizedService.truckLoosing}"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="3">
+                                        <h:inputText value="#{deliveryConfirm.equipment.masterEquipment.name}" id="ttUC" disabled="#{deliveryConfirm.diasbleEquipment}" onkeypress="showEquipments();" onmousedown="showEquipments();" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                                        <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{deliveryConfirm.diasbleEquipment}" type="button" onclick="showEquipments();"/>
+                                        <p:message for="ttUC" display="icon"/>
+                                    </h:panelGrid>
+                                    <h:outputLabel value="Opr Tango *" rendered="#{not deliveryConfirm.uncontainerizedService.truckLoosing}"/>
+                                    <h:outputLabel value="Opr Crane *" rendered="#{deliveryConfirm.uncontainerizedService.truckLoosing}"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="3">
+                                        <h:inputText value="#{deliveryConfirm.equipment.masterOperator.name}" id="otUC" disabled="#{deliveryConfirm.disableOptTango}" onkeypress="showOperators();" onmousedown="showOperators();" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                                        <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{deliveryConfirm.disableOptTango}" type="button" onclick="showOperators();"/>
+                                        <p:message for="otUC" display="icon"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <h:panelGrid columns="1">
+                                <h:panelGrid columns="4">
+                                    <h:outputLabel value="Start Time *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText id="datesUC" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="" readonly="true" value="#{deliveryConfirm.equipment.startTime}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:inputText>
+                                    <h:panelGrid columns="2">
+                                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                        <p:message display="icon" for="datesUC"/>
+                                    </h:panelGrid>
+                                    <h:outputLabel value="End Time *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText id="dateeUC" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="" readonly="true" value="#{deliveryConfirm.equipment.endTime}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:inputText>
+                                    <h:panelGrid columns="2">
+                                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                        <p:message display="icon" for="dateeUC"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{deliveryConfirm.saveUncontainerized}" 
+                                    update="serviceContFormUC serviceContFormUC:uncontainerizedConfirmTableUC serviceContFormUC:containerPropertiesUC selectFormUC:tableContainerSelectUC formAddEditUC:containerPropertiesUC serviceContFormUC:growl" 
+                                    onclick="viewUncontanerized()" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="resetFormByAde();" type="button" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+ </h:form>
+        <!--</p:dialog>-->  
+                    
+                    
+                    
+                      <h:outputText value="&nbsp;"/><h:outputText value="&nbsp;"/>
+                    
+                    
+                    
+     <h:form id="serviceContFormUC">   
+          <p:growl id="growl" showDetail="true" globalOnly="true"/>
+                    <p:dataTable id="uncontainerizedConfirmTableUC" var="item" value="#{deliveryConfirm.uncontainerizedServices}"
+                                 paginator="true" rows="10"
+                                 paginatorPosition="bottom" rowIndexVar="No"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15">
+
+                        <f:facet name="header">
+                            <div class="header-panel-left">
+                                <p:commandButton style="display:none" onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty deliveryConfirm.planningVessel.noPpkb}" actionListener="#{deliveryConfirm.handleAddUncontainerized}" update="serviceContForm" oncomplete="dlgAddEditUC.show();" onclick="genTitle('dlgUc','#{msg['application.operation.add']} Unconainerized to Deliver');" />
+                            </div>
+                            <div class="header-panel-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.refresh']}" image="ui-icon-refresh" disabled="#{empty deliveryConfirm.planningVessel.noPpkb}" update="serviceContForm:uncontainerizedConfirmTableUC" actionListener="#{deliveryConfirm.handleRefreshUc}" />
+                            </div>
+                        </f:facet>
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{No+1}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                            <f:facet name="header">
+                                <h:outputText value="BL No." />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Commodity" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Unit" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Weight" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Truck Lossing" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Disch Port" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[7]}">
+                            <f:facet name="header">
+                                <h:outputText value="Load Port" />
+                            </f:facet>
+                            <h:outputText value="#{item[7]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[8]}">
+                            <f:facet name="header">
+                                <h:outputText value="Block" />
+                            </f:facet>
+                            <h:outputText value="#{item[8]}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleEditDeleteUncontainerized}" disabled="#{item[9].equals('OUTSIDE')}" image="ui-icon ui-icon-pencil" title="Edit UC Lift Confirm" update="formAddEditUC:containerPropertiesUC formAddEditUC" >
+                                <f:attribute name="idUC" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleEditDeleteUncontainerized}" disabled="#{item[9].equals('OUTSIDE')}" image="ui-icon ui-icon-trash" title="Delete UC Lift Confirm" oncomplete="confirmationUC.show();">
+                                <f:attribute name="idUC" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+	</h:form>
+
+                </p:tab>
+
+                
+                
+                
+                <!--cancel loading-->
+                <p:tab title="#{msg['menu.yard_operation.cancel_loading']}">
+                    
+                    
+                    
+                    
+                    
+                    
+<!--                    <p:dialog modal="true"  widgetVar="cancelLoadingDeliveryConfirmDialog" width="700" header="Delivery Confirm" resizable="false" id="cancelLoadingDeliveryConfirmDialog">-->
+  <h:form id="cancelLoadingDeliveryConfirmForm">
+                <p:panel style="width:65%">
+                    <h:panelGrid id="panelDetailCancel" columns="3">
+                        <h:panelGrid id="detailCancel" columns="5">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="blCancel" onkeypress="showDeliverableCancelLoading();" onmousedown="showDeliverableCancelLoading();" value="#{deliveryConfirm.cancelLoadingService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{not empty deliveryConfirm.equipment.id}"/>
+                            <p:commandButton immediate="true" onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showDeliverableCancelLoading();" disabled="#{not empty deliveryConfirm.equipment.id}"/>
+                            <p:message for="blCancel" display="icon"/>
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.mlo.name}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.contSize}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.contGross}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.sealNo}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.masterCommodity.name}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="21 ft"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.dg ? deliveryConfirm.cancelLoadingService.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                        </h:panelGrid>
+                        <p:spacer width="20"/>
+                        <h:panelGrid>
+                            <h:panelGrid id="locCancel" columns="5">
+                                <h:outputText value="Location *"/>:
+                                <h:panelGrid columns="8">
+                                    B<h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.masterYard.block}" size="5"/>
+                                    S<h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.ySlot}" size="5"/>
+                                    R<h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.yRow}" size="5"/>
+                                    T<h:inputText disabled="true" value="#{deliveryConfirm.cancelLoadingService.yTier}" size="5"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <p:spacer height="20"/>
+                            <h:panelGrid id="equipOpPanelCancel" columns="5">
+                                <h:outputText value="TT Code *"/>:
+                                <h:inputText id="ttCancel" onkeypress="showEquipments();" onmousedown="showEquipments();" value="#{deliveryConfirm.equipment.masterEquipment.name}" required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{empty deliveryConfirm.cancelLoadingService.jobSlip}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" type="button" onclick="showEquipments();" disabled="#{empty deliveryConfirm.cancelLoadingService.jobSlip}"/>
+                                <p:message for="ttCancel" display="icon"/>
+
+                                <h:outputText value="Opt Code *"/>:
+                                <h:inputText id="otCancel" onkeypress="showOperators();" onmousedown="showOperators();" disabled="#{empty deliveryConfirm.equipment.masterEquipment.equipCode or empty deliveryConfirm.cancelLoadingService.jobSlip}" value="#{deliveryConfirm.equipment.masterOperator.name}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{empty deliveryConfirm.equipment.masterEquipment.equipCode or empty deliveryConfirm.cancelLoadingService.jobSlip}" style="font-size: x-small" type="button" onclick="showOperators();"/>
+                                <p:message for="otCancel" display="icon"/>
+                            </h:panelGrid>
+                            <p:spacer height="20"/>
+                            <h:panelGrid columns="4">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText id="datesCancel" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{deliveryConfirm.equipment.startTime}" disabled="#{empty deliveryConfirm.cancelLoadingService.jobSlip}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                    <p:message display="icon" for="datesCancel"/>
+                                </h:panelGrid>
+                                <h:outputLabel value="End Time *" />
+                                <h:outputLabel value=" : " />
+                                <h:inputText id="dateeCancel" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{deliveryConfirm.equipment.endTime}" disabled="#{empty deliveryConfirm.cancelLoadingService.jobSlip}" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                    <p:message display="icon" for="dateeCancel"/>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <p:spacer height="30"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.confirm']}" actionListener="#{deliveryConfirm.handleDeliveryCancelLoadingConfirm}" update="serviceContForm:cancelLoading serviceContForm:growl serviceContForm" oncomplete="handleRequestValidation(xhr, status, args);" disabled="#{empty deliveryConfirm.cancelLoadingService.jobSlip}"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.close']}" onclick="cancelLoadingDeliveryConfirmDialog.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+    </h:form>
+ <!--         </p:dialog>-->
+
+                    
+                    
+                      <h:outputText value="&nbsp;"/><h:outputText value="&nbsp;"/>
+                    
+                    
+<h:form id="serviceContFormCL">
+                    
+                    <h:panelGrid id="cancelLoading" width="100%">
+                        <p:dataTable paginatorPosition="bottom" var="item" value="#{deliveryConfirm.deliveredCancelLoadings}"
+                                     paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="No"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                            <f:facet name="header">
+                                <div class="header-panel-left">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.add']}" image="ui-icon-plusthick" immediate="true" disabled="#{empty deliveryConfirm.planningVessel.noPpkb}" update="serviceContForm" actionListener="#{deliveryConfirm.handleAddCancelLoadingDelivery}" oncomplete="cancelLoadingDeliveryConfirmDialog.show()" />
+                                </div>
+                                <div class="header-panel-right">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.refresh']}" image="ui-icon-refresh" immediate="true" disabled="#{empty deliveryConfirm.planningVessel.noPpkb}" update="serviceContForm:cancelLoading" actionListener="#{deliveryConfirm.handleDeliveredCancelLoadings}" />
+                                </div>
+                            </f:facet>
+                            <p:column style="text-align: center">
+                                <f:facet name="header">
+                                    <h:outputText value="No"/>
+                                </f:facet>
+                                <h:outputText value="#{No+1}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[1]}">
+                                <f:facet name="header">
+                                    <h:outputText value="BL No"/>
+                                </f:facet>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                                <f:facet name="header">
+                                    <h:outputText value="Container No"/>
+                                </f:facet>
+                                <h:outputText value="#{item[2]}"/>
+                            </p:column>
+
+                            <p:column sortBy="#{item[7]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Size"/>
+                                </f:facet>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[3]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Type"/>
+                                </f:facet>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[8]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Status"/>
+                                </f:facet>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[4]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Gross"/>
+                                </f:facet>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[10]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Seal No"/>
+                                </f:facet>
+                                <h:outputText value="#{item[10]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[6]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Block"/>
+                                </f:facet>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[7]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Slot"/>
+                                </f:facet>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[8]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Row"/>
+                                </f:facet>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                            <p:column sortBy="#{item[9]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Tier"/>
+                                </f:facet>
+                                <h:outputText value="#{item[9]}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="Action" />
+                                </f:facet>
+                                <center>
+                                    <p:commandButton onstart="freeze();" disabled="#{item[14].equals('01')}" actionListener="#{deliveryConfirm.handleSelectDeliveredCancelLoading}" oncomplete="cancelLoadingDeliveryConfirmDialog.show();" update="serviceContForm" image="ui-icon-check" title="Edit">
+                                        <f:attribute name="jobSlip" value="#{item[0]}"/>
+                                    </p:commandButton>
+                                    <p:commandButton onstart="freeze();" disabled="#{item[14].equals('01')}" actionListener="#{deliveryConfirm.handleSelectDeliveredCancelLoading}" oncomplete="deliveredCancelLoadingDeleteConfirmationDialog.show();" image="ui-icon-trash" title="Delete">
+                                        <f:attribute name="jobSlip" value="#{item[0]}"/>
+                                    </p:commandButton>
+                                </center>
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGrid>
+</h:form>  
+
+                </p:tab>
+            </p:tabView>
+        
+
+        <!--Uncontainerized-->
+        
+
+        <!--dialog untuk memilih uncontainer yang akan di pindahkan-->
+        <p:dialog header="Select Container"  widgetVar="dlgUncontainerized" modal="true" minWidth="550">
+            <h:form id="selectFormUC">
+                <p:dataTable id="tableContainerSelectUC" var="item" value="#{deliveryConfirm.uncontainerizedServiceSelect}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowIndexVar="No"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="BL No." />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Commodity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Truck Lossing" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleSelectUncontainerized}" value="select" update="formAddEditUC:containerPropertiesUC formAddEditUC:equipmentPropertiesUC" oncomplete="dlgUncontainerized.hide();">
+                            <f:attribute name="idSelect" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk konfirmasi menghapus-->
+        <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmationUC">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{deliveryConfirm.deleteUC}"  update="serviceContFormUC:uncontainerizedConfirmTableUC selectFormUC:tableContainerSelectUC serviceContFormUC:growl" onclick="confirmationUC.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmationUC.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        
+
+        
+        <h:form id="dialogVesselForm">
+            <p:dialog header="Select Planning Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" id="serviceVesselsTable" value="#{deliveryConfirm.serviceVessels}"
+                             paginator="true" rows="10" rowIndexVar="No"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="serviceVesselForm:serviceVesselDetail serviceContForm:cancelLoading serviceContForm:serviceContDischarge serviceContFormUC:uncontainerizedConfirmTableUC selectFormUC:tableContainerSelectUC" oncomplete="dlgVessel.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="dialogContForm">
+            <p:dialog header="Select Service Cont Discharge"  widgetVar="dlgCont" modal="true" minWidth="850">
+                <p:dataTable var="item" value="#{deliveryConfirm.serviceContDischarges}" id="contDischarge"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowIndexVar="No"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>                    
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[10]}">
+                        <f:facet name="header">
+                            <h:outputText value="Seal No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[10]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Blok"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Slot"/>
+                        </f:facet>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Row"/>
+                        </f:facet>
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[8]}">
+                        <f:facet name="header">
+                            <h:outputText value="Tier"/>
+                        </f:facet>
+                        <h:outputText value="#{item[8]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleSelectContPick}" value="#{msg['application.operation.select']}" update="dialogForm:detail dialogForm:loc" oncomplete="dlgCont.hide();">
+                            <f:attribute name="idCont" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty deliveryConfirm.serviceContDischarges}">
+                                <p:dataExporter type="xls" target="contDischarge" fileName="Data_Container_delivery" excludeColumns="0,10" postProcessor="#{deliveryConfirm.postProcessXLS}"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="operatorsForm">
+            <p:dialog header="Select Operator"  widgetVar="dlgOperator" modal="true" minWidth="500">
+                <p:dataTable id="operatorsTable" var="item" value="#{deliveryConfirm.operators}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" rowIndexVar="No"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item.optCode}" sortBy="#{item.optCode}">
+                        <f:facet name="header">
+                            <h:outputText value="Operator Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.optCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.isOutsource}">
+                        <f:facet name="header">
+                            <h:outputText value="is Out Source" />
+                        </f:facet>
+                        <h:outputText value="#{item.isOutsource}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleSelectOperator}" value="#{msg['application.operation.select']}" update="dialogForm:equipOpPanel serviceContForm:equipOpPanel formAddEditUC:equipmentPropertiesUC" immediate="true" oncomplete="dlgOperator.hide();">
+                            <f:attribute name="idOperator" value="#{item.optCode}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="equipmentsForm">
+            <p:dialog header="Select Equipment"  widgetVar="dlgEquipment" modal="true" minWidth="700">
+                <p:dataTable id="equipmentsTable" value="#{deliveryConfirm.equipments}" rowIndexVar="No" var="item" paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Equipment Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Capacity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Merk" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Made" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleSelectEquipment}" value="#{msg['application.operation.select']}" update="dialogForm:equipOpPanel serviceContForm:equipOpPanel formAddEditUC:equipmentPropertiesUC" immediate="true" oncomplete="dlgEquipment.hide();">
+                            <f:attribute name="idEquipment" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{deliveryConfirm.handleDelete}" update="serviceContForm:serviceContDischarge serviceContForm:growl" oncomplete="resetFormByAde();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="resetFormByAde()"  type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="deliveredCancelLoadingDeleteConfirmationDialog">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{deliveryConfirm.handleDeleteDeliveredCancelLoading}" update="serviceContForm:cancelLoading serviceContForm:growl" oncomplete="deliveredCancelLoadingDeleteConfirmationDialog.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="deliveredCancelLoadingDeleteConfirmationDialog.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog  header="#{msg['application.header.confirm.delivery']}"  widgetVar="confirmDelivery">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delivery.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{deliveryConfirm.handleDeliveryCancelLoadingConfirm}" update="serviceContForm:cancelLoading serviceContForm:growl" oncomplete="confirmDelivery.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmDelivery.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+
+        <p:dialog id="deliverableCancelLoadingsDialog"  widgetVar="deliverableCancelLoadingsDialog" header="Select Container" modal="true" minWidth="850">
+            <h:form id="deliverableCancelLoadingsForm">
+                <p:dataTable id="deliverableCancelLoadingsTable"  widgetVar="deliverableCancelLoadingsTable"
+                             var="item" value="#{deliveryConfirm.deliverableCancelLoadings}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowIndexVar="No"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;"/>
+                </f:facet>
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No"/>
+                    </f:facet>
+                    <h:outputText value="#{No+1}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Container No"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column sortBy="#{item[10]}">
+                    <f:facet name="header">
+                        <h:outputText value="Seal No"/>
+                    </f:facet>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Blok"/>
+                    </f:facet>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Slot"/>
+                    </f:facet>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Row"/>
+                    </f:facet>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column sortBy="#{item[9]}">
+                    <f:facet name="header">
+                        <h:outputText value="Tier"/>
+                    </f:facet>
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <p:commandButton onstart="freeze();" actionListener="#{deliveryConfirm.handleSelectDeliverableCancelLoading}" value="#{msg['application.operation.select']}" update="serviceContForm" oncomplete="deliverableCancelLoadingsDialog.hide();">
+                        <f:attribute name="jobSlip" value="#{item[0]}"/>
+                    </p:commandButton>
+                </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showUncontainerizedContainers" onstart="freeze();" immediate="true" oncomplete="dlgUncontainerized.show(); " update="selectFormUC:tableContainerSelectUC formAddEditUC:datesUC formAddEditUC:dateeUC" actionListener="#{deliveryConfirm.handleShowUncontainerizedContainers2}"/>
+            <p:remoteCommand name="showOperators" onstart="freeze();" immediate="true" oncomplete="dlgOperator.show(); " update="operatorsForm:operatorsTable" actionListener="#{deliveryConfirm.handleShowOperators}"/>
+            <p:remoteCommand name="showEquipments" onstart="freeze();" immediate="true" oncomplete="dlgEquipment.show(); " update="equipmentsForm:equipmentsTable" actionListener="#{deliveryConfirm.handleShowEquipments}"/>
+            <p:remoteCommand name="showServiceContDischarges" onstart="freeze();" immediate="true" oncomplete="dlgCont.show(); " update="dialogContForm:contDischarge dialogForm:dates dialogForm:datee" actionListener="#{deliveryConfirm.handleShowServiceContDischarges2}"/>
+            <p:remoteCommand name="showDeliverableCancelLoading" onstart="freeze();" immediate="true" oncomplete="deliverableCancelLoadingsDialog.show();deliverableCancelLoadingsTable.clearFilters();" update="deliverableCancelLoadingsForm:deliverableCancelLoadingsTable" actionListener="#{deliveryConfirm.handleShowDeliverableCancelLoadings2}"/>
+            <p:remoteCommand name="showServiceVessels" onstart="freeze();" immediate="true" oncomplete="dlgVessel.show(); " update="dialogVesselForm:serviceVesselsTable" actionListener="#{deliveryConfirm.handleShowServiceVessels}"/>
+            <p:remoteCommand name="viewListDischarge" onstart="freeze();" immediate="true" oncomplete="" update="dialogVesselForm:serviceVesselsTable" actionListener="#{deliveryConfirm.handleSelectNoPpkb}">
+            <f:attribute name="noPpkb" value="#{deliveryConfirm.serviceContDischarge.noPpkb}"/>
+            </p:remoteCommand>
+            <p:remoteCommand name="viewUncontanerized" onstart="freeze();" immediate="true" oncomplete="" update="dialogVesselForm:serviceVesselsTable" actionListener="#{deliveryConfirm.handleSelectNoPpkb}">
+            <f:attribute name="noPpkb" value="#{deliveryConfirm.uncontainerizedService.noPpkb}"/>
+            </p:remoteCommand>
+            <p:remoteCommand name="resetFormByAde" onstart="freeze();" immediate="true"  update="dialogForm formAddEditUC" actionListener="#{deliveryConfirm.resetForm()}" oncomplete="confirmation.hide();"/>
+          
+            
+        </h:form>
+    </ui:define>
+
+</ui:composition>

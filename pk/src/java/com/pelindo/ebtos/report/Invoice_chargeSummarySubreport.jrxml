@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Invoice_chargeSummarySubreport" pageWidth="555" pageHeight="802" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="chargeDetail" class="com.pelindo.ebtos.report.model.charge.IChargeDetail" isForPrompting="false"/>
+	<parameter name="masterCurrency" class="com.pelindo.ebtos.model.db.master.MasterCurrency" isForPrompting="false"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<variable name="curr_code" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[com.qtasnim.el.QTasnim.getCurrencySymbol($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry())]]></variableExpression>
+	</variable>
+	<background>
+		<band height="52" splitType="Stretch">
+			<textField pattern="#,##0">
+				<reportElement x="130" y="38" width="115" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$P{chargeDetail}.getTotalTagihan(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="106" y="13" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="38" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement x="130" y="0" width="115" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$P{chargeDetail}.getJumlahTagihan(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="106" y="25" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="115" y="38" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="130" y="25" width="115" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$P{chargeDetail}.getMaterai(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="115" y="0" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="29" y="13" width="74" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PPN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="115" y="13" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="38" width="103" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH NOTA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="29" y="25" width="74" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[MATERAI]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="115" y="25" width="17" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="130" y="13" width="115" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$P{chargeDetail}.getPpn(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="0" width="103" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PERHITUNGAN JASA]]></text>
+			</staticText>
+			<line>
+				<reportElement x="104" y="38" width="141" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="106" y="0" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+	</background>
+</jasperReport>

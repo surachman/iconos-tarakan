@@ -1,0 +1,712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PerhitunganCancelLoading_subreport" pageWidth="555" pageHeight="802" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<import value="java.math.BigDecimal"/>
+	<parameter name="materai" class="java.math.BigDecimal"/>
+	<parameter name="ppn" class="java.math.BigDecimal"/>
+	<parameter name="masterCurrency" class="com.pelindo.ebtos.model.db.master.MasterCurrency"/>
+	<queryString>
+		<![CDATA[]]>
+	</queryString>
+	<field name="blNo" class="java.lang.String">
+		<fieldDescription><![CDATA[blNo]]></fieldDescription>
+	</field>
+	<field name="charge" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[charge]]></fieldDescription>
+	</field>
+	<field name="class" class="java.lang.Class">
+		<fieldDescription><![CDATA[class]]></fieldDescription>
+	</field>
+	<field name="contGross" class="java.lang.Integer">
+		<fieldDescription><![CDATA[contGross]]></fieldDescription>
+	</field>
+	<field name="contNo" class="java.lang.String">
+		<fieldDescription><![CDATA[contNo]]></fieldDescription>
+	</field>
+	<field name="contSize" class="java.lang.Short">
+		<fieldDescription><![CDATA[contSize]]></fieldDescription>
+	</field>
+	<field name="contStatus" class="java.lang.String">
+		<fieldDescription><![CDATA[contStatus]]></fieldDescription>
+	</field>
+	<field name="contTeus" class="java.lang.Integer">
+		<fieldDescription><![CDATA[contTeus]]></fieldDescription>
+	</field>
+	<field name="createdBy" class="java.lang.String">
+		<fieldDescription><![CDATA[createdBy]]></fieldDescription>
+	</field>
+	<field name="createdDate" class="java.util.Date">
+		<fieldDescription><![CDATA[createdDate]]></fieldDescription>
+	</field>
+	<field name="dg" class="java.lang.String">
+		<fieldDescription><![CDATA[dg]]></fieldDescription>
+	</field>
+	<field name="dgLabel" class="java.lang.String">
+		<fieldDescription><![CDATA[dgLabel]]></fieldDescription>
+	</field>
+	<field name="dischargePort" class="com.pelindo.ebtos.model.db.master.MasterPort">
+		<fieldDescription><![CDATA[dischargePort]]></fieldDescription>
+	</field>
+	<field name="grossClass" class="java.lang.String">
+		<fieldDescription><![CDATA[grossClass]]></fieldDescription>
+	</field>
+	<field name="isExport" class="java.lang.String">
+		<fieldDescription><![CDATA[isExport]]></fieldDescription>
+	</field>
+	<field name="isUnderpaymentRequired" class="java.lang.String">
+		<fieldDescription><![CDATA[isUnderpaymentRequired]]></fieldDescription>
+	</field>
+	<field name="jobSlip" class="java.lang.String">
+		<fieldDescription><![CDATA[jobSlip]]></fieldDescription>
+	</field>
+	<field name="loadPort" class="com.pelindo.ebtos.model.db.master.MasterPort">
+		<fieldDescription><![CDATA[loadPort]]></fieldDescription>
+	</field>
+	<field name="masterActivity" class="com.pelindo.ebtos.model.db.master.MasterActivity">
+		<fieldDescription><![CDATA[masterActivity]]></fieldDescription>
+	</field>
+	<field name="masterCommodity" class="com.pelindo.ebtos.model.db.master.MasterCommodity">
+		<fieldDescription><![CDATA[masterCommodity]]></fieldDescription>
+	</field>
+	<field name="masterContainerType" class="com.pelindo.ebtos.model.db.master.MasterContainerType">
+		<fieldDescription><![CDATA[masterContainerType]]></fieldDescription>
+	</field>
+	<field name="mlo" class="com.pelindo.ebtos.model.db.master.MasterCustomer">
+		<fieldDescription><![CDATA[mlo]]></fieldDescription>
+	</field>
+	<field name="modifiedBy" class="java.lang.String">
+		<fieldDescription><![CDATA[modifiedBy]]></fieldDescription>
+	</field>
+	<field name="modifiedDate" class="java.util.Date">
+		<fieldDescription><![CDATA[modifiedDate]]></fieldDescription>
+	</field>
+	<field name="newPlanningVessel" class="com.pelindo.ebtos.model.db.PlanningVessel">
+		<fieldDescription><![CDATA[newPlanningVessel]]></fieldDescription>
+	</field>
+	<field name="overSize" class="java.lang.String">
+		<fieldDescription><![CDATA[overSize]]></fieldDescription>
+	</field>
+	<field name="perhitunganHandlingDischarge" class="com.pelindo.ebtos.model.db.PerhitunganHandlingDischarge">
+		<fieldDescription><![CDATA[perhitunganHandlingDischarge]]></fieldDescription>
+	</field>
+	<field name="perhitunganLiftService" class="com.pelindo.ebtos.model.db.PerhitunganLiftService">
+		<fieldDescription><![CDATA[perhitunganLiftService]]></fieldDescription>
+	</field>
+	<field name="perhitunganPassGate" class="com.pelindo.ebtos.model.db.PerhitunganPassGate">
+		<fieldDescription><![CDATA[perhitunganPassGate]]></fieldDescription>
+	</field>
+	<field name="perhitunganPenumpukan" class="com.pelindo.ebtos.model.db.PerhitunganPenumpukan">
+		<fieldDescription><![CDATA[perhitunganPenumpukan]]></fieldDescription>
+	</field>
+	<field name="perhitunganUpahBuruh" class="com.pelindo.ebtos.model.db.PerhitunganUpahBuruh">
+		<fieldDescription><![CDATA[perhitunganUpahBuruh]]></fieldDescription>
+	</field>
+	<field name="portOfDelivery" class="com.pelindo.ebtos.model.db.master.MasterPort">
+		<fieldDescription><![CDATA[portOfDelivery]]></fieldDescription>
+	</field>
+	<field name="referenceReceiving" class="com.pelindo.ebtos.model.db.Registration">
+		<fieldDescription><![CDATA[referenceReceiving]]></fieldDescription>
+	</field>
+	<field name="registration" class="com.pelindo.ebtos.model.db.Registration">
+		<fieldDescription><![CDATA[registration]]></fieldDescription>
+	</field>
+	<field name="sealNo" class="java.lang.String">
+		<fieldDescription><![CDATA[sealNo]]></fieldDescription>
+	</field>
+	<field name="totalCharge" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[totalCharge]]></fieldDescription>
+	</field>
+	<field name="twentyOneFeet" class="java.lang.String">
+		<fieldDescription><![CDATA[twentyOneFeet]]></fieldDescription>
+	</field>
+	<variable name="amount_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{totalCharge}.subtract($F{perhitunganUpahBuruh} == null ? BigDecimal.ZERO : $F{perhitunganUpahBuruh}.getCharge())]]></variableExpression>
+	</variable>
+	<variable name="curr_code" class="java.lang.String" resetType="None">
+		<variableExpression><![CDATA[com.qtasnim.el.QTasnim.getCurrencySymbol($P{masterCurrency}.getLanguage(), $P{masterCurrency}.getCountry())]]></variableExpression>
+	</variable>
+	<variable name="upah_buruh_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{perhitunganUpahBuruh} == null ? BigDecimal.ZERO : $F{perhitunganUpahBuruh}.getCharge()]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="51">
+			<staticText>
+				<reportElement x="191" y="33" width="19" height="18"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dg]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="323" y="34" width="42" height="17"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Masa2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="210" y="33" width="22" height="18"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Label]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="34" width="45" height="17"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Masa1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="365" y="17" width="51" height="34"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Handling]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="416" y="17" width="40" height="34"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Pass Kendaraan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="232" y="17" width="46" height="34"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Lift]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="0" width="22" height="51"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="165" y="0" width="26" height="51"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Over Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="25" y="0" width="75" height="51"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cont No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="191" y="0" width="41" height="33"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Dangerous]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="278" y="17" width="87" height="17"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Penumpukan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="25" height="51"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[No]]></text>
+			</staticText>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="498" y="0" width="57" height="51" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="3">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Total (" + $V{curr_code} + ")"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="232" y="0" width="266" height="17" isRemoveLineWhenBlank="true" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="3">
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["Charge (" + $V{curr_code} + ")"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="122" y="0" width="21" height="51"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="143" y="0" width="22" height="51"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="456" y="17" width="42" height="34"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="6" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Adm]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="122" y="0" width="21" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{masterContainerType}.getMasterContainerTypeInGeneral().getId()]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="25" y="0" width="75" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{contNo}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="165" y="0" width="26" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{overSize}.contentEquals("TRUE") ? "Y" : "N"]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="0" y="0" width="25" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="191" y="0" width="19" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{dg}.contentEquals("TRUE") ? "Y" : "N"]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="498" y="0" width="57" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$F{totalCharge}.subtract($F{perhitunganUpahBuruh} == null ? BigDecimal.ZERO : $F{perhitunganUpahBuruh}.getCharge()),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="100" y="0" width="22" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Short"><![CDATA[$F{contSize}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="210" y="0" width="22" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{dgLabel}.contentEquals("TRUE") ? "Y" : "N"]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="278" y="0" width="45" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$F{perhitunganPenumpukan} == null ? BigDecimal.ZERO : $F{perhitunganPenumpukan}.getChargeM1(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="232" y="0" width="46" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$F{perhitunganLiftService} == null ? BigDecimal.ZERO : $F{perhitunganLiftService}.getCharge(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="143" y="0" width="22" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{contStatus}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="323" y="0" width="42" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$F{perhitunganPenumpukan} == null ? BigDecimal.ZERO : $F{perhitunganPenumpukan}.getChargeM2(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="365" y="0" width="51" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$F{perhitunganHandlingDischarge} == null ? BigDecimal.ZERO : $F{perhitunganHandlingDischarge}.getCharge(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="416" y="0" width="40" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$F{perhitunganPassGate} == null ? BigDecimal.ZERO : $F{perhitunganPassGate}.getTotalCharge(),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="456" y="0" width="42" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$F{charge},false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="78">
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="498" y="0" width="57" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$V{amount_1},false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="498" y="15" width="57" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$P{ppn},false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="30" width="497" height="16"/>
+				<box rightPadding="3">
+					<leftPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Materai]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="498" y="61" width="57" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$V{amount_1}.add($P{ppn}).add($P{materai}).add($V{upah_buruh_1}),false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="498" y="30" width="57" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$P{materai},false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="498" y="61" width="57" height="1"/>
+			</line>
+			<staticText>
+				<reportElement x="1" y="15" width="497" height="16"/>
+				<box rightPadding="3">
+					<leftPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[PPN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="61" width="497" height="16"/>
+				<box rightPadding="3">
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Total Tagihan]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-50" y="45" width="548" height="16"/>
+				<box rightPadding="3">
+					<leftPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Biaya Handling]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="498" y="45" width="57" height="16" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box leftPadding="2" rightPadding="2">
+					<leftPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="7" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{masterCurrency}.getLanguage(),$P{masterCurrency}.getCountry(),$V{upah_buruh_1},false,$P{masterCurrency}.getDefaultFractionDigits())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1" y="0" width="497" height="16"/>
+				<box rightPadding="3">
+					<leftPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</columnFooter>
+</jasperReport>

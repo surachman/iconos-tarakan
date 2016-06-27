@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JobslipStripping" language="groovy" pageWidth="612" pageHeight="396" whenNoDataType="AllSectionsNoDetail" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="2" bottomMargin="0">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="job_slip" class="java.lang.String"/>
+	<parameter name="no_reg" class="java.lang.String"/>
+	<parameter name="blok" class="java.lang.String"/>
+	<parameter name="slot" class="java.lang.String"/>
+	<parameter name="row" class="java.lang.String"/>
+	<parameter name="tier" class="java.lang.String"/>
+	<parameter name="user" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT rs.job_slip,
+  rs.no_reg,
+  r.no_ppkb,
+  mv.name AS vessel,
+  ct.iso_code,
+  pp.voy_in,
+  pp.voy_out,
+  p.eta,
+  rs.cont_no,
+  rs.cont_size,
+  rs.cont_status,
+  rs.cont_gross,
+  rs.cont_type AS type,
+  rs.valid_date ,
+  i.no_invoice,
+  rs.bl_no,
+  ms.name AS cust_name,
+  i.payment_date,
+  rs.over_size,
+  scd.disch_port,
+  ma.description,
+  rs.commodity
+FROM stripping_service rs
+JOIN m_container_type ct
+ON (rs.cont_type = ct.cont_type)
+JOIN registration r
+ON (r.no_reg = rs.no_reg)
+JOIN planning_vessel p
+ON (r.no_ppkb = p.no_ppkb)
+JOIN preservice_vessel pp
+ON (p.booking_code = pp.booking_code)
+JOIN m_vessel mv
+ON (pp.vessel_code = mv.vessel_code)
+JOIN invoice i
+ON (r.no_reg=i.no_reg)
+JOIN m_customer ms
+ON (r.cust_code=ms.cust_code)
+JOIN service_cont_discharge scd
+ON (rs.cont_no = scd.cont_no
+AND r.no_ppkb  = scd.no_ppkb)
+JOIN perhitungan_stripping ps
+ON (rs.perhitungan_stripping_id = ps.id)
+LEFT JOIN perhitungan_sewa_alat psa
+ON (ps.perhitungan_sewa_alat_id = psa.id)
+LEFT JOIN m_activity ma
+ON (psa.activity_code = ma.activity_code)
+WHERE rs.job_slip     = $P{job_slip}
+]]>
+	</queryString>
+	<field name="job_slip" class="java.lang.String"/>
+	<field name="no_reg" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="vessel" class="java.lang.String"/>
+	<field name="iso_code" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="eta" class="java.sql.Timestamp"/>
+	<field name="cont_no" class="java.lang.String"/>
+	<field name="cont_size" class="java.lang.Integer"/>
+	<field name="cont_status" class="java.lang.String"/>
+	<field name="cont_gross" class="java.lang.Integer"/>
+	<field name="type" class="java.lang.Integer"/>
+	<field name="valid_date" class="java.sql.Timestamp"/>
+	<field name="no_invoice" class="java.lang.String"/>
+	<field name="bl_no" class="java.lang.String"/>
+	<field name="cust_name" class="java.lang.String"/>
+	<field name="payment_date" class="java.sql.Timestamp"/>
+	<field name="over_size" class="java.lang.String"/>
+	<field name="disch_port" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="commodity" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="394">
+			<textField>
+				<reportElement x="111" y="94" width="168" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cust_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a" isBlankWhenNull="true">
+				<reportElement x="470" y="74" width="139" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{eta}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="111" y="65" width="168" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{vessel} + " / " + $F{voy_in}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="470" y="84" width="139" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{bl_no}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="537" y="10" width="78" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{user}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="295" y="6" width="122" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[STRIPPING]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="537" y="19" width="78" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_invoice}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="470" y="94" width="139" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_reg}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="111" y="41" width="168" height="12" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cont_no}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="469" y="53" width="140" height="12" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="Arial" size="9" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{job_slip}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="498" y="136" width="56" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="111" y="53" width="168" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cont_size} + " / " + $F{cont_status}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="111" y="106" width="168" height="12"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{disch_port}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="470" y="105" width="100" height="19"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{payment_date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="470" y="65" width="100" height="12"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{over_size}.contentEquals( "TRUE" ) ? "Yes" : "No"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="111" y="118" width="168" height="12"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{commodity}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="111" y="130" width="272" height="12"/>
+				<textElement>
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

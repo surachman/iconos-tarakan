@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="handlingLoadPreview" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="de38e377-076c-436a-bfc2-fabca9138546">
+	<property name="ireport.zoom" value="1.331000000000001"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object">
+		<defaultValueExpression><![CDATA["handlingLoadPreview_subreport.jasper"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_CONTRECAP" class="java.lang.Object">
+		<defaultValueExpression><![CDATA["handlingLoadPreview_containerRecapSubreport.jasper"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+  (SELECT description FROM m_setting_app WHERE id='ebtos.cabang.kota'
+  ) AS kota,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.nama.cabang'
+  ) AS cabang,
+  (SELECT description
+  FROM m_setting_app
+  WHERE id='ttd_supervisor_tarakan'
+  ) description,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id='ttd_supervisor_tarakan'
+  ) nama_ttd,
+  (SELECT value_nip
+  FROM m_setting_app
+  WHERE id='ttd_supervisor_tarakan'
+  ) nip_ttd,
+  mv.vessel_code,
+  mv.name vessel_name,
+  prv.voy_in,
+  prv.voy_out,
+  sv.berhting_time,
+  sv.departure_time,
+(SELECT value_string FROM m_setting_app WHERE id = 'ttd_supervisor_tarakan'
+  )  asman
+FROM service_vessel sv
+JOIN planning_vessel pv
+ON (sv.no_ppkb = pv.no_ppkb)
+JOIN m_vessel mv
+ON (pv.vessel_code = mv.vessel_code)
+JOIN preservice_vessel prv
+ON (pv.booking_code = prv.booking_code)
+WHERE sv.no_ppkb = $P{no_ppkb}]]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="cabang" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="nama_ttd" class="java.lang.String"/>
+	<field name="nip_ttd" class="java.lang.String"/>
+	<field name="vessel_code" class="java.lang.String"/>
+	<field name="vessel_name" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="berhting_time" class="java.sql.Timestamp"/>
+	<field name="departure_time" class="java.sql.Timestamp"/>
+	<field name="asman" class="java.lang.String"/>
+	<variable name="now" class="java.util.Date" resetType="None">
+		<variableExpression><![CDATA[new java.util.Date()]]></variableExpression>
+	</variable>
+	<title>
+		<band height="112" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="31de98ef-98ca-4381-93bb-ba5d0aa8f501" x="372" y="74" width="122" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[BERTHING DATE  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d2b18a23-a3bb-4d6d-8f13-f23aa748e48e" x="77" y="59" width="13" height="15"/>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="30473f88-3644-4a8c-8c41-4cc0f2619e3f" x="0" y="74" width="74" height="15"/>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[VESSEL NAME]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="db6cde1a-4ef3-4d0a-86b1-223a9b79f80e" x="371" y="22" width="122" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Print Date  :]]></text>
+			</staticText>
+			<textField pattern="dd-MM-yyyy" isBlankWhenNull="false">
+				<reportElement uuid="104e56f7-d38e-4c50-864b-e3402e484844" mode="Transparent" x="495" y="89" width="58" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{departure_time}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MM-yyyy" isBlankWhenNull="false">
+				<reportElement uuid="0fd3bd90-fda5-4f5e-85b6-3a65ae3fb7ac" mode="Transparent" x="495" y="74" width="58" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{berhting_time}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1c66542b-e10d-46d7-a1aa-2c9d691bbca7" x="0" y="4" width="183" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PT PELABUHAN INDONESIA IV (PERSERO)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cda2b664-9864-49a0-80c8-b78526e66263" x="77" y="74" width="13" height="15"/>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6ff18e7c-851b-48be-beba-9f9e68d154cc" x="0" y="89" width="74" height="15"/>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[VOY NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="42c9ac42-6f99-45ae-8ecc-192c1867b43f" x="372" y="89" width="122" height="15"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[DEPARTURE DATE  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="eecd11b6-a741-4f63-80cb-0cb9e7ebda5e" x="0" y="59" width="74" height="15"/>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[VESSEL ID ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="efedccb4-68cb-43c4-ba6d-af917c7a7545" x="0" y="38" width="555" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true" isStrikeThrough="false"/>
+				</textElement>
+				<text><![CDATA[HANDLING LOAD PREVIEW]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement uuid="a60b932f-dff8-4105-bc1e-44a2268feba2" mode="Transparent" x="90" y="89" width="172" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{voy_in} + "/" + $F{voy_out}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy HH.mm" isBlankWhenNull="false">
+				<reportElement uuid="a139891d-e695-4c82-b965-ddb71e56963b" mode="Transparent" x="494" y="22" width="59" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{now}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="23c2d3f9-b556-468d-89c6-9c042e74011a" mode="Transparent" x="90" y="59" width="172" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vessel_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement uuid="8118ddce-77e8-4dbb-941d-d06809ac103e" mode="Transparent" x="90" y="74" width="172" height="15" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="7" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vessel_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="78fbcb1e-ba67-48af-97dc-76bca555f75d" x="77" y="89" width="13" height="15"/>
+				<box leftPadding="5" rightPadding="5"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="false"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="c6d31a64-8e7b-401e-b69d-5ad8f4cc1cb3" x="1" y="19" width="182" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cabang}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="9209c989-53fb-4817-8c10-8b596ea6a06b" x="490" y="11" width="65" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="96e1c425-6431-484d-9ab8-204b6de6f896" x="132" y="1" width="29" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4cde657b-19d0-4601-89e1-a7476767fd25" x="447" y="11" width="43" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Equip. Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f565d8f6-b057-40b7-bb73-1f40f7abb75f" x="196" y="1" width="34" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Seal No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e988b57e-e9c3-4846-a632-e0d54d8e5fea" x="0" y="1" width="24" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="79829c2f-cf87-4f57-9332-87c1e2017d60" x="230" y="11" width="43" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Equip. Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="90b18701-8513-4ef2-8378-7ec27768e9eb" x="339" y="11" width="43" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Equip. Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d2498cb4-9d87-45c7-bf8b-f481f7c89b86" x="447" y="1" width="108" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Stevedoring]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ea07fc58-91c3-4c3a-a208-0e679ae46a93" x="230" y="1" width="109" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Lo / Lo]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2cd6979d-d37c-4cec-9818-ee8c51a503b5" x="101" y="1" width="31" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a2805dd8-4bfe-4e1b-8ba4-74054d711b4a" x="339" y="1" width="108" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Haulage Trucking]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="92449675-f0d8-41df-a69d-7a7b3f731687" x="24" y="1" width="77" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Container No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="79c07f33-59b6-4ee3-ba1a-6d5a1cfd2dc0" x="382" y="11" width="65" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="949d90bc-a32a-4075-88b1-74c1199ffb83" x="273" y="11" width="66" height="10"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Date]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="61a7e378-3372-4179-a42b-b50c8f75e624" x="161" y="1" width="35" height="20"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5" lineStyle="Solid"/>
+					<leftPen lineWidth="0.5" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.5" lineStyle="Solid"/>
+					<rightPen lineWidth="0.5" lineStyle="Solid"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<subreport>
+				<reportElement uuid="2a2dd73f-1d1b-4508-ba97-1a47117b59f0" x="0" y="0" width="555" height="20"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="157">
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement uuid="853811ca-eb2e-4693-9713-d1a358ea6174" mode="Transparent" x="331" y="114" width="224" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_ttd}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="3c424e90-c4b8-42e9-a5d2-11cd68f30eb5" x="331" y="34" width="224" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[DISETUJUI]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="d50a2d73-cd7a-455c-862b-7eb1193075e2" mode="Transparent" x="331" y="0" width="224" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{kota}.substring(0, 1)+$F{kota}.substring(1, $F{kota}.length()).toLowerCase()+", " + new java.text.SimpleDateFormat("dd-MM-yyyy").format($V{now})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="8dece5ad-72b1-4979-916e-8b8f7d6e786c" x="331" y="54" width="224" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement uuid="2cf6f50f-1934-4849-b277-07f512336e6b" mode="Transparent" x="331" y="134" width="224" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NIP " + $F{nip_ttd}]]></textFieldExpression>
+			</textField>
+			<subreport>
+				<reportElement uuid="750c1e8e-e822-4fec-b3f3-ee3300234dd2" x="0" y="24" width="302" height="50"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_CONTRECAP}]]></subreportExpression>
+			</subreport>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_yard']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_yard']}"/>
+    </ui:define>
+
+<ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" life="3000" showDetail="true" globalOnly="true"/>
+
+        <h:form id="portform">
+            <p:dataTable id="tableport" var="item" value="#{masterYardTypeBean.masterYards}"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{masterYardTypeBean.handleAddButton}" update="addeditform" oncomplete="dialogAddEdit.show();" title="Add" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Port');"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.yardType}" filterMatchMode="contains" filterBy="#{item.yardType}" style="width: 100px">
+                    <f:facet name="header">
+                        <h:outputText value="Yard Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item.yardType}"/>
+                </p:column>
+                <p:column sortBy="#{item.description}" filterMatchMode="contains" filterBy="#{item.description}">
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item.description}"/>
+                </p:column>
+                
+                <p:column style="width: 70px">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton actionListener="#{masterYardTypeBean.handleEditButton}" image="ui-icon ui-icon-pencil" title="Edit" update="addeditform addeditform:tauah" oncomplete="dialogAddEdit.show();" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Yard Type');">
+                            <f:attribute name="idType" value="#{item.id}"/>
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{masterYardTypeBean.handleEditButton}" image="ui-icon ui-icon-trash" title="Delete" update="deleteconfim:opsiHidden deleteconfim:idportHidden" oncomplete="confirmation.show();">
+                            <f:attribute name="idType" value="#{item.id}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Master Yard Type"  widgetVar="dialogAddEdit" modal="true" minWidth="400" id="dialogAddEdit">
+            <h:form id="addeditform">
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+
+                        <h:outputLabel value="Yard Type *"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="namePort" value="#{masterYardTypeBean.masterYardType.yardType}" size="40" required="true" requiredMessage="The port name field is required."/>
+                        <p:message for="namePort" display="icon"/>
+
+                        <h:outputLabel value="Description"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputTextarea value="#{masterYardTypeBean.masterYardType.description}"  />
+                        <h:outputLabel value=""/>
+                        
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}"  image="ui-icon-check" actionListener="#{masterYardTypeBean.saveEdit}"  update="portform growl addeditform" oncomplete="validateForm(xhr, status, args)"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form  id="deleteconfim">
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{masterYardTypeBean.handleDelete}"  update="portform growl" onclick="confirmation.hide();" />
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>
+

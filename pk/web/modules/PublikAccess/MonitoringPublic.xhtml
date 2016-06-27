@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:ajaxStatus onerror="conDialog.show();poll.stop();"/>
+        <p:dialog header="Warning" modal="true" width="300"  widgetVar="conDialog" closable="false">
+            <h:form>
+                <p:panel>
+                    <p>Connection Error!</p>
+                    <f:facet name="footer">
+                        <a href="">[reload]</a>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+        <h:form id="monitoringForm">
+            <p:poll interval="5" update="monitoringForm:monitoringTable"  widgetVar="poll" autoStart="true"/>
+            <p:outputPanel id="monitoringTable">
+                <p:dataTable paginatorPosition="bottom" var="item" value="#{monitoringPublicBean.activities}">
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            <p:commandButton onclick="poll.stop();" action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                    </f:facet>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="Vessel Name"/>
+                            <p:column colspan="2" headerText="Voyage"/>
+                            <p:column colspan="2" headerText="Port"/>
+                            <p:column colspan="4" headerText="Discharge/Load"/>
+                            <p:column colspan="4" headerText="Time Scheduling"/>
+                            <p:column rowspan="2" headerText="Closing Time"/>
+                            <p:column rowspan="2" headerText="Status"/>
+                        </p:row>
+                        <p:row>
+                            <p:column headerText="In"/>
+                            <p:column headerText="Out"/>
+                            <p:column headerText="Last"/>
+                            <p:column headerText="Next"/>
+                            <p:column headerText="Est. Disc"/>
+                            <p:column headerText="Disc"/>
+                            <p:column headerText="Est. Load"/>
+                            <p:column headerText="Load"/>
+                            <p:column headerText="ETA"/>
+                            <p:column headerText="TA"/>
+                            <p:column headerText="ETD"/>
+                            <p:column headerText="TD"/>
+                        </p:row>
+                    </p:columnGroup>
+                    <p:column>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[8]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[9]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[10]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[11]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[12]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[13]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[14]}"/>
+                    </p:column>
+                    <f:facet name="footer">
+                        &nbsp;
+                    </f:facet>
+                </p:dataTable>
+            </p:outputPanel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,1593 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.vessel_operation.load_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.vessel_operation.load_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+
+            function handleRequestValidation(xhr, status, args) {
+                if(!(args.validationFailed || args.loggedIn == false)) {
+                    dlgAddEditUC.hide();
+                }
+            }
+
+            function handleDownloadReportRequest(args) {
+                if(!(args.validationFailed || args.doPrint == false)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+
+        <h:form>            
+            <p:dialog  widgetVar="lovBc" header="Select Planning Vessel" width="700" modal="true">
+                <p:dataTable var="item" paginator="true"
+                             value="#{loadConfirmBean.serviceVessels}"
+                             paginatorPosition="bottom" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}"  filterMatchMode="contains" filterBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton actionListener="#{loadConfirmBean.handleOnSelect}"
+                                             value="select" update="listData:vessel listData:contLoad loadableContainersForm:loadableContainersTable listData:contLoadShift listData:contt loadableTranshipmentContainersForm:loadableTranshipmentContainersTable listData:uncontainerizedConfirmTableUC loadableUcsForm:loadableUcsTable"
+                                             oncomplete="lovBc.hide();" onstart="freeze();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="listData">
+            <h:panelGrid columns="5" id="vessel">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadConfirmBean.serviceVessel[0]}" disabled="true" size="30"/>
+                <p:commandButton onstart="freeze();" onclick="lovBc.show()" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" style="font-size: x-small"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-document" oncomplete="loadReportDialog_var.show()" immediate="true" disabled="#{empty loadConfirmBean.serviceVessel[0]}" value="#{msg['menu.report']}" title="#{msg['menu.report']}"/>
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadConfirmBean.serviceVessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputText />
+
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadConfirmBean.serviceVessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputText />
+
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadConfirmBean.serviceVessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputText />
+            </h:panelGrid>
+            <br />
+            <br />
+            <p:tabView>
+                <p:tab title="Load">
+                    <p:dataTable var="item" paginator="true"
+                                 value="#{loadConfirmBean.loadedContainers}"
+                                 paginatorPosition="bottom" id="contLoad"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rows="10" dynamic="true" rowIndexVar="number" >
+                        <f:facet name="header">
+                            <div class="header-panel-left">
+                                <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{loadConfirmBean.handleAdd}" update="loads" oncomplete="dialogAddDis.show()" disabled="#{empty loadConfirmBean.serviceVessel[0]}" onclick="genTitle('dialog','#{msg['application.operation.add']} Load Confirm');"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <p:commandButton image="ui-icon-refresh" onstart="freeze();" value="#{msg['application.operation.refresh']}" update="contLoad" actionListener="#{loadConfirmBean.handleRefreshLoadedContainers}" disabled="#{empty loadConfirmBean.serviceVessel[0]}"/>
+                            </div>
+                        </f:facet>
+                        <p:column style="text-align: center" >
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{number+1}."/>
+                        </p:column>
+                        <p:column sortBy="#{item[14]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[14]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Bl No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[14]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[0]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Container No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[0]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[1]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[1]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Size"/>
+                            </f:facet>
+                            <h:outputText value="#{item[1]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[2]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[2]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Type"/>
+                            </f:facet>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[3]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[3]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Status"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[4]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Gross"/>
+                            </f:facet>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[10]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Seal No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[10]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[15]}" style="text-align: center" filterMatchMode="contains" filterBy="#{item[15]}">
+                            <f:facet name="header">
+                                <h:outputText value="Comodity"/>
+                            </f:facet>
+                            <h:outputText value="#{item[15]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[11]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Bay"/>
+                            </f:facet>
+                            <h:outputText value="#{item[11]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[12]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Row"/>
+                            </f:facet>
+                            <h:outputText value="#{item[12]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[13]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Tier"/>
+                            </f:facet>
+                            <h:outputText value="#{item[13]}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton actionListener="#{loadConfirmBean.handleEditDelete}" update="loads loads:row loads:st loads:et" oncomplete="dialogAddDis.show();" image="ui-icon ui-icon-pencil" title="Edit Service Cont Load" onclick="genTitle('dialog','#{msg['application.operation.edit']} Load Confirm');" onstart="freeze();">
+                                    <f:attribute name="id_cont" value="#{item[9]}"/>
+                                </p:commandButton>
+                                <p:commandButton actionListener="#{loadConfirmBean.handleEditDelete}" oncomplete="dialogDel.show();" image="ui-icon-trash" title="Delete Service Cont Load" onstart="freeze();">
+                                    <f:attribute name="id_cont" value="#{item[9]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty loadConfirmBean.serviceVessel[0] or empty loadConfirmBean.loadedContainers}">
+                                    <p:dataExporter type="xls" target="contLoad" fileName="Data_Container_load" excludeColumns="0,11,12" postProcessor="#{loadConfirmBean.postProcessXLS}"/>
+                                </p:commandButton>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+
+                <p:tab title="Transhipment">
+                    <p:dataTable var="item" paginator="true" id="contt"
+                                 value="#{loadConfirmBean.loadedTranshipmentContainers}"
+                                 paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rows="10" dynamic="true" rowIndexVar="number" >
+                        <f:facet name="header">
+                            <div class="header-panel-left">
+                                <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{loadConfirmBean.handleAdd}" disabled="#{empty loadConfirmBean.serviceVessel[0]}" update="loadst loadst:operator" oncomplete="dialogAddt.show()" onclick="genTitle('dialog2','#{msg['application.operation.add']} Transhipment Confirm');" onstart="freeze();"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <p:commandButton image="ui-icon-refresh" value="#{msg['application.operation.refresh']}" onstart="freeze();" update="contt" actionListener="#{loadConfirmBean.handleRefreshLoadedTranshipmentContainers}" disabled="#{empty loadConfirmBean.serviceVessel[0]}"/>
+                            </div>
+                        </f:facet>
+                        <p:column style="text-align: center" >
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{number+1}."/>
+                        </p:column>
+                        <p:column sortBy="#{item[14]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[14]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Bl No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[14]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[0]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Container No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[0]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[1]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[1]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Size"/>
+                            </f:facet>
+                            <h:outputText value="#{item[1]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[2]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Type"/>
+                            </f:facet>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[3]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[3]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Status"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[4]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Gross"/>
+                            </f:facet>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[10]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Seal No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[10]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[15]}" style="text-align: center" filterMatchMode="contains" filterBy="#{item[15]}">
+                            <f:facet name="header">
+                                <h:outputText value="Comodity"/>
+                            </f:facet>
+                            <h:outputText value="#{item[15]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[11]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Bay"/>
+                            </f:facet>
+                            <h:outputText value="#{item[11]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[12]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Row"/>
+                            </f:facet>
+                            <h:outputText value="#{item[12]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[13]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Tier"/>
+                            </f:facet>
+                            <h:outputText value="#{item[13]}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleEditDeleteTran}" update="loadst loadst:row loadst:rowRl loadst:st loadst:et" oncomplete="dialogAddt.show();" image="ui-icon ui-icon-pencil" title="Edit Service Cont Load" onclick="genTitle('dialog2','#{msg['application.operation.edit']} Transhipment Confirm');">
+                                    <f:attribute name="id_cont" value="#{item[9]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleEditDeleteTran}" oncomplete="dialogDel.show();" image="ui-icon-trash" title="Delete Service Cont Load">
+                                    <f:attribute name="id_cont" value="#{item[9]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <p:commandButton ajax="false" value="Export to Excell" disabled="#{empty loadConfirmBean.serviceVessel[0] or empty loadConfirmBean.loadedTranshipmentContainers}">
+                                    <p:dataExporter type="xls" target="contt" fileName="Data_Container_Transhipment" excludeColumns="0,11,12" postProcessor="#{loadConfirmBean.postProcessXLS}"/>
+                                </p:commandButton>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Uncontainerized">
+                    <p:dataTable id="uncontainerizedConfirmTableUC" var="item" value="#{loadConfirmBean.loadedUcs}"
+                                 paginator="true" rows="10"
+                                 paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                        <f:facet name="header">
+                            <div class="header-panel-left">
+                                <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty loadConfirmBean.serviceVessel[0]}" actionListener="#{loadConfirmBean.handleAddUncontainerized}" update="formAddEditUC" oncomplete="dlgAddEditUC.show();" onclick="genTitle('dlgUc','#{msg['application.operation.add']} Uncontainerized Confirm');" />
+                            </div>
+                            <div class="header-panel-right">
+                                <p:commandButton image="ui-icon-refresh" value="#{msg['application.operation.refresh']}" onstart="freeze();" update="uncontainerizedConfirmTableUC" actionListener="#{loadConfirmBean.handleRefreshLoadedUcs}" disabled="#{empty loadConfirmBean.serviceVessel[0]}"/>
+                            </div>
+                        </f:facet>
+                        <p:column style="text-align: center" >
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{number+1}."/>
+                        </p:column>
+                        <p:column sortBy="#{item[1]}"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                            <f:facet name="header">
+                                <h:outputText value="BL No." />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}"  filterMatchMode="contains" filterBy="#{item[2]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Commodity" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Unit" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Weight" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Truck Lossing" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[6]}"  filterMatchMode="contains" filterBy="#{item[6]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Disch Port" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[7]}"  filterMatchMode="contains" filterBy="#{item[7]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Load Port" />
+                            </f:facet>
+                            <h:outputText value="#{item[7]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[8]}">
+                            <f:facet name="header">
+                                <h:outputText value="Block" />
+                            </f:facet>
+                            <h:outputText value="#{item[8]}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleEditDeleteUncontainerized}" image="ui-icon ui-icon-pencil" title="Edit UC Lift Confirm" update="formAddEditUC" oncomplete="dlgAddEditUC.show();" onclick="genTitle('dlgUc','#{msg['application.operation.edit']} Uncontainerized Confirm');">
+                                <f:attribute name="idUC" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleEditDeleteUncontainerized}" image="ui-icon ui-icon-trash" title="Delete UC Lift Confirm" oncomplete="confirmationUC.show();">
+                                <f:attribute name="idUC" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <p:commandButton ajax="false" value="Export to Excell" disabled="#{empty loadConfirmBean.serviceVessel[0] or empty loadConfirmBean.loadedUcs}">
+                                    <p:dataExporter type="xls" target="uncontainerizedConfirmTableUC" fileName="Data_Uncontainerized_Container" excludeColumns="0,9" postProcessor="#{loadConfirmBean.postProcessXLS}"/>
+                                </p:commandButton>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+
+                <p:tab title="Shifting To CY">
+                    <p:dataTable var="item" paginator="true"
+                                 value="#{loadConfirmBean.loadedShiftContainers}"
+                                 paginatorPosition="bottom" id="contLoadShift"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rows="10" dynamic="true" rowIndexVar="number" >
+                        <f:facet name="header">
+                            <div class="header-panel-left">
+                                <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{loadConfirmBean.handleAddShift}" update="loadsShift" oncomplete="dialogAddDisShift.show()" disabled="#{empty loadConfirmBean.serviceVessel[0]}" onclick="genTitle('dialog','#{msg['application.operation.add']} Load Confirm');"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <p:commandButton image="ui-icon-refresh" onstart="freeze();" value="#{msg['application.operation.refresh']}" update="contLoadShift" actionListener="#{loadConfirmBean.handleRefreshLoadedShiftContainers}" disabled="#{empty loadConfirmBean.serviceVessel[0]}"/>
+                            </div>
+                        </f:facet>
+                        <p:column style="text-align: center" >
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{number+1}."/>
+                        </p:column>
+                        <p:column sortBy="#{item[14]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[14]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Bl No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[14]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[0]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Container No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[0]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[1]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[1]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Size"/>
+                            </f:facet>
+                            <h:outputText value="#{item[1]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[2]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[2]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Type"/>
+                            </f:facet>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[3]}" style="text-align: center"  filterMatchMode="contains" filterBy="#{item[3]}" >
+                            <f:facet name="header">
+                                <h:outputText value="Status"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[4]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Gross"/>
+                            </f:facet>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[10]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Seal No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[10]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[15]}" style="text-align: center" filterMatchMode="contains" filterBy="#{item[15]}">
+                            <f:facet name="header">
+                                <h:outputText value="Comodity"/>
+                            </f:facet>
+                            <h:outputText value="#{item[15]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[11]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Bay"/>
+                            </f:facet>
+                            <h:outputText value="#{item[11]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[12]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Row"/>
+                            </f:facet>
+                            <h:outputText value="#{item[12]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[13]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Tier"/>
+                            </f:facet>
+                            <h:outputText value="#{item[13]}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton actionListener="#{loadConfirmBean.handleEditDeleteShifting}" update="loadsShift" oncomplete="dialogAddDisShift.show();" image="ui-icon ui-icon-pencil" title="Edit Service Cont Load" onclick="genTitle('dialog','#{msg['application.operation.edit']} Load Confirm');" onstart="freeze();">
+                                    <f:attribute name="idPlanning" value="#{item[9]}"/>
+                                    <f:attribute name="idService" value="#{item[16]}"/>
+                                </p:commandButton>
+                                <p:commandButton actionListener="#{loadConfirmBean.handleEditDeleteShifting}" oncomplete="dialogDelShift.show();" image="ui-icon-trash" title="Delete Service Cont Load" onstart="freeze();">
+                                    <f:attribute name="idPlanning" value="#{item[9]}"/>
+                                    <f:attribute name="idService" value="#{item[16]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty loadConfirmBean.serviceVessel[0] or empty loadConfirmBean.loadedShiftContainers}">
+                                    <p:dataExporter type="xls" target="contLoadShift" fileName="Data_Container_load" excludeColumns="0,11,12" postProcessor="#{loadConfirmBean.postProcessXLS}"/>
+                                </p:commandButton>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+
+             <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDelShift">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{loadConfirmBean.handleDeleteShift}" update="listData:contLoadShift loadableShiftContainersForm:loadableShiftContainersTable growl" oncomplete="dialogDel.hide()"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="dialogDelShift.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{loadConfirmBean.handleDelete}" update="listData:contLoad loadableContainersForm:loadableContainersTable listData:contt loadableTranshipmentContainersForm:loadableTranshipmentContainersTable growl" oncomplete="dialogDel.hide()"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="dialogDel.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog  widgetVar="loadableTranshipmentContainersDialog" header="Select Planning Cont Load" width="750" modal="true">
+            <h:form id="loadableTranshipmentContainersForm">
+                <p:dataTable id="loadableTranshipmentContainersTable"  widgetVar="loadableTranshipmentContainersTable"
+                             var="item" paginator="true"
+                             value="#{loadConfirmBean.loadableTranshipmentContainers}"
+                             paginatorPosition="bottom" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item[11]}"  filterMatchMode="contains" filterBy="#{item[11]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Bl No" />
+                        </f:facet>
+                        <h:outputText value="#{item[11]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Cont No" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}"  filterMatchMode="contains" filterBy="#{item[2]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Cont Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleSelectNoContt}"
+                                             value="select" update="loadst" oncomplete="loadableTranshipmentContainersDialog.hide()">
+                                <f:attribute name="id_no" value="#{item[9]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="loadableShiftContainersDialog" header="Select Planning Cont Load" width="750" modal="true">
+            <h:form id="loadableShiftContainersForm">
+                <p:dataTable id="loadableShiftContainersTable"  widgetVar="loadableShiftContainersTable"
+                             var="item" paginator="true"
+                             value="#{loadConfirmBean.loadableShiftContainers}"
+                             paginatorPosition="bottom" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item[14]}"  filterMatchMode="contains" filterBy="#{item[14]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Bl No" />
+                        </f:facet>
+                        <h:outputText value="#{item[14]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Cont No" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleSelectNoContShifting}"
+                                             value="select" update="loadsShift:rowRl loadsShift" oncomplete="loadableShiftContainersDialog.hide()">
+                                <f:attribute name="idPlanning" value="#{item[9]}"/>
+                                <f:attribute name="idService" value="#{item[16]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="loadableContainersDialog" header="Select Planning Cont Load" width="750" modal="true">
+            <h:form id="loadableContainersForm">
+                <p:dataTable id="loadableContainersTable"  widgetVar="loadableContainersTable"
+                             var="item" paginator="true"
+                             value="#{loadConfirmBean.loadableContainers}"
+                             paginatorPosition="bottom" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item[11]}"  filterMatchMode="contains" filterBy="#{item[11]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Bl No" />
+                        </f:facet>
+                        <h:outputText value="#{item[11]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Cont No" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleSelectNoCont}"
+                                             value="select" update="loads:bay,loads:positionBay,loads:rowChoices,loads:tierChoices,loads:contAdda,loads:rowRl loads contAdda:carne" oncomplete="loadableContainersDialog.hide()">
+                                <f:attribute name="id_no" value="#{item[9]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty loadConfirmBean.loadableContainers}">
+                                <p:dataExporter type="xls" target="load" fileName="Data_Container_lod_confirm" excludeColumns="0,5" postProcessor="#{loadConfirmBean.postProcessXLS}"/>
+                            </p:commandButton>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <!--LOAD ADD TRANSHIPMENT-->
+
+        <p:dialog modal="true"  widgetVar="dialogAddt" width="850" header="Load Confirm Transhipment" id="dialog2" >
+            <h:form id="loadst">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid columns="5" id="contAdda">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="contNo" onkeypress="showLoadableTranshipmentContainers();" onmousedown="showLoadableTranshipmentContainers();" value="#{loadConfirmBean.serviceContLoad.contNo}" requiredMessage="Container No field #{msg['application.validation.required']}" required="true"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton type="button" onstart="freeze();" immediate="true" disabled="#{loadConfirmBean.disableEdit}" onclick="showLoadableTranshipmentContainers();" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" style="font-size: x-small"/>
+                            </h:panelGrid>
+                            <p:message for="contNo" display="icon"/>
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.mlo.name}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.masterContainerType.name}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.contSize}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.contGross}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.sealNo}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.masterCommodity.commodityCode}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.overSize ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="21 feet"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.dangerous ? loadConfirmBean.serviceContLoad.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>                            
+
+                        </h:panelGrid>
+                        <p:spacer width="10"/>
+                        <h:panelGrid columns="4">
+
+                            <h:outputLabel value="Realisasi" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="12" id="rowR2">
+                                <h:outputText value="Bay"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="bay" value="#{loadConfirmBean.serviceContLoad.VBay}" valueChangeListener="#{loadConfirmBean.onchangeBay}">
+                                    <f:selectItems value="#{loadConfirmBean.bayChoices}" />
+                                    <f:ajax execute="@this" event="change" render="rowChoices tierChoices"/>
+                                </h:selectOneMenu>
+
+                                <h:outputText value="Row"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="rowChoices" value="#{loadConfirmBean.serviceContLoad.VRow}" valueChangeListener="#{loadConfirmBean.onChangeRow}">
+                                    <f:selectItems value="#{loadConfirmBean.rowChoices}" />
+                                    <f:ajax execute="@this" event="change" render="tierChoices"/>
+                                </h:selectOneMenu>
+                                <h:outputText value="Tier"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="tierChoices" value="#{loadConfirmBean.serviceContLoad.VTier}">
+                                    <f:selectItems value="#{loadConfirmBean.tierChoices}" />
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Crane *"/>
+                            <h:outputText value=":"/>
+                            <h:selectOneRadio value="#{loadConfirmBean.serviceContLoad.crane}" id="caren" requiredMessage="#{msg['application.validation.required']}" required="true" disabled="#{empty loadConfirmBean.serviceContLoad.contNo}" valueChangeListener="#{loadConfirmBean.onChangeCrane}">
+                                <f:selectItem itemValue="L" itemLabel="Land"/>
+                                <f:selectItem itemValue="S" itemLabel="Ship"/>                               
+                                <f:ajax execute="@this" event="change" render="cc opt" />
+                            </h:selectOneRadio>
+                            <p:message for="caren" display="icon"/>
+
+                            <h:outputText value="CC Code *"/>:
+                            <h:panelGrid columns="3" id="cc">
+                                <h:inputText onkeypress="dlgTT.show()" onmousedown="dlgTT.show()" id="cccode" value="#{loadConfirmBean.crane.masterEquipment.name}" requiredMessage="CC Code field #{msg['application.validation.required']}" required="true" disabled="#{empty loadConfirmBean.serviceContLoad.contNo}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgTT.show();"  style="font-size: x-small" disabled="#{empty loadConfirmBean.serviceContLoad.contNo}"/>
+                                <p:message for="cccode" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Operator *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="opt">
+                                <h:inputText onkeypress="dlgOperatorCrane.show()" onmousedown="dlgOperatorCrane.show()" id="operator" value="#{loadConfirmBean.crane.masterOperator.name}" requiredMessage="Operator field #{msg['application.validation.required']}" required="true" disabled="#{empty loadConfirmBean.crane.masterEquipment.name}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgOperatorCrane.show();" disabled="#{empty loadConfirmBean.crane.masterEquipment.name}" style="font-size: x-small"/>
+                                <p:message for="operator" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Start Time *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="st">
+                                <h:inputText styleClass="" readonly="true" id="start" value="#{loadConfirmBean.crane.startTime}" requiredMessage="Start Time field #{msg['application.validation.required']}" required="true">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message for="start" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="End Time *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="et">                              
+
+                                <h:inputText styleClass="" readonly="true" id="end" value="#{loadConfirmBean.crane.endTime}" requiredMessage="End Time field #{msg['application.validation.required']}" required="true">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message for="end" display="icon"/>
+
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputText value="&nbsp;"/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.confirm']}" onstart="freeze();" actionListener="#{loadConfirmBean.handleSaveTrans}" update="growl listData:contLoad loadableContainersForm:loadableContainersTable loadst:st loadst:et listData:contt loadst" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton value="#{msg['application.operation.exit']}" onstart="freeze();" onclick="dialogAddt.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <!--ADD LOAD LOAD LOAD-->
+        <p:dialog modal="true"  widgetVar="dialogAddDis" width="850" header="Load Confirm" id="dialog">
+            <h:form id="loads">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid columns="5" id="contAdda">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="contNo" onkeypress="showLoadableContainers()" onmousedown="showLoadableContainers()" value="#{loadConfirmBean.serviceContLoad.contNo}" requiredMessage="Container No field #{msg['application.validation.required']}" required="true"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton onstart="freeze();" type="button" immediate="true" disabled="#{loadConfirmBean.disableEdit}" onclick="showLoadableContainers()" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" style="font-size: x-small"/>
+                            </h:panelGrid>
+                            <p:message for="contNo" display="icon"/>
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.mlo.name}"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.masterContainerType.name}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.contSize}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.contGross}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.sealNo}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.masterCommodity.commodityCode}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.overSize ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="21 feet"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.serviceContLoad.dangerous ? loadConfirmBean.serviceContLoad.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                        </h:panelGrid>
+                        <p:spacer width="10"/>
+                        <h:panelGrid columns="4">
+                            <h:outputLabel value="Realisasi" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="12" id="rowRl">
+                                <h:outputText value="Bay"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="bay" value="#{loadConfirmBean.serviceContLoad.VBay}" valueChangeListener="#{loadConfirmBean.onchangeBay}">
+                                    <f:selectItems value="#{loadConfirmBean.bayChoices}" />
+                                    <f:ajax execute="@this" event="change" render="rowChoices tierChoices"/>
+                                </h:selectOneMenu>
+
+                                <h:outputText value="Row"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="rowChoices" value="#{loadConfirmBean.serviceContLoad.VRow}" valueChangeListener="#{loadConfirmBean.onChangeRow}">
+                                    <f:selectItems value="#{loadConfirmBean.rowChoices}" />
+                                    <f:ajax execute="@this" event="change" render="tierChoices"/>
+                                </h:selectOneMenu>
+                                <h:outputText value="Tier"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="tierChoices" value="#{loadConfirmBean.serviceContLoad.VTier}">
+                                    <f:selectItems value="#{loadConfirmBean.tierChoices}" />
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Selling " />
+                            <h:outputLabel value=" : " />
+                            <h:selectBooleanCheckbox value="#{loadConfirmBean.serviceContLoad.isSeling}" disabled="#{loadConfirmBean.serviceContLoad.isSeling == true}">
+                                <f:selectItem itemValue="true" itemLabel="Yes"/>
+                            </h:selectBooleanCheckbox>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Crane *"/>:
+                            <h:panelGrid columns="3" id="cc">
+                                <h:inputText id="cccode" onkeypress="dlgTT.show()" onmousedown="dlgTT.show()" value="#{loadConfirmBean.crane.masterEquipment.name}" requiredMessage="Crane field #{msg['application.validation.required']}" required="true" disabled="#{empty loadConfirmBean.serviceContLoad.contNo}" />
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgTT.show();"  style="font-size: x-small" disabled="#{empty loadConfirmBean.serviceContLoad.contNo}"/>
+
+                                <p:message for="cccode" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Operator " />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="opt">
+                                <h:inputText id="operator" onkeypress="dlgOperatorCrane.show()" onmousedown="dlgOperatorCrane.show()" value="#{loadConfirmBean.crane.masterOperator.name}" requiredMessage="Operator field #{msg['application.validation.required']}" required="false" disabled="#{empty loadConfirmBean.crane.masterEquipment.name}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgOperatorCrane.show();" disabled="#{empty loadConfirmBean.crane.masterEquipment.name}" style="font-size: x-small"/>
+
+                                <p:message for="operator" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Start Time *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="st">
+                                <h:inputText styleClass="" readonly="true" id="start" value="#{loadConfirmBean.crane.startTime}" requiredMessage="Start Time field #{msg['application.validation.required']}" required="true">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message for="start" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="End Time *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="et">
+                                <h:inputText styleClass="" readonly="true" id="end" value="#{loadConfirmBean.crane.endTime}" requiredMessage="End Time field #{msg['application.validation.required']}" required="true">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message for="end" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputText value="&nbsp;"/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.confirm']}" onstart="freeze();" actionListener="#{loadConfirmBean.handleSave}" update="growl listData:contLoad loadableContainersForm:loadableContainersTable growl loads:st loads:et loads" oncomplete="handleRequestValidation(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.exit']}" onstart="freeze();" onclick="dialogAddDis.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <!--ADD LOAD SHIFTING-->
+        <p:dialog modal="true"  widgetVar="dialogAddDisShift" width="850" header="Load Confirm" id="dialogShift">
+            <h:form id="loadsShift">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid columns="5" id="contAdda" rowClasses="first-tr">
+                            <h:outputText value="Container No *"/>:
+                            <h:inputText id="contNo" onkeypress="showLoadableShiftContainers()" onmousedown="showLoadableShiftContainers()" value="#{loadConfirmBean.planningShiftDischarge.contNo}" requiredMessage="Container No field #{msg['application.validation.required']}" required="true"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton onstart="freeze();" type="button" immediate="true" disabled="#{loadConfirmBean.disableEdit}" onclick="showLoadableShiftContainers()" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" style="font-size: x-small"/>
+                            </h:panelGrid>
+                            <p:message for="contNo" display="icon"/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.masterContainerType.name}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.contSize}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.contGross}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.sealNo}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.masterCommodity.commodityCode}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.overSize ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="21 feet"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.twentyOneFeet ? 'Y' : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{loadConfirmBean.planningShiftDischarge.dg ? loadConfirmBean.planningShiftDischarge.masterCommodity.masterDangerousClass : 'N'}"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                        </h:panelGrid>
+                        <p:spacer width="10"/>
+                        <h:panelGrid columns="4">
+                            <h:outputLabel value="Realisasi" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="12" id="rowRl">
+                                <h:outputText value="Bay"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="bay" value="#{loadConfirmBean.serviceShifting.VBay}" valueChangeListener="#{loadConfirmBean.onchangeBay}" >
+                                    <f:selectItems value="#{loadConfirmBean.bayChoices}" />
+                                    <f:ajax execute="@this" event="change" render="rowChoices tierChoices"/>
+                                </h:selectOneMenu>
+
+                                <h:outputText value="Row"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="rowChoices" value="#{loadConfirmBean.serviceShifting.VRow}" valueChangeListener="#{loadConfirmBean.onChangeRow}">
+                                    <f:selectItems value="#{loadConfirmBean.rowChoices}" />
+                                    <f:ajax execute="@this" event="change" render="tierChoices"/>
+                                </h:selectOneMenu>
+                                <h:outputText value="Tier"/>
+                                <h:outputText value=":"/>
+                                <h:selectOneMenu id="tierChoices" value="#{loadConfirmBean.serviceShifting.VTier}" >
+                                    <f:selectItems value="#{loadConfirmBean.tierChoices}" />
+                                </h:selectOneMenu>
+
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Crane *"/>
+                            <h:outputText value=":"/>
+                            <h:selectOneRadio value="#{loadConfirmBean.serviceShifting.crane}" id="carne" requiredMessage="#{msg['application.validation.required']}" required="true" valueChangeListener="#{loadConfirmBean.onChangeCraneS}" disabled="#{empty loadConfirmBean.planningShiftDischarge.contNo}">
+                                <f:selectItem itemValue="L" itemLabel="Land"/>
+                                <f:selectItem itemValue="S" itemLabel="Ship"/>
+                                <f:ajax execute="@this" event="change" render="cc opt" />
+                            </h:selectOneRadio>
+                            <p:message for="carne" display="icon"/>
+
+                            <h:outputText value="CC Code *"/>:
+                            <h:panelGrid columns="3" id="cc">
+                                <h:inputText id="cccode" onkeypress="dlgTT.show()" onmousedown="dlgTT.show()" value="#{loadConfirmBean.crane.masterEquipment.name}" requiredMessage="CC Code field #{msg['application.validation.required']}" required="true" disabled="#{empty loadConfirmBean.planningShiftDischarge.contNo}" />
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgTT.show();"  style="font-size: x-small" disabled="#{empty loadConfirmBean.planningShiftDischarge.contNo}"/>
+
+                                <p:message for="cccode" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Operator *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="opt">
+                                <h:inputText id="operator" onkeypress="dlgOperatorCrane.show()" onmousedown="dlgOperatorCrane.show()" value="#{loadConfirmBean.crane.masterOperator.name}" requiredMessage="Operator field #{msg['application.validation.required']}" required="true" disabled="#{empty loadConfirmBean.crane.masterEquipment.name}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgOperatorCrane.show();" disabled="#{empty loadConfirmBean.crane.masterEquipment.name}" style="font-size: x-small"/>
+
+                                <p:message for="operator" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="Start Time *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="st">
+                                <h:inputText styleClass="" readonly="true" id="start" value="#{loadConfirmBean.crane.startTime}" requiredMessage="Start Time field #{msg['application.validation.required']}" required="true">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message for="start" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="End Time *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="et">
+                                <h:inputText styleClass="" readonly="true" id="end" value="#{loadConfirmBean.crane.endTime}" requiredMessage="End Time field #{msg['application.validation.required']}" required="true">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message for="end" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputLabel value="&nbsp;" />
+                            <h:outputText value="&nbsp;"/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.confirm']}" onstart="freeze();" actionListener="#{loadConfirmBean.handleSaveShifting}" update="growl listData:contLoadShift growl loadsShift:st loadableShiftContainersForm loadsShift:et loadsShift" oncomplete="handleRequestValidation(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.exit']}" onstart="freeze();" onclick="dialogAddDisShift.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="Select C/C"  widgetVar="dlgTT" modal="true" minWidth="750">
+            <h:form>
+                <p:dataTable id="tableHTSelect" var="item" value="#{loadConfirmBean.masterEquipments}"
+                             paginator="true" rows="10" rowIndexVar="no"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Equipment Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}"  filterMatchMode="contains" filterBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}"  filterMatchMode="contains" filterBy="#{item[2]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Capacity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleSelectHT}" value="select" update="loads:cc loads:opt loadsShift:cc loadsShift:opt loadst:cc loadst:opt formAddEditUC:equipmentPropertiesUC" oncomplete="dlgTT.hide()">
+                            <f:attribute name="idHT" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Operator CC"  widgetVar="dlgOperatorCrane" modal="true" minWidth="750">
+            <h:form>
+                <p:dataTable var="item" value="#{loadConfirmBean.masterOperators}"
+                             paginator="true" rows="10" rowIndexVar="no"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item.optCode}"  filterMatchMode="contains" filterBy="#{item.optCode}" >
+                        <f:facet name="header">
+                            <h:outputText value="Operator Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.optCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}"  filterMatchMode="contains" filterBy="#{item.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.isOutsource}">
+                        <f:facet name="header">
+                            <h:outputText value="is Out Source" />
+                        </f:facet>
+                        <h:outputText value="#{item.isOutsource}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleSelectOperatorCrane}" value="select" update="loads:opt loadst:opt loadsShift:opt loadstShift:opt loadst:cc loadst:opt formAddEditUC:equipmentPropertiesUC" oncomplete="dlgOperatorCrane.hide();">
+                            <f:attribute name="idOperatorCrane" value="#{item.optCode}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+        <!-- dialog Uncontainerized -->
+        <p:dialog header="Uncontainerized"  widgetVar="dlgAddEditUC" modal="true" minWidth="800" id="dlgUc">
+            <h:form id="formAddEditUC">
+                <p:panel>
+                    <h:panelGrid columns="3" rowClasses="first-tr">
+                        <h:panelGrid id="containerPropertiesUC" columns="4">
+                            <h:outputLabel value="Container Details" style="font-weight: bold"/>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="BL No *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="blNo" value="#{loadConfirmBean.uncontainerizedService.blNo}" required="true" requiredMessage="#{msg['application.validation.required']}" onmousedown="showLoadableUcs();" onkeypress="showLoadableUcs();"/>
+                            <h:panelGrid columns="2">
+                                <p:commandButton image="ui-icon-folder-open" immediate="true" value="..." type="button" onclick="showLoadableUcs();" style="font-size: x-small"/>
+                                <p:message for="blNo" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputLabel value="Commodity" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{loadConfirmBean.uncontainerizedDetail[1]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Unit" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{loadConfirmBean.uncontainerizedDetail[2]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Weight" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{loadConfirmBean.uncontainerizedDetail[3]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Truck Lossing" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{loadConfirmBean.uncontainerizedDetail[4]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Disch Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{loadConfirmBean.uncontainerizedDetail[5]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Load Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{loadConfirmBean.uncontainerizedDetail[6]}" disabled="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="Block" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{loadConfirmBean.uncontainerizedDetail[7]}" disabled="true"/>
+                            <h:outputText />
+                        </h:panelGrid>
+
+                        <p:spacer height="0" width="20" />
+
+                        <h:panelGrid columns="1">
+                            <h:outputLabel value="Equipment" style="font-weight: bold"/>
+                            <h:panelGrid columns="1">
+                                <h:panelGrid columns="4">
+                                    <h:outputLabel value="Crane *" style="width: 50px;" />
+                                    <p:spacer width="20px" height="0px" />
+                                    <h:selectOneRadio id="craneuc" value="#{loadConfirmBean.uncontainerizedService.crane}" required="true" requiredMessage="#{msg['application.validation.required']}" valueChangeListener="#{loadConfirmBean.onChangeCraneUc}">
+                                        <f:selectItem itemValue="L" itemLabel="land" />
+                                        <f:selectItem itemValue="S" itemLabel="ship" />
+                                        <f:ajax execute="@this" event="change" render="equipmentPropertiesUC" />
+                                    </h:selectOneRadio>
+                                    <p:message for="craneuc" display="icon"/>
+                                </h:panelGrid>
+                                <h:panelGrid id="equipmentPropertiesUC" columns="3">
+                                    <h:outputLabel value="CC Code *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="3">
+                                        <h:inputText id="ccuc" onkeypress="dlgTT.show()" onmousedown="dlgTT.show()" value="#{loadConfirmBean.crane.masterEquipment.name}" requiredMessage="End Time field #{msg['application.validation.required']}" required="true"/>
+                                        <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{empty loadConfirmBean.uncontainerizedDetail[0]}" type="button" onclick="dlgTT.show();" style="font-size: x-small"/>
+                                        <p:message for="ccuc" display="icon"/>
+                                    </h:panelGrid>
+                                    <h:outputLabel value="Opr Crane *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="3">
+                                        <h:inputText id="optuc" onkeypress="dlgOperatorCrane.show()" onmousedown="dlgOperatorCrane.show()" value="#{loadConfirmBean.crane.masterOperator.name}" requiredMessage="End Time field #{msg['application.validation.required']}" required="true"/>
+                                        <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." disabled="#{empty loadConfirmBean.crane.masterEquipment.name}" type="button" onclick="dlgOperatorCrane.show();" style="font-size: x-small"/>
+                                        <p:message for="optuc" display="icon"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <h:panelGrid columns="1">
+                                <h:panelGrid columns="5">
+
+                                    <h:outputLabel value="&nbsp;" />
+                                    <h:outputLabel value="&nbsp;" />
+                                    <h:outputLabel value="&nbsp;" />
+                                    <h:outputLabel value="&nbsp;" />
+                                    <h:outputLabel value="&nbsp;" />
+
+                                    <h:outputLabel value="Start Time *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText id="startuc" styleClass="" readonly="true" value="#{loadConfirmBean.crane.startTime}" requiredMessage="End Time field #{msg['application.validation.required']}" required="true">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:inputText>
+                                    <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                    <p:message for="startuc" display="icon"/>
+
+
+                                    <h:outputLabel value="End Time *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText styleClass="" readonly="true" id="enduc" value="#{loadConfirmBean.crane.endTime}" requiredMessage="End Time field #{msg['application.validation.required']}" required="true">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:inputText>
+                                    <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                    <p:message for="enduc" display="icon"/>
+
+
+                                </h:panelGrid>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}" onstart="freeze();" actionListener="#{loadConfirmBean.saveUncontainerized}" update="formAddEditUC listData:uncontainerizedConfirmTableUC loadableUcsForm:loadableUcsTable growl" oncomplete="handleRequestValidation(xhr, status, args)" />
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onstart="freeze();" onclick="dlgAddEditUC.hide();" type="button" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk memilih uncontainer yang akan di pindahkan-->
+        <p:dialog header="Select Container"  widgetVar="loadableUcsDialog" modal="true" minWidth="750">
+            <h:form id="loadableUcsForm">
+                <p:dataTable id="loadableUcsTable"  widgetVar="loadableUcsTable"
+                             var="item" value="#{loadConfirmBean.loadableUcs}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[1]}"  filterMatchMode="contains" filterBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="BL No." />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}"  filterMatchMode="contains" filterBy="#{item[2]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Truck Lossing" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{loadConfirmBean.handleSelectUncontainerized}" value="select" update="formAddEditUC:containerPropertiesUC formAddEditUC:equipmentPropertiesUC" oncomplete="loadableUcsDialog.hide();">
+                            <f:attribute name="idSelect" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk konfirmasi menghapus-->
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmationUC">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" onstart="freeze();" actionListener="#{loadConfirmBean.deleteUC}"  update="listData:uncontainerizedConfirmTableUC loadableUcsForm:loadableUcsTable growl" onclick="confirmationUC.hide();" />
+                            <p:commandButton value="#{msg['application.operation.no']}" onstart="freeze();" onclick="confirmationUC.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="loadReportDialog_var" id="loadReportDialog" width="600" modal="true" position="center" header="Laporan Muatan">
+            <h:form id="loadReportForm">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel for="foreMan"  value="Foreman *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="foreMan" value="#{loadConfirmBean.foreman}" required="true"/>
+                        <p:message display="icon" for="foreMan"/>
+                        <h:outputLabel for="supervisiOperasi"  value="Supervisi Operasi *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="supervisiOperasi" value="#{loadConfirmBean.supervisiOperasi}" required="true"/>
+                        <p:message display="icon" for="supervisiOperasi"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <p:commandButton actionListener="#{loadConfirmBean.handleDownloadReport}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadReportRequest(args);" style="font-size: x-small" update="loadReportForm"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" immediate="true" oncomplete="loadReportDialog_var.hide();"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showLoadableUcs" onstart="freeze();" immediate="true" oncomplete="loadableUcsDialog.show();loadableUcsTable.clearFilters();" update="loadableUcsForm:loadableUcsTable formAddEditUC:startuc   formAddEditUC:enduc" actionListener="#{loadConfirmBean.handleShowLoadableUcs}"/>
+            <p:remoteCommand name="showLoadableTranshipmentContainers" onstart="freeze();" immediate="true" oncomplete="loadableTranshipmentContainersDialog.show();loadableTranshipmentContainersTable.clearFilters();" update="loadableTranshipmentContainersForm:loadableTranshipmentContainersTable loadst:st loadst:et" actionListener="#{loadConfirmBean.handleShowLoadableTranshipmentContainers}"/>
+            <p:remoteCommand name="showLoadableContainers" onstart="freeze();" immediate="true" oncomplete="loadableContainersDialog.show();loadableContainersTable.clearFilters();" update="loadableContainersForm:loadableContainersTable loads:st loads:et" actionListener="#{loadConfirmBean.handleShowLoadableContainers}"/>
+            <p:remoteCommand name="showLoadableShiftContainers" onstart="freeze();" immediate="true" oncomplete="loadableShiftContainersDialog.show();loadableShiftContainersTable.clearFilters();" update="loadableShiftContainersForm:loadableShiftContainersTable loadsShift:start loadsShift:end" actionListener="#{loadConfirmBean.handleShowLoadableShiftContainers}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

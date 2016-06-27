@@ -1,0 +1,235 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:dy="http://java.sun.com/jsf/composite/tags/module"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.vessel.master_vessel']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function handleLoginRequestVessel(xhr, status, args) {
+            if(!(args.validationFailed || !args.loggedIn)) {
+                dialogAddEdit.hide();
+                vesselsTable.clearFilters();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.vessel.master_vessel']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="vessel">
+            <p:growl globalOnly="true" showDetail="true"/>
+            <p:dataTable paginatorPosition="bottom" value="#{masterVesselBean.masterVessels}" var="item"
+                         paginator="true" rows="10" id="dataType"  widgetVar="vesselsTable"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" actionListener="#{masterVesselBean.handleAdd}" update="addEdit" oncomplete="dialogAddEdit.show()"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="VesselCode"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[10]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Vessel Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+                <p:column sortBy="#{item[11]}" filterMatchMode="contains" filterBy="#{item[11]}">
+                    <f:facet name="header">
+                        <h:outputText value="MasterCustomer"/>
+                    </f:facet>
+                    <h:outputText value="#{item[11]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="GRT"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="DWT"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="NRT"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="LOA"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Hatch Amount"/>
+                    </f:facet>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Year"/>
+                    </f:facet>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <p:commandButton onstart="freeze();" image="ui-icon-pencil" actionListener="#{masterVesselBean.handleEditDeleteButton}" update="addEdit" oncomplete="dialogAddEdit.show()">
+                        <f:attribute name="vessel_code" value="#{item[0]}"/>
+                    </p:commandButton>
+                    <p:commandButton onstart="freeze();" image="ui-icon-trash" actionListener="#{masterVesselBean.handleEditDeleteButton}" update="dialogDelete" oncomplete="dialogDel.show()">
+                        <f:attribute name="vessel_code" value="#{item[0]}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true"  widgetVar="dialogAddEdit" minWidth="400" header="Master Vessel" id="dialog">
+            <h:form id="addEdit">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Vessel Code *" for="vesselCode" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="vesselCode" onkeyup="javascript:this.value=this.value.toUpperCase();" disabled="#{masterVesselBean.cekId}" value="#{masterVesselBean.vessel.vesselCode}" title="VesselCode" required="true"/>
+                            <p:message display="icon" for="vesselCode"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Vessel Type"/>:
+                        <h:selectOneMenu value="#{masterVesselBean.vessel.masterVesselType.vesselTypeCode}" label="Pilih vessel">
+                            <f:selectItems value="#{masterVesselBean.vesselTypes}" var="i" itemValue="#{i.vesselTypeCode}" itemLabel="#{i.vesselTypeCode} || #{i.name}"/>
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Owner *" />:
+                        <h:panelGrid columns="2">
+                            <p:autoComplete id="masterCustomer" required="true" value="#{masterVesselBean.masterCustomerSelection}" var="item" itemLabel="#{item[1]}" itemValue="#{item[0]}" completeMethod="#{masterCustomerSelector.handleFilterByName}" size="20"/>
+                            <p:message display="icon" for="masterCustomer"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Vessel Name *" for="name" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="name" value="#{masterVesselBean.vessel.name}" required="true" requiredMessage="Vessel Name field is required" title="Name" />
+                            <p:message display="icon" for="name"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Call Sign *" for="name" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="callSign" value="#{masterVesselBean.vessel.callSign}" required="true" requiredMessage="callSign field is required" title="callSign" />
+                            <p:message display="icon" for="callSign"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="GRT *" for="grt" />:
+                        <h:inputText id="grt" value="#{masterVesselBean.vessel.grt}" required="true" requiredMessage="GRT field is required" title="Grt" />
+                        
+                        <h:outputLabel value="DWT" for="dwt" />:
+                        <h:inputText id="dwt" value="#{masterVesselBean.vessel.dwt}" title="Dwt" />
+
+                        <h:outputLabel value="BRT" for="brt" />:
+                        <h:inputText id="brt" value="#{masterVesselBean.vessel.brt}" title="Brt" />
+
+                        <h:outputLabel value="NRT" for="nrt" />:
+                        <h:inputText id="nrt" value="#{masterVesselBean.vessel.nrt}" title="Nrt" />
+
+                        <h:outputLabel value="LOA *" for="loa" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="loa" value="#{masterVesselBean.vessel.loa}" required="true" requiredMessage="LOA field is required" title="Loa" />
+                            <p:message display="icon" for="loa"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Capacity (teus) *" for="contCapacity" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="contCapacity" value="#{masterVesselBean.vessel.contCapacity}" required="true" requiredMessage="Cont Capacity field is required" title="Loa" />
+                            <p:message display="icon" for="contCapacity"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Hatch Amount" for="jumlahPalka" />:
+                        <h:inputText id="jumlahPalka" value="#{masterVesselBean.vessel.jumlahPalka}" title="JumlahPalka" />
+
+                        <h:outputLabel value="Jumlah Derek" for="jumlahDerek" />:
+                        <h:inputText id="jumlahDerek" value="#{masterVesselBean.vessel.jumlahDerek}" title="JumlahDerek" />
+
+                        <h:outputLabel value="Owner" />:
+                        <h:selectOneMenu value="#{masterVesselBean.vessel.linerTramper}" title="Linier Temper" >
+                            <f:selectItem itemValue="true" itemLabel="TRUE"/>
+                            <f:selectItem itemValue="false" itemLabel="FALSE"/>
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Year" for="tahunPembuatan" />:
+                        <h:inputText id="tahunPembuatan" value="#{masterVesselBean.vessel.tahunPembuatan}" title="TahunPembuatan" />
+
+                        <h:outputLabel value="Start Deck" for="startDeck" />:
+                        <h:inputText id="startDeck" value="#{masterVesselBean.vessel.startDeck}" title="StartDeck" />
+
+                        <h:outputLabel value="Kapal Bayangan" />:
+                        <h:selectBooleanCheckbox id="kapalBayangan" value="#{masterVesselBean.vessel.kapalBayangan}" title="Kapal Bayangan"/>
+
+                        <h:outputLabel value="Description" />:
+                        <h:inputTextarea value="#{masterVesselBean.vessel.note}" title="Note" />
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{masterVesselBean.saveEdit}" update="addEdit vessel" oncomplete="handleLoginRequestVessel(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" type="button" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>            
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="dialogDelete">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{masterVesselBean.DeleteButton}" oncomplete="dialogDel.hide(); vesselsTable.clearFilters();" update="vessel, dataType, dialogDelete"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

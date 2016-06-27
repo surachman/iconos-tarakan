@@ -1,0 +1,274 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.cfs_operation.stuffing_confirm']}"/>
+    </ui:define>
+<ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+
+                jQuery('.cal').livequery(function(){
+                        jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+                    });
+
+
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>    
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.cfs_operation.stuffing_confirm']}"/>
+    </ui:define>
+
+  <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="cfsStrippingForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{stuffingCfsBean.serviceCfsStuffings}"
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="number" id="cfsStrippingTable"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{stuffingCfsBean.handleAdd}" update="cfsDialog:cfsStripping serviceCfsForm:serviceCfs" oncomplete="dlg.show();" onclick="genTitle('dialog','#{msg['application.operation.add']} Stripping Confirm');"/>
+                    </div>
+                </f:facet>
+
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="No PPKB" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}" filterBy="#{item[3]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="BL No" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Unit" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Weight" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Volume" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Placement Date" />
+                    </f:facet>
+                    <h:outputText value="#{item[8]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{strippingConfirmBean.handleEditDelete}" oncomplete="dlg.show();" image="ui-icon-pencil" title="Edit Service CFS Stripping" update="cfsDialog:cfsStripping" onclick="genTitle('dialog','#{msg['application.operation.edit']} Stripping Confirm');">
+                            <f:attribute name="idCont" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{strippingConfirmBean.handleEditDelete}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Service CFS Stripping">
+                            <f:attribute name="idCont" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Entry Delivery Service"  widgetVar="dlg" modal="true" minWidth="450" id="dialog" >
+            <h:form id="cfsDialog">
+                <p:panel>
+                    <h:panelGrid columns="4" id="cfsStripping">
+                        <h:outputLabel value="Container No *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="#{not empty stuffingCfsBean.serviceCfsStuffing.blNo}" id="cn" onkeypress="dlgCont.show();" onmousedown="dlgCont.show();" value="#{stuffingCfsBean.serviceCfsStuffing.contNo}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <h:panelGrid columns="2">
+                            <p:commandButton disabled="#{not empty stuffingCfsBean.serviceCfsStuffing.blNo}" onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+                            <p:message display="icon" for="cn"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{stuffingCfsBean.serviceCfsStuffing.mlo.name}" size="25"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="No PPKB *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{stuffingCfsBean.serviceCfsStuffing.noPpkb}" size="25"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{stuffingCfsBean.serviceCfsStuffing.commodityCode}" style="width: 140px;">
+                            <f:selectItems value="#{stuffingCfsBean.commoditys}" var="i" itemLabel="#{i[1]}" itemValue="#{i[0]}"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="No BL *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText required="true" maxlength="10" id="bl" value="#{stuffingCfsBean.serviceCfsStuffing.blNo}" size="25" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message display="icon" for="bl"/>
+
+                        <h:outputLabel value="Unit *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText required="true" maxlength="4" id="un" value="#{stuffingCfsBean.serviceCfsStuffing.unit}" size="25" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="un"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Weight *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText required="true" maxlength="7" id="we" value="#{stuffingCfsBean.serviceCfsStuffing.weight}" size="25" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="we"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Volume *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText required="true" maxlength="7" id="vol" value="#{stuffingCfsBean.serviceCfsStuffing.volume}" size="25" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="vol"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Placement Date *" />
+                        <h:outputLabel value=":"/>
+                        <h:inputText id="tgl1" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{stuffingCfsBean.tanggal}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tgl1" display="icon"/>
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{stuffingCfsBean.handleConfirm}" update="cfsDialog:cfsStripping cfsStrippingForm:cfsStrippingTable growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}" id="confirmation"  widgetVar="confirmation" minWidth="400">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{strippingConfirmBean.handleDelete}" update="cfsStrippingForm:cfsStrippingTable growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="serviceCfsForm">
+            <p:dialog header="Select Service Cfs"  widgetVar="dlgCont" modal="true" minWidth="450">
+                <p:dataTable id="serviceCfs" var="item" value="#{stuffingCfsBean.serviceCfss}"
+                             paginator="true" rows="10" rowIndexVar="number" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{stuffingCfsBean.handleSelectContPick}" value="#{msg['application.operation.select']}" update="cfsDialog:cfsStripping" oncomplete="dlgCont.hide();">
+                                <f:attribute name="idCfs" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JobslipDelivery" language="groovy" pageWidth="612" pageHeight="396" whenNoDataType="AllSectionsNoDetail" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="2" bottomMargin="0">
+	<property name="ireport.zoom" value="1.6500000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="job_slip" class="java.lang.String"/>
+	<parameter name="no_reg" class="java.lang.String"/>
+	<parameter name="user" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT rs.job_slip,
+  rs.no_reg,
+  rs.no_ppkb,
+  mv.name AS vessel,
+  pp.voy_in,
+  pp.voy_out,
+  p.eta,
+  rs.cont_status,
+  rs.cont_no,
+  rs.cont_size,
+  ct.iso_code,
+  rs.cont_gross,
+  ct.type_in_general AS type,
+  rs.valid_date,
+  rs.placement_date,
+  i.no_invoice,
+  rs.bl_no,
+  ms.name AS cust_name,
+  scd.block,
+  scd.y_slot,
+  scd.y_row,
+  scd.y_tier,
+  scd.disch_port,
+  scd.over_size,
+  i.payment_date,
+  sv.arrival_time
+FROM ((((delivery_service rs
+JOIN m_container_type ct
+ON (rs.cont_type = ct.cont_type))
+JOIN service_cont_discharge scd
+ON (rs.cont_no=scd.cont_no
+AND rs.no_ppkb=scd.no_ppkb))
+JOIN ((registration r
+JOIN m_customer ms
+ON (r.cust_code=ms.cust_code))
+JOIN invoice i
+ON (r.no_reg =i.no_reg))
+ON (r.no_reg = rs.no_reg))
+JOIN (planning_vessel p
+JOIN preservice_vessel pp
+ON (p.booking_code = pp.booking_code)
+JOIN m_vessel mv
+ON (pp.vessel_code = mv.vessel_code))
+ON (r.no_ppkb      = p.no_ppkb))
+JOIN service_vessel sv
+ON (sv.no_ppkb    = rs.no_ppkb)
+WHERE rs.job_slip = $P{job_slip}]]>
+	</queryString>
+	<field name="job_slip" class="java.lang.String"/>
+	<field name="no_reg" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="vessel" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="eta" class="java.sql.Timestamp"/>
+	<field name="cont_status" class="java.lang.String"/>
+	<field name="cont_no" class="java.lang.String"/>
+	<field name="cont_size" class="java.lang.Integer"/>
+	<field name="iso_code" class="java.lang.String"/>
+	<field name="cont_gross" class="java.lang.Integer"/>
+	<field name="type" class="java.lang.String"/>
+	<field name="valid_date" class="java.sql.Timestamp"/>
+	<field name="placement_date" class="java.sql.Timestamp"/>
+	<field name="no_invoice" class="java.lang.String"/>
+	<field name="bl_no" class="java.lang.String"/>
+	<field name="cust_name" class="java.lang.String"/>
+	<field name="block" class="java.lang.String"/>
+	<field name="y_slot" class="java.lang.Integer"/>
+	<field name="y_row" class="java.lang.Integer"/>
+	<field name="y_tier" class="java.lang.Integer"/>
+	<field name="disch_port" class="java.lang.String"/>
+	<field name="over_size" class="java.lang.String"/>
+	<field name="payment_date" class="java.sql.Timestamp"/>
+	<field name="arrival_time" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="394" splitType="Stretch">
+			<staticText>
+				<reportElement x="263" y="141" width="100" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<text><![CDATA[BERLAKU S.D]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="497" y="54" width="115" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{job_slip}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="133" y="58" width="168" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cont_size} + " / " + $F{cont_status} + " / " + $F{type}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="133" y="69" width="168" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{vessel} + " / " + $F{voy_in}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="133" y="46" width="168" height="13" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" rotation="None" markup="none">
+					<font fontName="Arial" size="11" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cont_no}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement x="263" y="155" width="100" height="14"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{valid_date})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="133" y="79" width="168" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cust_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="497" y="86" width="115" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{bl_no}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="558" y="20" width="73" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_invoice}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="263" y="155" width="100" height="1"/>
+			</line>
+			<textField isBlankWhenNull="true">
+				<reportElement x="558" y="10" width="73" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{user}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy" isBlankWhenNull="true">
+				<reportElement x="518" y="141" width="72" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="133" y="89" width="168" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{block} + "   " + $F{y_slot} + "   " + $F{y_row} + "   " + $F{y_tier}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="497" y="96" width="115" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_reg}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="133" y="121" width="161" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{disch_port}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="497" y="66" width="115" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{over_size}.contentEquals( "TRUE" ) ? "Yes" : "No"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="497" y="106" width="115" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{payment_date})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="497" y="76" width="115" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{arrival_time})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="263" y="7" width="83" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="15" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Delivery]]></text>
+			</staticText>
+		</band>
+	</detail>
+</jasperReport>

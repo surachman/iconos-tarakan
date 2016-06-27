@@ -1,0 +1,171 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="bundles">
+        bundles
+    </ui:define>
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.finance.master_discount']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dialogAddEdit.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9.]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+        <h:form id="formTable">
+            <p:dataTable paginatorPosition="bottom" value="#{masterDscountBean.masterDiscounts}" var="item"
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="tarifTable" rowIndexVar="number"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{masterDscountBean.handleOnAdd}" image="ui-icon-plusthick" oncomplete="dialogAddEdit.show()" update="formEdit:tarifEdit"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="Activity Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Activity Name"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[1]}"/>
+                    </div>
+                </p:column>
+                <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Customer Name"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[2]}"/>
+                    </div>
+                </p:column>
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Discount Amount"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[3]}"/>
+                    </div>
+                </p:column>
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="Valid Date"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[4]}"/>
+                    </div>
+                </p:column>
+
+                <p:column  style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{masterDscountBean.handleEdit}" update="formEdit:tarifEdit" oncomplete="dialogAddEdit.show();" image="ui-icon ui-icon-pencil" title="Edit Discount">
+                            <f:attribute name="idTarif" value="#{item[5]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{masterDscountBean.handleEdit}" update="deleteForm" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Discount">
+                            <f:attribute name="idTarif" value="#{item[5]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form id="deleteForm">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{masterDscountBean.hanldeDelete}"  update="formTable:tarifTable growl" oncomplete="confirmation.hide();"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="formEdit">
+            <p:dialog modal="true"  widgetVar="dialogAddEdit" minWidth="550" header="Master Discount">
+                <p:panel>
+                    <h:panelGrid columns="4" id="tarifEdit">
+                        <h:outputLabel value="Activity"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu value="#{masterDscountBean.masterDiscount.masterActivity.activityCode}" id="activity">
+                            <f:selectItems value="#{masterDscountBean.masterActivitys}" var="it" itemValue="#{it[0]}" itemLabel="#{it[1]}"/>
+                        </h:selectOneMenu>
+                        <p:message display="icon" for="activity"/>
+
+                        <h:outputLabel value="Customer"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu value="#{masterDscountBean.masterDiscount.masterCustomer.custCode}" id="cust">
+                            <f:selectItems value="#{masterDscountBean.masterCustomers}" var="it" itemValue="#{it[0]}" itemLabel="#{it[1]}"/>
+                        </h:selectOneMenu>
+                        <p:message display="icon" for="cust"/>
+
+                        <h:outputLabel value="Discount Amount (%)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{masterDscountBean.masterDiscount.discountAmount}" id="disch" requiredMessage="Discount Amount #{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                        <p:message display="icon" for="disch"/>
+
+                        <h:outputLabel value="Discount Amount (Money)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{masterDscountBean.masterDiscount.discountAmountAsMoney}" id="discountAmountAsMoney" requiredMessage="Discount Amount As Money #{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                        <p:message display="icon" for="discountAmountAsMoney"/>
+
+                        <h:outputLabel value="Valid Date"/>
+                        <h:outputLabel value=":"/>
+                        <p:calendar value="#{masterDscountBean.masterDiscount.validDate}" required="true" id="valid" requiredMessage="Valid Date #{msg['application.validation.required']}"/>
+                        <p:message display="icon" for="valid"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{masterDscountBean.handleSave}" update="formTable:tarifTable formEdit:tarifEdit growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

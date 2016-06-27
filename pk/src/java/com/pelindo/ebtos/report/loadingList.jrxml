@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="loadingList" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Key">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\PROJECT\\ebtos-ear\\ebtos\\src\\java\\com\\pelindo\\ebtos\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR2" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\PROJECT\\ebtos-ear\\ebtos\\src\\java\\com\\pelindo\\ebtos\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="user" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT a.cont_size,
+  a.cont_type,
+  a.gross,
+  a.box,
+  a.teus,
+  b.no_ppkb,
+  b.name,
+  b.voy_in,
+  b.voy_out
+FROM
+  (SELECT loading.cont_size,
+    loading.cont_type,
+    SUM(loading.cont_gross) AS gross,
+    CASE
+      WHEN loading.cont_size = 20
+      THEN COUNT(loading.cont_size)
+      WHEN loading.cont_size >= 40
+      THEN COUNT(loading.cont_size)
+    END                       AS box ,
+    COUNT( loading.cont_size) AS teus
+  FROM
+    (SELECT pcl.no_ppkb,
+      pcl.cont_no,
+      pcl.cont_size,
+      mct.type_in_general AS cont_type,
+      pcl.cont_status,
+      pcl.cont_gross,
+      pcl.seal_no,
+      pcl.v_bay,
+      pcl.v_row,
+      pcl.v_tier,
+      pcl.load_port,
+      pcl.disch_port,
+      pcl.id,
+      pcl.block,
+      pcl.y_slot,
+      pcl.y_row,
+      pcl.y_tier,
+      pcl.completed,
+      pcl.bl_no,
+      mp.name,
+      CASE
+        WHEN pcl.is_transhipment = 'TRUE'
+        THEN 'TRANSHIPMENT'
+        WHEN pcl.is_change_vessel = 'TRUE'
+        THEN 'EX CANCEL LOADING'
+        WHEN pcl.is_shifting = 'TRUE'
+        THEN 'SHIFTING'
+        ELSE 'RECEIVING'
+      END AS status,
+      CASE
+        WHEN pcl.is_change_vessel = 'TRUE'
+        THEN mc_cls.name
+        WHEN pcl.is_transhipment = 'TRUE'
+        OR pcl.is_shifting = 'TRUE'
+        THEN mc_vs.name
+        ELSE mc.name
+      END AS cust_name,
+      CASE
+        WHEN (sgr.cont_no IS NOT NULL)
+        OR pcl.is_change_vessel = 'TRUE'
+        OR pcl.is_transhipment = 'TRUE'
+        OR pcl.is_shifting = 'TRUE'
+        THEN 'OS'
+        ELSE 'GT'
+      END AS i_stat,
+      mco.name commodity,
+      pcl.status_cancel_loading
+    FROM planning_cont_load pcl
+    LEFT JOIN receiving_service rs
+    ON (pcl.no_ppkb=rs.no_ppkb
+    AND pcl.cont_no=rs.cont_no)
+    LEFT JOIN registration r
+    ON (r.no_reg=rs.no_reg)
+    LEFT JOIN m_customer mc
+    ON (r.cust_code=mc.cust_code)
+    LEFT JOIN service_gate_receiving sgr
+    ON (rs.job_slip=sgr.job_slip)
+    LEFT JOIN cancel_loading_service cls
+    ON (pcl.no_ppkb=cls.new_ppkb
+    AND pcl.cont_no=cls.cont_no)
+    LEFT JOIN registration r_cls
+    ON (r_cls.no_reg=cls.no_reg)
+    LEFT JOIN m_customer mc_cls
+    ON (r_cls.cust_code=mc_cls.cust_code)
+    LEFT JOIN service_shifting ss
+    ON (pcl.cont_no=ss.cont_no
+    AND pcl.no_ppkb=ss.no_ppkb
+    AND ss.shift_to='TOCY')
+    JOIN planning_vessel pv
+    ON (pcl.no_ppkb=pv.no_ppkb)
+    JOIN preservice_vessel prv
+    ON (prv.booking_code=pv.booking_code)
+    JOIN m_customer mc_vs
+    ON (prv.cust_code=mc_vs.cust_code)
+    JOIN m_port mp
+    ON (mp.port_code=pcl.disch_port)
+    JOIN m_container_type mct
+    ON (pcl.cont_type = mct.cont_type)
+    JOIN m_commodity mco
+    ON (mco.commodity_code=pcl.commodity_code)
+    ) loading
+  WHERE loading.no_ppkb = $P{no_ppkb}
+  AND NOT loading.status_cancel_loading = 'TRUE'
+  GROUP BY loading.cont_size,
+    loading.cont_type
+  ORDER BY loading.cont_size,
+    loading.cont_type ASC
+  )a,
+  (SELECT p.no_ppkb,
+    mv.name,
+    pp.voy_in,
+    pp.voy_out
+  FROM planning_vessel p,
+    preservice_vessel pp,
+    m_vessel mv
+  WHERE p.booking_code=pp.booking_code
+  AND pp.vessel_code  = mv.vessel_code
+  AND p.no_ppkb       = $P{no_ppkb}
+  )b
+]]>
+	</queryString>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="cont_size" class="java.lang.String"/>
+	<field name="cont_type" class="java.lang.String"/>
+	<field name="gross" class="java.lang.String"/>
+	<field name="box" class="java.lang.String"/>
+	<field name="teus" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="135" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="17" width="555" height="23" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Planning Container Load]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="93" width="100" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{voy_out}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="8" y="93" width="62" height="15" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Voyage Out]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="78" width="62" height="15" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Voyage In]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="78" width="10" height="15" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="63" width="10" height="15" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="48" width="62" height="15" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No PPKB]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="63" width="154" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="48" width="100" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_ppkb}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="70" y="93" width="10" height="15" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="8" y="63" width="62" height="15" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Vessel Name]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement x="80" y="78" width="100" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{voy_in}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="70" y="48" width="10" height="15" isPrintInFirstWholeBand="true"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement mode="Transparent" x="268" y="109" width="287" height="20" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="8" isBold="false" isItalic="true" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{user} + " / " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(new java.util.Date())]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="51" splitType="Stretch">
+			<subreport>
+				<reportElement x="-1" y="0" width="556" height="50"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="121">
+			<subreport>
+				<reportElement x="0" y="58" width="556" height="63"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR2}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>

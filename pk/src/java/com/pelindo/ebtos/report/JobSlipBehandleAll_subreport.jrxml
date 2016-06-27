@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JobSlipBehandleAll_subreport" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+    <parameter name="no_reg" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[
+--Original Query
+--SELECT rs.job_slip, rs.no_reg, rs.no_ppkb, mv.name as vessel, pp.voy_in, pp.voy_out, p.eta, rs.cont_no, rs.cont_size,rs.cont_status, rs.cont_gross, rs.cont_type,change(rs.special_equipment), rs.valid_date FROM registration r, behandle_service rs, planning_vessel p, preservice_vessel pp, m_vessel mv WHERE r.no_ppkb = p.no_ppkb AND p.booking_code = pp.booking_code AND pp.vessel_code = mv.vessel_code AND r.no_reg = rs.no_reg AND r.no_reg = 'REG0000007'
+--Patched Query
+SELECT rs.job_slip,
+  rs.no_reg,
+  rs.no_ppkb,
+  mv.name AS vessel,
+  pp.voy_in,
+  pp.voy_out,
+  p.eta,
+  rs.cont_no,
+  rs.cont_size,
+  rs.cont_status,
+  rs.cont_gross,
+  rs.cont_type,
+  change(rs.special_equipment),
+  rs.valid_date
+FROM registration r,
+  behandle_service rs,
+  planning_vessel p,
+  preservice_vessel pp,
+  m_vessel mv
+WHERE r.no_ppkb    = p.no_ppkb
+AND p.booking_code = pp.booking_code
+AND pp.vessel_code = mv.vessel_code
+AND r.no_reg       = rs.no_reg
+AND r.no_reg       = $P{no_reg}
+]]>
+	</queryString>
+	<field name="job_slip" class="java.lang.String"/>
+	<field name="no_reg" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="vessel" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="eta" class="java.sql.Timestamp"/>
+	<field name="cont_no" class="java.lang.String"/>
+	<field name="cont_size" class="java.lang.Integer"/>
+	<field name="cont_status" class="java.lang.String"/>
+	<field name="cont_gross" class="java.lang.Integer"/>
+	<field name="cont_type" class="java.lang.String"/>
+	<field name="change" class="java.lang.String"/>
+	<field name="valid_date" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

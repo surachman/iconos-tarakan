@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="dischargeList" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Key">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_reg" class="java.lang.String"/>
+	<parameter name="total" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object"/>
+	<queryString>
+		<![CDATA[
+SELECT r.no_reg,
+  c.name,
+  r.no_ppkb,
+  m.name AS vessel_name,
+  b.voy_in,
+  b.voy_out,
+  r.status_service
+FROM registration r,
+  m_customer c,
+  m_service s,
+  planning_vessel p,
+  m_vessel m,
+  preservice_vessel b
+WHERE r.cust_code  = c.cust_code
+AND p.booking_code =b.booking_code
+AND b.vessel_code  =m.vessel_code
+AND r.service_code = s.service_code
+AND r.no_ppkb      = p.no_ppkb
+AND s.service_code = 'SC001'
+AND r.no_reg       =$P{no_reg}
+]]>
+	</queryString>
+	<field name="no_reg" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="vessel_name" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="status_service" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="26" splitType="Prevent">
+			<staticText>
+				<reportElement x="179" y="0" width="234" height="23" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true"/>
+				<textElement>
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Perhitungan  Receiving Service]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="107" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="15"/>
+				<textElement/>
+				<text><![CDATA[No Registrasi]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="30" width="100" height="15"/>
+				<textElement/>
+				<text><![CDATA[Customer ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="15" width="100" height="15"/>
+				<textElement/>
+				<text><![CDATA[No_ppkb]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="45" width="100" height="15"/>
+				<textElement/>
+				<text><![CDATA[Vessel Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="60" width="100" height="15"/>
+				<textElement/>
+				<text><![CDATA[Voy In]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="75" width="100" height="15"/>
+				<textElement/>
+				<text><![CDATA[Voy Out]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="90" width="100" height="15"/>
+				<textElement/>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="99" y="45" width="125" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{vessel_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="90" width="124" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{status_service}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="30" width="124" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="100" y="60" width="124" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{voy_in}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="99" y="75" width="125" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{voy_out}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="99" y="0" width="125" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_reg}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="99" y="15" width="125" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_ppkb}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<staticText>
+				<reportElement x="1" y="1" width="77" height="35"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Job Slip]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="78" y="1" width="73" height="35"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Cont No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="151" y="1" width="63" height="35"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Status]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="214" y="1" width="47" height="35"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="261" y="1" width="46" height="35"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Type]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="1" width="107" height="15"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Dangerous]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="475" y="1" width="80" height="35"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Lift Off]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="368" y="16" width="42" height="20"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Dg]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="410" y="16" width="65" height="20"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Label]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="307" y="1" width="61" height="35"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Over Size]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<subreport>
+				<reportElement x="1" y="0" width="554" height="20"/>
+				<subreportParameter name="no_reg">
+					<subreportParameterExpression><![CDATA[$P{no_reg}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="20" splitType="Stretch">
+			<staticText>
+				<reportElement x="368" y="0" width="100" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[Jumlah Total : ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="468" y="0" width="101" height="20"/>
+				<textElement>
+					<font size="12" isBold="true" isItalic="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{total}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+</jasperReport>

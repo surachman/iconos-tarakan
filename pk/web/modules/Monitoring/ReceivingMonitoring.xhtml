@@ -1,0 +1,156 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.receiving_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.receiving_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form>
+            <h:panelGrid columns="3">
+                <h:panelGrid columns="3">
+                    <h:outputLabel value="No PPKB:"/>
+                    <h:inputText id="noPpkb" value="#{receivingMonitoringBean.serviceVessel.planningVessel.noPpkb}" title="Container"/>
+                    <p:commandButton value="..." update="#" actionListener="#" style="font-size: x-small"/>
+                    <h:outputLabel value="Vessel Name:"/>
+                    <h:inputText id="vesselName" value="#{receivingMonitoringBean.serviceVessel.planningVessel.vesselName}" title="Type"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="Voyyage In:" />
+                    <h:inputText id="voyyageIn" value="#{receivingMonitoringBean.serviceVessel.planningVessel.voyIn}" title="Dimension"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="Voyyage Out:" />
+                    <h:inputText id="voyyageOut" value="#{receivingMonitoringBean.serviceVessel.planningVessel.voyOut}" title="Eta"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputText value="Start Work:"/>
+                    <h:inputText id="startWork" value="#{receivingMonitoringBean.serviceVessel.startWorkTime}" title="Start Work"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputText value="End Work:"/>
+                    <h:inputText id="endWork" value="#{receivingMonitoringBean.serviceVessel.endWorkTime}" title="End Work"/>
+                    <h:outputText value="&nbsp;"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <br/>
+            <!-- LIST DATA RECEIVING MONITORING  -->
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{receivingMonitoringBean.planningContReceivings}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" style="font-size: 9px">
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+                <p:column sortBy="#{item.contNo}">
+                    <f:facet name="header">
+                        <h:outputText value="Container No"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contNo}"/>
+                </p:column>
+                <p:column sortBy="#{item.contSize}">
+                    <f:facet name="header">
+                        <h:outputText value="Size"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contSize}"/>
+                </p:column>
+                <p:column sortBy="#{item.masterContainerType.contType}">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterContainerType.contType}"/>
+                </p:column>
+                <p:column sortBy="#{item.contStatus}">
+                    <f:facet name="header">
+                        <h:outputText value="Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contStatus}"/>
+                </p:column>
+                <p:column sortBy="#{item.contGross}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contGross}"/>
+                </p:column>
+                <p:column sortBy="#{item.overSize}">
+                    <f:facet name="header">
+                        <h:outputText value="OH/OW/OL"/>
+                    </f:facet>
+                    <h:outputText value="#{item.overSize ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column sortBy="#{item.dg}">
+                    <f:facet name="header">
+                        <h:outputText value="Dg"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dg ? item.masterCommodity.masterDangerousClass : 'N'}"/>
+                </p:column>
+                <p:column sortBy="#{item.dgLabel}">
+                    <f:facet name="header">
+                        <h:outputText value="Dg Label"/>
+                    </f:facet>
+                    <h:outputText value="#{item.dgLabel ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column sortBy="#{item.masterYard.block}">
+                    <f:facet name="header">
+                        <h:outputText value="Blok"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterYard.block}"/>
+                </p:column>
+                <p:column sortBy="#{item.frSlot}">
+                    <f:facet name="header">
+                        <h:outputText value="Fr Slot"/>
+                    </f:facet>
+                    <h:outputText value="#{item.frSlot}"/>
+                </p:column>
+                <p:column sortBy="#{item.toSlot}">
+                    <f:facet name="header">
+                        <h:outputText value="To Slot"/>
+                    </f:facet>
+                    <h:outputText value="#{item.toSlot}"/>
+                </p:column>
+                <p:column sortBy="#{item.frRow}">
+                    <f:facet name="header">
+                        <h:outputText value="Fr Row"/>
+                    </f:facet>
+                    <h:outputText value="#{item.frRow}"/>
+                </p:column>
+                <p:column sortBy="#{item.toRow}">
+                    <f:facet name="header">
+                        <h:outputText value="To Row"/>
+                    </f:facet>
+                    <h:outputText value="#{item.toRow}"/>
+                </p:column>
+                <p:column sortBy="#{item.totalBooking}">
+                    <f:facet name="header">
+                        <h:outputText value="Booking (Box)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.totalBooking}"/>
+                </p:column>
+                <p:column sortBy="#{item.realisasi}">
+                    <f:facet name="header">
+                        <h:outputText value="Realisasi (Box)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.realisasi}"/>
+                </p:column>
+                <p:column sortBy="#{item.sisa}">
+                    <f:facet name="header">
+                        <h:outputText value="Sisa (Box)"/>
+                    </f:facet>
+                    <h:outputText value="#{item.sisa}"/>
+                </p:column>
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                       <p:commandButton value="#{msg['application.operation.preview']}"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+
+        </h:form>
+    </ui:define>
+
+</ui:composition>

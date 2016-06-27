@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_cont_type_in_general']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_cont_type_in_general']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" />
+
+        <h:form id="contTypeForm">
+            <p:dataTable id="contTypeTable" var="item" value="#{masterContainerTypeInGeneralBean.masterContTypes}"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.id}" style="width:100px; text-align: center;" filterMatchMode="contains" filterBy="#{item.id}">
+                    <f:facet name="header">
+                        <h:outputText value="ID"/>
+                    </f:facet>
+                    <h:outputText value="#{item.id}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.description}" filterMatchMode="contains" filterBy="#{item.description}">
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item.description}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.masterPattern.name}" filterMatchMode="contains" filterBy="#{item.masterPattern.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Pattern"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterPattern.name}"/>
+                </p:column>
+
+                <p:column style="width:100px; text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <p:commandButton actionListener="#{masterContainerTypeInGeneralBean.handleEditButton}" value="edit" image="ui-icon ui-icon-pencil" title="Edit Container Type" update="addeditform addeditform:contTypeId" oncomplete="dlg.show();">
+                        <f:attribute name="contTypeId" value="#{item.id}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Master Container Type"  widgetVar="dlg" modal="true" width="325" resizable="false" >
+            <h:form id="addeditform">
+                <h:inputHidden id="contTypeId" value="#{masterContainerTypeInGeneralBean.masterContType.id}" />
+                <p:panel rendered="#{not empty masterContainerTypeInGeneralBean.masterContType}">
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="ID"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterContainerTypeInGeneralBean.masterContType.id}" disabled="true"/>
+                        <h:outputLabel value="Name"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterContainerTypeInGeneralBean.masterContType.name}"/>
+                        <h:outputLabel value="Description"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText value="#{masterContainerTypeInGeneralBean.masterContType.description}"/>
+                        <h:outputLabel value="Pattern"/>
+                        <h:outputLabel value=" : "/>
+                        <h:selectOneMenu value="#{masterContainerTypeInGeneralBean.masterContType.masterPattern.name}" onchange="updateAfterPatternChanged();">
+                            <f:selectItems value="#{masterContainerTypeInGeneralBean.masterPatterns}" var="item" itemValue="#{item.name}" itemLabel="#{item.name}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <p:remoteCommand id="updateAfterPatternChanged"/>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}"  actionListener="#{masterContainerTypeInGeneralBean.saveEdit}"  update="contTypeForm:contTypeTable growl" oncomplete="dlg.hide();" />
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="button" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

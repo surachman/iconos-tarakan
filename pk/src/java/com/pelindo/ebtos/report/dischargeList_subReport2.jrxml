@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="loadingList" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="5.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT container.container,
+  COALESCE(fcl.box,0)   AS fcl_box,
+  COALESCE(fcl.teus,0)  AS fcl_teus,
+  COALESCE(mty.box,0)   AS mty_box,
+  COALESCE(mty.teus,0)  AS mty_teus,
+  COALESCE(lcl.box,0)   AS lcl_box,
+  COALESCE(lcl.teus,0)  AS lcl_teus,
+  SUM(COALESCE(fcl.gross,0)+COALESCE(mty.gross,0)+COALESCE(lcl.gross,0)) AS gross
+FROM
+  (SELECT DISTINCT (p.cont_size || ' ' || c.type_in_general) AS container,
+    p.no_ppkb
+  FROM planning_cont_discharge p,
+    m_container_type           c
+  WHERE p.cont_type = c.cont_type
+  AND p.no_ppkb     = $P{no_ppkb}
+  GROUP BY p.cont_size,
+    c.type_in_general,
+    p.no_ppkb
+  ) container
+LEFT JOIN
+  (SELECT p.cont_size || ' ' || c.type_in_general AS container,
+    p.no_ppkb,
+    COUNT( p.cont_size) AS box,
+    CASE
+      WHEN p.cont_size = 20
+      THEN COUNT(p.cont_size)
+      WHEN p.cont_size >= 40
+      THEN COUNT(p.cont_size)*2
+    END                        AS teus,
+    SUM(p.cont_gross)          AS gross
+  FROM planning_cont_discharge p,
+    m_container_type           c
+  WHERE p.cont_type = c.cont_type
+  AND p.cont_status ='FCL'
+  GROUP BY p.cont_size,
+    c.type_in_general,
+    p.no_ppkb
+  ) fcl
+ON (container.container=fcl.container
+AND container.no_ppkb  =fcl.no_ppkb)
+LEFT JOIN
+  (SELECT p.cont_size ||' '|| c.type_in_general AS container,
+    p.no_ppkb,
+    COUNT( p.cont_size) AS box,
+    CASE
+      WHEN p.cont_size = 20
+      THEN COUNT(p.cont_size)
+      WHEN p.cont_size >= 40
+      THEN COUNT(p.cont_size)*2
+    END                        AS teus,
+    SUM(p.cont_gross)          AS gross
+  FROM planning_cont_discharge p,
+    m_container_type           c
+  WHERE p.cont_type = c.cont_type
+  AND p.cont_status ='MTY'
+  GROUP BY p.cont_size,
+    c.type_in_general,
+    p.no_ppkb
+  ) mty
+ON (container.container=mty.container
+AND container.no_ppkb  =mty.no_ppkb)
+LEFT JOIN
+  (SELECT p.cont_size ||' '|| c.type_in_general AS container,
+    p.no_ppkb,
+    COUNT( p.cont_size) AS box,
+    CASE
+      WHEN p.cont_size = 20
+      THEN COUNT(p.cont_size)
+      WHEN p.cont_size >= 40
+      THEN COUNT(p.cont_size)*2
+    END                        AS teus,
+    SUM(p.cont_gross)          AS gross
+  FROM planning_cont_discharge p,
+    m_container_type           c
+  WHERE p.cont_type = c.cont_type
+  AND p.cont_status ='LCL'
+  GROUP BY p.cont_size,
+    c.type_in_general,
+    p.no_ppkb
+  ) lcl
+ON (container.container=lcl.container
+AND container.no_ppkb  =lcl.no_ppkb)
+GROUP BY container.container,
+  fcl.box,
+  fcl.teus,
+  mty.box,
+  mty.teus,
+  lcl.box,
+  lcl.teus
+ORDER BY container.container
+]]>
+	</queryString>
+	<field name="container" class="java.lang.String"/>
+	<field name="fcl_box" class="java.lang.String"/>
+	<field name="fcl_teus" class="java.lang.String"/>
+	<field name="mty_box" class="java.lang.String"/>
+	<field name="mty_teus" class="java.lang.String"/>
+	<field name="lcl_box" class="java.lang.String"/>
+	<field name="lcl_teus" class="java.lang.String"/>
+	<field name="gross" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="319" y="5" width="120" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MTY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="79" y="20" width="56" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Box]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="135" y="20" width="64" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Teus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="439" y="5" width="90" height="30"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL GROSS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="79" y="5" width="120" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[FCL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="5" width="79" height="30"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Container Size]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="255" y="20" width="64" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Teus]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="5" width="120" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[LCL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="319" y="20" width="56" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Box]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="199" y="20" width="56" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Box]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="20" width="64" height="15"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Teus]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField>
+				<reportElement x="439" y="0" width="90" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{gross}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="199" y="0" width="56" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{lcl_box}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="0" width="56" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fcl_box}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="319" y="0" width="56" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{mty_box}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="375" y="0" width="64" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{mty_teus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="79" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement>
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{container}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="135" y="0" width="64" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{fcl_teus}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="255" y="0" width="64" height="15"/>
+				<box leftPadding="2" rightPadding="5">
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{lcl_teus}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

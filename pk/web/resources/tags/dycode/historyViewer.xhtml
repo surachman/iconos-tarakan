@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:c="http://java.sun.com/jsp/jstl/core"
+      xmlns:p="http://primefaces.prime.com.tr/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+  <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="id" required="true"/>
+        <cc:attribute name="targetElement" required="true" type="java.lang.String"/>
+        <cc:attribute name="oncomplete" required="true" type="java.lang.String"/>
+        <cc:attribute name="update" required="true" type="java.lang.String"/>
+        <cc:attribute name="fieldName" required="true" type="java.lang.String"/>
+        <cc:attribute name="param" required="true" type="java.lang.String"/>
+        <cc:attribute name="render" required="true" type="java.lang.Boolean"/>
+        <cc:attribute name="actionListener" method-signature="void actionListener(javax.faces.event.ActionEvent)" required="true"/>
+    </cc:interface>
+
+  <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <p:outputPanel>
+            <h:outputText rendered="#{not cc.attrs.render}" value=""/>
+            <p:remoteCommand rendered="#{cc.attrs.render}" name="#{cc.attrs.id}remoteCommand" process="@this" immediate="true" onstart="freeze();" oncomplete="#{cc.attrs.oncomplete}" update="#{cc.attrs.update}" actionListener="#{cc.attrs.actionListener}">
+                <f:param name="fieldName" value="#{cc.attrs.fieldName}"/>
+                <f:param name="param" value="#{cc.attrs.param}"/>
+            </p:remoteCommand>
+            <p:outputPanel  rendered="#{cc.attrs.render}">
+                <script type='text/javascript'>
+                    var #{cc.attrs.id} = jQuery('#{cc.attrs.targetElement}').aToolTip({
+                        clickIt: true,
+                        tipContent: '<span onmousedown="#{cc.attrs.id}remoteCommand();">View Histories</span>'
+                    });
+                </script>
+            </p:outputPanel>
+        </p:outputPanel>
+    </cc:implementation>
+</html>

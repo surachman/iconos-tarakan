@@ -1,0 +1,513 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.uncontainerized_planning']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(!(args.validationFailed || args.isValid == false)) {
+                            AddDialog.hide();
+                            AddDialogLoad.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.uncontainerized_planning']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <p:dialog header="Select Planning Vessel"  widgetVar="dlgvessel" modal="true" width="750">
+            <h:form id="newVessel">
+                <p:dataTable var="item" value="#{uncontainerizedPlanningBean.planningVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[3]}" sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{uncontainerizedPlanningBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="listPlanning:planningVesselDetail listPlanning:planningBayplanDischargesTable listPlanning:planningBayplanDischargesTableLoad" oncomplete="dlgvessel.hide();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+        <h:form id="listPlanning">
+            <h:panelGrid id="planningVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" value="#{uncontainerizedPlanningBean.planningVessel[0]}" disabled="true"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="dlgvessel.show();" style="font-size: x-small" actionListener="#{uncontainerizedPlanningBean.handleNewPpkb}" update="newVessel" />
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" value="#{uncontainerizedPlanningBean.planningVessel[1]}" disabled="true" />
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" value="#{uncontainerizedPlanningBean.planningVessel[2]}" disabled="true" />
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" value="#{uncontainerizedPlanningBean.planningVessel[3]}" disabled="true" />
+                <h:outputText />
+            </h:panelGrid>
+            <br />
+            <p:tabView>
+                <p:tab title="Discharge">
+                    <p:dataTable id="planningBayplanDischargesTable" var="item" value="#{uncontainerizedPlanningBean.uncontainerizedServices}"
+                                 paginator="true" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                        <f:facet name="header">
+                            <div class="header-panel-single-left">
+                                <p:commandButton onstart="freeze();" image="ui-icon-plusthick" onclick="genTitle('ucDialogDisch','#{msg['application.operation.add']} Uncontainerized Planning Discharge');" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{uncontainerizedPlanningBean.handleAdd}" oncomplete="AddDialog.show();" update="addEdit" disabled="#{empty uncontainerizedPlanningBean.planningVessel[0]}"/>
+                            </div>
+                        </f:facet>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{number+1}." />
+                        </p:column>
+                        <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}">
+                            <f:facet name="header">
+                                <h:outputText value="No BL" />
+                            </f:facet>
+                            <h:outputText value="#{item[0]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[1]}">
+                            <f:facet name="header">
+                                <h:outputText value="Commodity" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Unit" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Weight (kg)" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Cubication" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Truck Lossing"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" image="ui-icon ui-icon-pencil" actionListener="#{uncontainerizedPlanningBean.handleEditDelete}" title="Edit Planning Uncontainerized Discharge" update="addEdit:addUncont" oncomplete="AddDialog.show();" onclick="genTitle('ucDialogDisch','#{msg['application.operation.edit']} Uncontainerized Planning Discharge');">
+                                    <f:attribute name="idd" value="#{item[4]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" actionListener="#{uncontainerizedPlanningBean.handleEditDelete}" image="ui-icon ui-icon-trash" title="Delete Planning Uncontainerized Discharge" oncomplete="confirmation.show();">
+                                    <f:attribute name="idd" value="#{item[4]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Load">
+                    <p:dataTable id="planningBayplanDischargesTableLoad" var="item" value="#{uncontainerizedPlanningBean.uncontainerizedServicesLoad}"
+                                 paginator="true" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                        <f:facet name="header">
+                            <div class="header-panel-single-left">
+                                <p:commandButton onstart="freeze();" image="ui-icon-plusthick" onclick="genTitle('ucDialogLoad','#{msg['application.operation.add']} Uncontainerized Planning Load');" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{uncontainerizedPlanningBean.handleAddLoad}" oncomplete="AddDialogLoad.show();" update="addEditLoad" disabled="#{empty uncontainerizedPlanningBean.planningVessel[0]}"/>
+                            </div>
+                        </f:facet>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{number+1}." />
+                        </p:column>
+                        <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}">
+                            <f:facet name="header">
+                                <h:outputText value="No BL" />
+                            </f:facet>
+                            <h:outputText value="#{item[0]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[1]}">
+                            <f:facet name="header">
+                                <h:outputText value="Commodity" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Unit" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Weight (kg)" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Cubication" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Truck Lossing"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" image="ui-icon ui-icon-pencil" actionListener="#{uncontainerizedPlanningBean.handleEditDelete}" title="Edit Planning Uncontainerized Load" update="addEditLoad:addUncont" oncomplete="AddDialogLoad.show();" onclick="genTitle('ucDialogLoad','#{msg['application.operation.edit']} Uncontainerized Planning Load');">
+                                    <f:attribute name="idd" value="#{item[4]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" actionListener="#{uncontainerizedPlanningBean.handleEditDelete}" image="ui-icon ui-icon-trash" title="Delete Planning Uncontainerized Load" oncomplete="confirmation.show();">
+                                    <f:attribute name="idd" value="#{item[4]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{uncontainerizedPlanningBean.delete}"  update="listPlanning:planningBayplanDischargesTable listPlanning:planningBayplanDischargesTableLoad growl" onclick="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Uncontainerized Planning Discharge"  widgetVar="AddDialog" modal="true" width="500" resizable="false" id="ucDialogDisch">
+            <h:form id="addEdit">
+                <p:panel>
+                    <h:panelGrid columns="3" id="addUncont">
+                        <h:outputLabel value="No BL *"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="2">
+                            <h:inputText id="bd" maxlength="15" value="#{uncontainerizedPlanningBean.uncontainerizedService.blNo}" disabled="#{not empty uncontainerizedPlanningBean.uncontainerizedService.idUc}" title="No BL" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:message display="icon" for="bd"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3">
+                            <h:inputText id="com" required="true" requiredMessage="#{msg['application.validation.required']}" onkeypress="pilih.show()" onmousedown="pilih.show()" value="#{uncontainerizedPlanningBean.comodity}" title="Comodity"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" style="font-size: x-small" onclick="pilih.show()"/>
+                            <p:message display="icon" for="com"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Part *"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3">
+                            <h:inputText id="pd" maxlength="4" value="#{uncontainerizedPlanningBean.uncontainerizedService.unit}" title="Unit" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="pd"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Weight *" />
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="4">
+                            <h:inputText id="wd" maxlength="7" value="#{uncontainerizedPlanningBean.uncontainerizedService.weight}" title="Weight" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="kg"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="wd"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Volume *" />
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3">
+                            <h:inputText id="cubication" maxlength="7" value="#{uncontainerizedPlanningBean.uncontainerizedService.cubication}" title="Cubication" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="cubication"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Truck Lossing *" />
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu value="#{uncontainerizedPlanningBean.uncontainerizedService.truckLoosing}" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItem itemValue="TRUE" itemLabel="YES"/>
+                            <f:selectItem itemValue="FALSE" itemLabel="NO"/>
+                            <p:ajax process="@this" event="change" onstart="freeze();" update="blockAllocationSelection"/>
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Block Alocation *"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3" id="blockAllocationSelection">
+                            <h:inputText maxlength="7" value="Dermaga" disabled="true" rendered="#{uncontainerizedPlanningBean.uncontainerizedService.truckLoosing}"/>
+                            <h:selectOneMenu value="#{uncontainerizedPlanningBean.uncontainerizedService.block}" rendered="#{not uncontainerizedPlanningBean.uncontainerizedService.truckLoosing}">
+                                <f:selectItems value="#{uncontainerizedPlanningBean.masterYards}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} - #{blok[1]}"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Load Port *" />
+                        <h:outputLabel value=":"/>
+                                <h:panelGrid columns="2">
+                                    <p:autoComplete id="autoPort1" required="true" value="#{uncontainerizedPlanningBean.selectedPort1}"
+                                                    completeMethod="#{masterPortSelector.handleFilterByName}" size="20" />
+                                    <p:message display="icon" for="autoPort1"/>
+                                </h:panelGrid>
+
+                         <h:outputLabel value="Disch Port *" />
+                        <h:outputLabel value=":"/>
+                                <h:panelGrid columns="2">
+                                    <p:autoComplete id="autoPort2" required="true" value="#{uncontainerizedPlanningBean.selectedPort2}"
+                                                    completeMethod="#{masterPortSelector.handleFilterByName}" size="20" />
+                                    <p:message display="icon" for="autoPort2"/>
+                                </h:panelGrid>
+
+                        <h:outputLabel value="Is Import *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{uncontainerizedPlanningBean.uncontainerizedService.isExportImport}">
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" update="listPlanning:planningBayplanDischargesTable listPlanning:planningBayplanDischargesTableLoad addEdit:addUncont addEditLoad:addUncont growl" actionListener="#{uncontainerizedPlanningBean.handleSave}" oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" type="reset" onclick="AddDialog.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Add Uncontainerized Planning Load"  widgetVar="AddDialogLoad" modal="true" width="500" resizable="false" id="ucDialogLoad">
+            <h:form id="addEditLoad">
+                <p:panel>
+                    <h:panelGrid columns="3" id="addUncont">
+                        <h:outputLabel value="No BL *"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="2">
+                            <h:inputText id="b" maxlength="15" value="#{uncontainerizedPlanningBean.uncontainerizedService.blNo}" disabled="#{not empty uncontainerizedPlanningBean.uncontainerizedService.idUc}" title="No BL" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:message display="icon" for="b"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3">
+                            <h:inputText id="com" required="true" requiredMessage="#{msg['application.validation.required']}" onkeypress="pilih.show()" onmousedown="pilih.show()" value="#{uncontainerizedPlanningBean.comodity}" title="Comodity"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" style="font-size: x-small" onclick="pilih.show()"/>
+                            <p:message display="icon" for="com"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Part *"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3">
+                            <h:inputText id="p" maxlength="4" value="#{uncontainerizedPlanningBean.uncontainerizedService.unit}" title="Unit" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="p"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Weight *" />
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="4">
+                            <h:inputText id="w" maxlength="7" value="#{uncontainerizedPlanningBean.uncontainerizedService.weight}" title="Weight" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="kg"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="w"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Cubication *" />
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3">
+                            <h:inputText id="cubication" maxlength="7" value="#{uncontainerizedPlanningBean.uncontainerizedService.cubication}" title="Cubication" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="cubication"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Truck Lossing *" />
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu required="true" value="#{uncontainerizedPlanningBean.uncontainerizedService.truckLoosing}" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItem itemValue="TRUE" itemLabel="YES"/>
+                            <f:selectItem itemValue="FALSE" itemLabel="NO"/>
+                            <p:ajax process="@this" event="change" onstart="freeze();" update="blockAllocationSelection"/>
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Block Alocation *"/>
+                        <h:outputLabel value=":"/>
+                        <h:panelGrid columns="3" id="blockAllocationSelection">
+                            <h:inputText maxlength="7" value="Dermaga" disabled="true" rendered="#{uncontainerizedPlanningBean.uncontainerizedService.truckLoosing}"/>
+                            <h:selectOneMenu value="#{uncontainerizedPlanningBean.uncontainerizedService.block}" rendered="#{not uncontainerizedPlanningBean.uncontainerizedService.truckLoosing}">
+                                <f:selectItems value="#{uncontainerizedPlanningBean.masterYards}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} - #{blok[1]}"/>
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Disch.Port *"/>
+                        <h:outputLabel value=":"/>
+                        
+                                <h:panelGrid columns="2">
+                                    <p:autoComplete id="autoPort2" required="true" value="#{uncontainerizedPlanningBean.selectedPort2}"
+                                                    completeMethod="#{masterPortSelector.handleFilterByName}" size="20" />
+                                    <p:message display="icon" for="autoPort2"/>
+                                </h:panelGrid>
+
+                        <h:outputLabel value="Is Export *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:selectOneMenu value="#{uncontainerizedPlanningBean.uncontainerizedService.isExportImport}">
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" update="listPlanning:planningBayplanDischargesTable listPlanning:planningBayplanDischargesTableLoad addEdit:addUncont addEditLoad:addUncont growl" actionListener="#{uncontainerizedPlanningBean.handleSave}" oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="AddDialogLoad.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog modal="true" header="Select Commodity"  widgetVar="pilih" id="dialogAgent" width="750">
+            <h:form>
+                <p:dataTable value="#{uncontainerizedPlanningBean.masterCommoditys}" var="itemm"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{itemm[0]}" sortBy="#{itemm[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Code"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[0]}"/>
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{itemm[1]}" sortBy="#{itemm[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Name"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[1]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{uncontainerizedPlanningBean.handleSelectCommodity}" value="#{msg['application.operation.select']}" update="addEdit:com addEditLoad:com" oncomplete="pilih.hide();">
+                            <f:attribute name="cust_code" value="#{itemm[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

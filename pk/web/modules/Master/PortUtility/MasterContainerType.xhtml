@@ -1,0 +1,157 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_container_type']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_container_type']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">      
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+
+        <h:form id="containertypeform">
+            <p:dataTable id="tablecontainertype" var="item" value="#{masterContainerTypeBean.masterContainerTypes}"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{masterContainerTypeBean.handleAddButton}" update="addeditform" oncomplete="dialogAddEdit.show();" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Container Type');"/>
+                        <!--                        <p:commandButton image="ui-icon ui-icon-trash" value="{msg['application.operation.delete_all']}" actionListener="{masterContainerTypeBean.handleDeleteAll}" update="deleteconfim" oncomplete="confirmation.show();" />-->
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.contType}" filterMatchMode="contains" filterBy="#{item.contType}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Container Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item.contType}"/>
+                </p:column>
+                <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}" style="width: 100px;">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item.description}"/>
+                </p:column>
+                <p:column style="width: 120px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText rendered="#{not empty item.masterContainerTypeInGeneral}" value="#{item.masterContainerTypeInGeneral.name}"/>
+                    <h:outputText rendered="#{empty item.masterContainerTypeInGeneral}" value="-"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton disabled="#{empty item.masterContainerTypeInGeneral}" actionListener="#{masterContainerTypeBean.handleEditButton}" image="ui-icon ui-icon-pencil" title="Edit" update="addeditform" oncomplete="dialogAddEdit.show();" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Container Type');">
+                            <f:attribute name="idContainerType" value="#{item.contType}"/>
+                        </p:commandButton>
+                        <p:commandButton disabled="#{empty item.masterContainerTypeInGeneral}" actionListener="#{masterContainerTypeBean.handleDeleteButton}" image="ui-icon ui-icon-trash" title="Delete" update="deleteconfim:opsiHidden deleteconfim:idcontainertypeHidden" oncomplete="confirmation.show();">
+                            <f:attribute name="idContainerType" value="#{item.contType}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+
+        <p:dialog header="Master Container Type"  widgetVar="dialogAddEdit" modal="true" minWidth="450" >
+            <h:form id="addeditform">
+                <h:inputHidden id="tauah" value="#{masterContainerTypeBean.masterContainerType.contType}" />
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Container Type*"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="contType" required="true" requiredMessage="Container Type #{msg['application.validation.required']}" value="#{masterContainerTypeBean.masterContainerType.contType}" disabled="#{not empty masterContainerTypeBean.masterContainerType.contType}" size="30"/>
+                        <p:message for="contType" display="icon"/>
+
+                        <h:outputLabel value="Name*"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="typeName" required="true" requiredMessage="Name #{msg['application.validation.required']}" value="#{masterContainerTypeBean.masterContainerType.name}" size="30"/>
+                        <p:message for="typeName" display="icon"/>
+
+                        <h:outputLabel value="Description"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputTextarea value="#{masterContainerTypeBean.masterContainerType.description}" rows="3"/>
+                        <h:outputLabel value=""/>
+
+                        <h:outputLabel value="Classification"/>
+                        <h:outputLabel value=" : "/>
+                        <h:selectOneMenu value="#{masterContainerTypeBean.masterContainerType.masterContainerTypeInGeneral.id}">
+                            <f:selectItems value="#{masterContainerTypeBean.masterContainerTypeInGenerals}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}" />
+                        </h:selectOneMenu>
+                        <h:outputLabel value=""/>
+                        <h:outputLabel value="Type"/>
+                        <h:outputLabel value=" : "/>
+                        <h:selectOneRadio value="#{masterContainerTypeBean.masterContainerType.type}">
+                            <f:selectItem itemValue="STDR" itemLabel="Standar" />
+                            <f:selectItem itemValue="REEFER" itemLabel="Reefer" />
+                        </h:selectOneRadio>
+                        <h:outputLabel value=""/>
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}"  actionListener="#{masterContainerTypeBean.saveEdit}"  update="containertypeform growl addeditform" oncomplete="validateForm(xhr, status, args);" />
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide();"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form  id="deleteconfim">
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">                           
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{masterContainerTypeBean.delete}"  update="containertypeform growl" onsuccess="confirmation.hide()" />
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

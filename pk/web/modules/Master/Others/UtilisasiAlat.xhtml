@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="bundles">
+        bundles
+    </ui:define>
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.utilisasi_alat']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.others.utilisasi_alat']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="utilisasiAlat">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{masterUtilisasiAlatBean.utilisasiAlatList}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="tableList" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left ">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" oncomplete="AddEdit.show()"  actionListener="#{masterUtilisasiAlatBean.handleAdd}" update="addForm" />
+                    </div>
+                </f:facet>
+                <p:column style="text-align: center" >
+                    <f:facet name="header">
+                        <h:outputText value="No"/>
+                    </f:facet>
+                    <h:outputText value="#{number+1}."/>
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[8]}" sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Nama Alat" />
+                    </f:facet>
+                    <h:outputText value="#{item[8]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[9]}" filterMatchMode="contains" filterBy="#{item[9]}">
+                    <f:facet name="header">
+                        <h:outputText value="Owner" />
+                    </f:facet>
+                    <h:outputText value="#{item[9]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Tanggal" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Available Hour (AH)" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="M (Hour)" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="B (Hour)" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="R (Hour)"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5]}">
+
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="A (Hour)" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="W (Hour)" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" image="ui-icon-pencil" title="Edit Utilisasi Alat" oncomplete="AddEdit.show()" actionListener="#{masterUtilisasiAlatBean.handleEdit}" update="addForm">
+                            <f:attribute name="idAlat" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" image="ui-icon-trash" title="Delete Utilisasi Alat" oncomplete="confirmation.show()" actionListener="#{masterUtilisasiAlatBean.handleEdit}" update="confirmation">
+                            <f:attribute name="idAlat" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <!--dialog untuk konfirmasi menghapus-->
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form>
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{masterUtilisasiAlatBean.handleDelete}"  update="utilisasiAlat growl" onclick="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true"  widgetVar="AddEdit" width="450" header="Utilisasi Alat" resizable="false" id="dialog">
+            <h:form id="addForm">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="Equipment"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.equipCode}">
+                            <f:selectItems value="#{masterUtilisasiAlatBean.equipmentList}" var="it" itemLabel="#{it[1]}" itemValue="#{it[0]}"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Tanggal *"/>
+                        <h:outputLabel value=":"/>
+                        <p:calendar id="tanggal" value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.tanggl}" required="true" requiredMessage="Tanggal #{msg['application.validation.required']}"/>
+                        <p:message for="tanggal" display="icon"/>
+
+                        <h:outputLabel value="Available (Hour)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText id="available" value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.availableHour}" required="true" requiredMessage="Available Hour #{msg['application.validation.required']}"/>
+                        <p:message for="available" display="icon"/>
+
+                        <h:outputLabel value="Maintenance (Hour)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.maintenance}"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Break Down (Hour)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.breakDown}"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Repair (Hour)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.repair}"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Accident (Hour)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.accident}"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Waiting (Hour)"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{masterUtilisasiAlatBean.masterUtilisasiAlat.waiting}"/>
+                        <h:outputLabel/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.confirm']}" actionListener="#{masterUtilisasiAlatBean.handleSubmitEdit}" update="addForm utilisasiAlat growl" oncomplete="handleLoginRequest(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="AddEdit.hide()" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+        function handleLoginRequest(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog').show();
+                } else {
+                        AddEdit.hide();
+                }
+        }
+        </script>
+
+    </ui:define>
+
+</ui:composition>

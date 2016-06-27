@@ -1,0 +1,91 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                >
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.yard_monitoring.bird_view']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.yard_monitoring.bird_view']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+        <h:form id="birdViewForm">
+            <p:panel header="Yard Monitoring (#{msg['menu.monitoring.yard_monitoring.bird_view']})">
+                <div class="ui-panel ui-widget ui-widget-content ui-corner-all" style="width:600px;">
+                    <p:remoteCommand name="updateAfterBlockChanged" update="birdViewForm:tierSubForm birdViewForm:buttonSubForm birdViewForm:imageSubForm"/>
+                    <p:remoteCommand name="updateAfterTierChanged" update="birdViewForm:buttonSubForm birdViewForm:imageSubForm"/>
+                    <p:remoteCommand name="updateAfterExistOnlyChanged" update="birdViewForm:imageSubForm"/>
+                    <h:panelGrid columns="3" style="padding:15px;">
+                        <h:outputText value="Container Status"/>
+                        <h:outputText value=":"/>
+                        <p:outputPanel id="ExistOnlySubForm">
+                            <h:selectOneMenu value="#{containerBirdView.existOnly}" onchange="updateAfterExistOnlyChanged();" label="">
+                                <f:selectItem itemLabel="All" itemValue="f"/>
+                                <f:selectItem itemLabel="Exist Only" itemValue="t"/>
+                            </h:selectOneMenu>
+                        </p:outputPanel>
+                        <h:outputText value="Blok"/>
+                        <h:outputText value=":"/>
+                        <p:outputPanel id="blockSubForm">
+                            <h:selectOneMenu value="#{containerBirdView.selectedBlock}" valueChangeListener="#{containerBirdView.handleChangeBlock}" onchange="updateAfterBlockChanged();" label="Pilih Block">
+                                <f:selectItems value="#{containerBirdView.blocks}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} - #{i[1]}"/>
+                            </h:selectOneMenu>
+                        </p:outputPanel>
+                        <h:outputText value="Tier"/>
+                        <h:outputText value=":"/>
+                        <p:outputPanel id="tierSubForm">
+                            <h:selectOneMenu value="#{containerBirdView.selectedTier}" onchange="updateAfterTierChanged();" label="Pilih Tier">
+                                <f:selectItems value="#{containerBirdView.tiers}"/>
+                            </h:selectOneMenu>
+                        </p:outputPanel>
+                        <h:outputText value="Filter By PPKB"/>
+                        <h:outputText value=":"/>
+                        <p:outputPanel id="ppkbSubForm">
+                            <h:inputText value="#{containerBirdView.ppkb}"/>
+                            <p:commandButton value="Go" update="birdViewForm:imageSubForm"/>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                    <h:panelGrid rendered="false" columns="3" style="padding:0 0 15px 15px;">
+                        <h:outputText style="margin-top:10px;" value="Filter by PPKB"/>
+                        <h:outputText value=":"/>
+                        <p:inputText  />
+                    </h:panelGrid>
+                    <div class="ui-panel-footer ui-widget-content" style="overflow: visible;">
+                        <div class="header-panel-left">
+                            <p:commandButton image="ui-icon-arrowreturnthick-1-w" actionListener="#{containerBirdView.handleReset}" update="birdViewForm" value="Reset"/>
+                            <p:commandButton image="ui-icon-refresh" update="birdViewForm:imageSubForm" value="Refresh"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:outputPanel id="buttonSubForm">
+                                <p:commandButton image="ui-icon-arrowthick-1-n" actionListener="#{containerBirdView.handleClickNextButton}" update="birdViewForm:tierSubForm birdViewForm:buttonSubForm birdViewForm:imageSubForm" value="up"/>
+                                <p:commandButton image="ui-icon-arrowthick-1-s" actionListener="#{containerBirdView.handleClickPrevButton}" update="birdViewForm:tierSubForm birdViewForm:buttonSubForm birdViewForm:imageSubForm" value="down"/>
+                            </p:outputPanel>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <p:outputPanel id="imageSubForm">
+                    <p:graphicImage value="#{containerBirdView.birdViewUrl}" cache="false"/>
+                </p:outputPanel>
+                <h:panelGrid columns="3">
+<!--                    <p:commandButton  value="#{msg['application.operation.download_as_pdf']}"/>-->
+<!--                    <p:commandButton value="#{msg['application.operation.printpervessel']}"/>
+                    <p:commandButton value="#{msg['application.operation.listcontainer']}"/>-->
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+    </ui:define>
+</ui:composition>

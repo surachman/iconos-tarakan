@@ -1,0 +1,185 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.booking_form']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.booking_form']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+         <p:growl id="growl" showDetail="true"/>
+        <h:form id="formAddEdit">
+            <p:panel id="dialog">
+                <h:panelGrid>
+                    <h1>Vessel Detail</h1>
+                    <h:panelGrid columns="4">
+                        <h:outputText value="Vessel Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <h:inputText required="true" id="vesselname" value="#{bookingOnlineFrontBean.bookingOnline.vesselName}" requiredMessage="Vessel Name Cannot Not null"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="GRT"/>                        
+                        <h:outputText value=":"/>
+                        <h:inputText value="#{bookingOnlineFrontBean.bookingOnline.grt}" requiredMessage="Vessel Name Cannot Not null"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="DWT"/>                        
+                        <h:outputText value=":"/>
+                        <h:inputText value="#{bookingOnlineFrontBean.bookingOnline.dwt}" requiredMessage="Vessel Name Cannot Not null"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="BRT"/>                       
+                        <h:outputText value=":"/>
+                        <h:inputText value="#{bookingOnlineFrontBean.bookingOnline.brt}" requiredMessage="Vessel Name Cannot Not null"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="NRT"/>                        
+                        <h:outputText value=":"/>
+                        <h:inputText value="#{bookingOnlineFrontBean.bookingOnline.nrt}" requiredMessage="Vessel Name Cannot Not null"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="LOA"/>                       
+                        <h:outputText value=":"/>
+                        <h:inputText value="#{bookingOnlineFrontBean.bookingOnline.loa}" requiredMessage="Vessel Name Cannot Not null"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="Voy In *"/>                        
+                        <h:outputText value=":"/>
+                        <h:inputText id="voyin" required="true" value="#{bookingOnlineFrontBean.bookingOnline.voyIn}" requiredMessage="The Voy In field is required.">
+                            <f:validateLength maximum="10" />
+                        </h:inputText>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="Voy Out *"/>                        
+                        <h:outputText value=":"/>
+                        <h:inputText id="voyout" required="true" value="#{bookingOnlineFrontBean.bookingOnline.voyOut}" requiredMessage="The Voy Out field is required.">
+                            <f:validateLength maximum="10" />
+                        </h:inputText>
+                        <h:outputText value=""/>
+                    </h:panelGrid>
+                    <br/>
+                    <h1>Agent Detail</h1>
+
+                    <h:panelGrid columns="4">
+                        <h:outputText value="Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <h:inputText disabled="true" value="#{bookingOnlineFrontBean.bookingOnline.custCode}"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="Phone"/>                       
+                        <h:outputText value=":"/>
+                        <h:inputText  disabled="true" value="#{bookingOnlineFrontBean.bookingOnline.custCode}"/>
+                        <h:outputText value=""/>
+
+                        <h:outputText value="Address"/>                        
+                        <h:outputText value=":"/>
+                        <h:inputText  disabled="true" value="#{bookingOnlineFrontBean.bookingOnline.custCode}"/>
+                        <h:outputText value=""/>
+                    </h:panelGrid>
+                    <br/>
+                    <h1>Schedule Detail</h1>
+                    <h:panelGrid columns="4">
+                        <h:outputText value="Activity &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <h:selectOneRadio value="#{bookingOnlineFrontBean.bookingOnline.activity}" id="activity" valueChangeListener="#{bookingOnlineFrontBean.onChangeEvent}">
+                            <f:selectItem itemValue="1" itemLabel="Discharge"/>
+                            <f:selectItem itemValue="2" itemLabel="Load"/>
+                            <f:selectItem itemValue="3" itemLabel="Discharge/Load"/>
+                            <f:ajax execute="@this" event="change" render="bookingVessel2"/>
+                        </h:selectOneRadio>
+                        <h:outputText value=""/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="4" id="bookingVessel2">
+                        <h:outputText value="Est. Discharge &nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <h:inputText maxlength="4" required="true" value="#{bookingOnlineFrontBean.bookingOnline.estDischarge}" disabled="#{bookingOnlineFrontBean.visibleHiji}" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+
+                        <h:outputText value="Est. Load &nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <h:inputText maxlength="4" required="true" value="#{bookingOnlineFrontBean.bookingOnline.estLoad}" disabled="#{bookingOnlineFrontBean.visibleDua}" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="4">
+                        <h:outputText style="padding-right: 40px;" value="ETA * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <p:inputMask required="true" mask="99/99/9999 99:99" value="#{bookingOnlineFrontBean.bookingOnline.eta}" requiredMessage="The ETA field is required.">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </p:inputMask>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="4">
+                        <h:outputText value="ETD * &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <p:inputMask required="true" mask="99/99/9999 99:99" value="#{bookingOnlineFrontBean.bookingOnline.etd}" requiredMessage="The ETD field is required.">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </p:inputMask>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="4">
+                        <h:outputText value="Last Port &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <h:selectOneMenu value="#{bookingOnlineFrontBean.bookingOnline.nextPortCode}">
+                            <f:selectItems value="#{bookingOnlineFrontBean.masterPorts}" var="i" itemValue="#{i.portCode}" itemLabel="#{i.name}"/>
+                        </h:selectOneMenu>
+                        <h:outputText value=""/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="4">
+                        <h:outputText value="Next Port &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"/>
+                        <h:outputText value=":&nbsp;&nbsp;&nbsp;"/>
+                        <h:selectOneMenu value="#{bookingOnlineFrontBean.bookingOnline.lastPortCode}">
+                            <f:selectItems value="#{bookingOnlineFrontBean.masterPorts}" var="i" itemValue="#{i.portCode}" itemLabel="#{i.name}"/>
+                        </h:selectOneMenu>
+                        <h:outputText value=""/>
+                    </h:panelGrid>
+
+                </h:panelGrid>
+                <br/>
+                <f:facet name="footer">
+                    <div class="header-panel-right">
+                        <p:commandButton image="ui-icon-check" value="#{msg['application.operation.save']}" update="growl formAddEdit" actionListener="#{bookingOnlineFrontBean.handleSaveEdit}" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                        <p:commandButton value="#{msg['application.operation.cancel']}" actionListener="#{bookingOnlineFrontBean.handleClear}" update="formAddEdit"/>
+                    </div>
+                </f:facet>
+            </p:panel>
+        </h:form>
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            addEditDialog.hide();confirm.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^-?[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+</ui:composition>

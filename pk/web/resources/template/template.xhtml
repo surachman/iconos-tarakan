@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="#{localeBean.language}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.prime.com.tr/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ebtos="http://www.dycode.com/jsf">
+    <f:view locale="#{localeBean.locale}" contentType="text/html">
+        <h:head>
+            <meta http-equiv="Cache-Control" content="max-age=0"/>
+            <meta http-equiv="Cache-Control" content="no-cache"/>
+            <meta http-equiv="expires" content="0"/>
+            <meta http-equiv="Expires" content="Tue, 01 Jan 1980 1:00:00 GMT"/>
+            <meta http-equiv="Pragma" content="no-cache"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /> 
+            <link href="#{facesContext.externalContext.requestContextPath}/resources/template/css/themes/primefaces-start/theme.css" rel="stylesheet" type="text/css" />
+            <link href="#{facesContext.externalContext.requestContextPath}/resources/template/css/default.css" rel="stylesheet" type="text/css" />
+            <link href="#{facesContext.externalContext.requestContextPath}/resources/template/css/cssLayout.css" rel="stylesheet" type="text/css" />
+            <ui:insert name="bundles"></ui:insert>
+            <title>.:: #{msg['application.title']} - <ui:insert name="title">title</ui:insert> ::.</title>
+            <ui:insert name="script"></ui:insert>
+            <script type="text/javascript">
+                var isFreeze = false;
+                function showLoader(){
+                    if (isFreeze){
+                        statusDialog.show();
+                    } else {
+                        jQuery('[id=loader-message]').html('#{msg['application.loading.please_wait']}');
+                        jQuery('[id=loader-panel]').show();
+                    }
+                }
+
+                function showError(){
+                    jQuery('[id=loader-message]').html('#{msg['application.loading.error']}');
+                    jQuery('[id=loader-panel]').show();
+                }
+
+                function hideLoader(){
+                    if (isFreeze){
+                        statusDialog.hide();
+                    } else {
+                        jQuery('[id=loader-panel]').hide();
+                    }
+                    isFreeze = false;
+                }
+
+                function freeze(){
+                    isFreeze = true;
+                }
+
+                jQuery(function($) {
+                  var options = {
+                    format: '%A %d %B %Y, %H:%M:%S',
+                    utc: true,
+                    utcOffset: +8,
+                    foreground: 'black',
+                    seedTime: #{loginSessionBean.serverTime}
+                  }
+                  jQuery('.clock').jclock(options);
+                });
+            </script>
+            <ui:fragment rendered="#{loginSessionBean.active}">
+                <script type="text/javascript">
+                    function changePasswordValidation(xhr, status, args) {
+                        if(!(args.validationFailed || !args.isPasswordChanged)) {
+                            changePasswordDialog.hide();
+                        }
+                    }
+                </script>
+            </ui:fragment>
+            <script type="text/javascript" src="#{facesContext.externalContext.requestContextPath}/resources/scripts/util.js"/>
+            <script type="text/javascript" src="#{facesContext.externalContext.requestContextPath}/resources/scripts/jquery.jclock.js"/>
+        </h:head>
+
+        <h:body>
+            <div id="wrapper">
+                <div id="header">
+                    <div id="login">
+                        <h:form>
+                           
+                            
+  <TABLE border="0" width="100%"
+			    background="#{facesContext.externalContext.requestContextPath}/resources/images/banner-ebtos-slim2.png">
+  <TR>
+      <TD align="left" width="30%" style="text-shadow:1px 1px 1px #000;"> <h:outputLabel value="Welcome, "  style="font-size: 12px;color:#ffffff;font-weight:bold"/><b><h:outputText rendered="#{loginSessionBean.active}" value="#{loginSessionBean.name}"  style="font-size: 12px;color:#ffffff;font-weight:bold"/><h:outputText rendered="#{not loginSessionBean.active}" value="guest"  style="font-size: 12px;color:#ffffff;font-weight:bold"/></b>&nbsp;<h:outputText rendered="#{loginSessionBean.supervisor}" value="[SUPERVISOR]"  style="font-size: 12px;color:#ffffff;font-weight:bold"/>&nbsp;<h:outputText rendered="#{loginSessionBean.supervisorKeuangan}" value="[SUPERVISOR KEUANGAN]"  style="font-size: 12px;color:#ffffff;font-weight:bold"/>
+          <h:outputText value="[#{loginSessionBean.cabang}]" style="font-size: 12px;color:#ffffff;font-weight:bold"/>
+      
+      </TD>
+	<TD align="center"  rowspan="2">
+		<div style="display:inline-block;">
+			<img src="#{facesContext.externalContext.requestContextPath}/resources/images/logos.png"/>
+		</div>
+		<div style="font-size: 12px;color:#ffffff;font-weight:bold; text-shadow:1px 1px 1px #000;display:inline-block;bottom:7px;" class="letter">
+			<B><font size="5"> 
+				<h:outputText value="#{loginSessionBean.judul}"/>
+			</font>
+			</B>
+		</div>
+	</TD>
+	<TD align="right" width="30%"> 
+            <span class="clock" title="Server Time" style="font-size: 12px;color:#ffffff;font-weight:bold">aaaa </span>
+	
+	</TD>
+  </TR>
+   <p:remoteCommand actionListener="#{loginController.invalidate}" name="invalidate"/>
+			
+                        
+
+ 
+ <TR>
+            <td>
+                <p:outputPanel id="loginPanel">
+                                        <p:commandLink rendered="#{not loginSessionBean.active}"  style="font-size: 10px;color:#ffffff;font-weight:bold" onclick="loginDialog.show();" value="[ login ]" onstart="freeze();"/>
+                                        <p:commandLink rendered="#{loginSessionBean.active}"  style="font-size: 10px;color:#ffffff;font-weight:bold" onclick="changePasswordDialog.show();" value="[ change password ]" onstart="freeze();"/>
+                                        <p:commandLink rendered="#{loginSessionBean.active}"  style="font-size: 10px;color:#ffffff;font-weight:bold;margin-left:10px;" actionListener="#{loginController.doLogout}" value="[ logout ]" onstart="freeze();">
+                                            <f:ajax execute="@this" render="@none"/>
+                                        </p:commandLink>
+                </p:outputPanel> 
+            </td>
+	<TD align="right">
+                <div>
+                    <h:form>
+                        <h:panelGrid columns="2">
+                            <h:selectOneMenu value="#{localeBean.language}" onchange="submit();">
+                                <f:selectItem itemValue="en" itemLabel="English" />
+                                <f:selectItem itemValue="in" itemLabel="Indonesia" />
+                            </h:selectOneMenu>
+                        </h:panelGrid>
+                    </h:form>
+                </div>
+        </TD>
+ </TR>
+  </TABLE>
+                            
+                            
+                            
+                            
+                            
+                        </h:form>
+                    </div>
+<br/><br/>
+                    
+                </div>
+                <div id="menubar">
+                    <h:form id="menuBar">
+                        <ebtos:menubar menuRoot="#{navigation.menuRoot}" roleValidator="#{navigation.roleValidator}" userGroup="#{loginSessionBean.groups}" contextName="#{navigation.contextName}"/>
+                        <p:menubar rendered="false"/>
+                    </h:form>
+                    
+                    <p:dialog rendered="#{loginSessionBean.active}" resizable="false" header="Change Password" modal="true" width="350" widgetVar="changePasswordDialog" visible="false" closable="false">
+                        <h:form id="changePasswordForm" style="background-color: #eff5fa;">
+                            <p:panel>
+                                <p:outputPanel id="changePasswordPanel">
+                                    <table cellspacing="5" style="width:100%;margin-top:5px;">
+                                        <tbody>
+                                            <tr>
+                                                <td><h:outputLabel value="Current Password:"/></td>
+                                                <td><h:inputSecret id="currentPassword" autocomplete="off" value="#{loginController.changePassword.currentPassword}" required="true" requiredMessage="Current Password field cant empty" tabindex="1" /></td>
+                                                <td><p:message for="currentPassword" display="icon"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">
+                                                    &nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><h:outputLabel value="New Password:"/></td>
+                                                <td><h:inputSecret id="newPassword" autocomplete="off" value="#{loginController.changePassword.newPassword}" required="true" requiredMessage="New Password field cant empty" tabindex="2"/></td>
+                                                <td><p:message for="newPassword" display="icon"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td><h:outputLabel value="Repeat New Password:"/></td>
+                                                <td><h:inputSecret id="repeatNewPassword" autocomplete="off" value="#{loginController.changePassword.repeatNewPassword}" required="true" requiredMessage="Repeat New Password field cant empty" tabindex="2"/></td>
+                                                <td><p:message for="repeatNewPassword" display="icon"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </p:outputPanel>
+                                <f:facet name="footer">
+                                    <div class="header-panel-single-right">
+                                        <p:commandButton value="submit" update="changePasswordForm:changePasswordPanel growlPublic" actionListener="#{loginController.changePassword}" onstart="freeze();" oncomplete="changePasswordValidation(xhr, status, args);">
+                                            <f:ajax execute="@this" render="@none"/>
+                                        </p:commandButton>
+                                        <p:commandButton value="cancel" onclick="changePasswordDialog.hide();"/>
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                        </h:form>
+                    </p:dialog>
+                </div>
+               
+                <div id="content" style="overflow: auto;">
+                    <p:ajaxStatus onstart="showLoader();" onerror="showError();" oncomplete="hideLoader();"/>
+                    <div id="loader-panel" style="display: none;" class="loader-type-1">
+                        <center><span id="loader-message">Mohon tunggu...</span><p:graphicImage value="/resources/images/ajax-loader.gif" alt="img loader" styleClass="img-loader"/></center>
+                    </div>
+                    <p:dialog modal="true" widgetVar="statusDialog" header="Loading..."
+                              draggable="false" closable="false">
+                        <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+                    </p:dialog>
+                    <p:growl id="growlPublic" showDetail="true"/>
+                    <p:outputPanel rendered="#{not facesContext.externalContext.requestServerName.equals('www.ebtos.pelabuhan4.co.id') and false}">
+                        <div class="ui-messages ui-widget">
+                            <div class="ui-messages-warn ui-corner-all">
+                                <span class="ui-messages-warn-icon"></span>
+                                <ul>
+                                    <li style="text-align: center;">
+                                        <span class="ui-messages-warn-summary" style="font-size: 17px;">Pengumuman</span>
+                                        <p class="ui-messages-warn-detail" style="text-align: center;line-height: 16px;">Aplikasi <a href="http://www.ebtos.pelabuhan4.co.id"><b>e-BTOS</b></a> saat ini dapat di akses melalui <a href="http://www.ebtos.pelabuhan4.co.id"><b>www.ebtos.pelabuhan4.co.id</b></a>
+                                        <br/>Mohon segera mengganti url/alamat/homepage Browser anda menjadi <a href="http://www.ebtos.pelabuhan4.co.id"><b>www.ebtos.pelabuhan4.co.id</b></a>
+                                        <br/>karena alamat <a href="http://www.ebtos.pelabuhan4.co.id"><b>e-BTOS</b></a> yang lama akan segera di non aktifkan.</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </p:outputPanel>
+                    <p:fieldset id="content-fieldset">
+                        <f:facet name="legend">
+                            <ebtos:breadcrumb/>
+                        </f:facet>
+                        <ui:insert name="content">Content</ui:insert>
+                    </p:fieldset>
+                </div>
+            </div>
+            
+            <p:dialog rendered="#{not loginSessionBean.active}" resizable="false" header="Login" modal="true" styleClass="login_top" width="350" widgetVar="loginDialog" visible="false" closable="false">
+                        <h:form id="loginForm" style="background-color: #eff5fa;">
+                            <p:panel>
+                                <p:outputPanel id="login">
+                                    <p:messages showDetail="true"/>
+                                    <h:panelGrid columns="2">
+                                        <h:panelGrid style="width:100%;" columns="2" cellspacing="5">
+                                            <h:outputLabel value="Username:"/>
+                                            <h:inputText id="username" autocomplete="on" value="#{loginController.username}" required="true" requiredMessage="Username cant empty" tabindex="1" />
+                                            <h:outputLabel value="Password:"/>
+                                            <h:inputSecret id="password" autocomplete="on" value="#{loginController.password}" required="true" requiredMessage="Password cant empty" tabindex="2"/>
+                                        </h:panelGrid>
+                                        <p:graphicImage value="/resources/images/P4Logo.png" style="width:100%" />
+                                    </h:panelGrid> 
+                                </p:outputPanel> 
+                                <f:facet name="footer">
+                                    <div class="header-panel-single-right">
+                                        <p:commandButton id="subminLogin" value="submit" update="loginForm:login" actionListener="#{loginController.doLogin}" onstart="freeze();">
+                                            <f:ajax execute="@this" render="@none"/>
+                                        </p:commandButton>
+                                        <p:commandButton value="cancel" onclick="loginDialog.hide();"/>
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                        </h:form>
+                    </p:dialog>
+        </h:body>
+    </f:view>
+</html>

@@ -1,0 +1,496 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.vessel_operation.vessel_service.vessel_service_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../../resources/scripts/util.js"></script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.vessel_operation.vessel_service.vessel_service_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            updateDialog.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="serviceVesselForm">
+            <h:outputText value="#{param['id']}"/>
+            <p:panel rendered="#{vesselServiceBean.listState}">
+                <p:dataTable paginatorPosition="bottom" var="item" value="#{vesselServiceBean.serviceVessels}" 
+                             paginator="true" rows="10" id="serviceVesselTable" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        &nbsp;
+                    </f:facet>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column sortBy="#{no+1}." rowspan="2" headerText="No"/>
+                            <p:column sortBy="#{item[0]}" rowspan="2" headerText="No PPKB"  filterMatchMode="contains" filterBy="#{item[0]}"/>
+                            <p:column sortBy="#{item[1]}" rowspan="2" headerText="Vessel Name"  filterMatchMode="contains" filterBy="#{item[1]}"/>
+                            <p:column sortBy="#{item[2]}" rowspan="2" headerText="Last Port" />
+                            <p:column sortBy="#{item[3]}" rowspan="2" headerText="Next Port" />
+                            <p:column sortBy="#{item[4]}" rowspan="2" headerText="Voy In" />
+                            <p:column sortBy="#{item[5]}" rowspan="2" headerText="Voy Out"/>
+                            <p:column colspan="2" headerText="Discharge" />
+                            <p:column colspan="2" headerText="Load" />
+                            <p:column colspan="2" headerText="Arrival Time" />
+                            <p:column colspan="2" headerText="Departure Time" />
+                            <p:column rowspan="2" headerText="Status"/>
+                            <p:column rowspan="2" headerText="Action"/>
+                        </p:row>
+                        <p:row>
+                            <p:column sortBy="#{item[6]}" headerText="Est" />
+                            <p:column sortBy="#{item[7]}" headerText="Real" />
+                            <p:column sortBy="#{item[8]}" headerText="Est" />
+                            <p:column sortBy="#{item[9]}" headerText="Real" />
+                            <p:column sortBy="#{item[10]}" headerText="ETA" />
+                            <p:column sortBy="#{item[11]}" headerText="TA" />
+                            <p:column sortBy="#{item[12]}" headerText="ETD" />
+                            <p:column sortBy="#{item[13]}" headerText="TD" />
+                        </p:row>
+                    </p:columnGroup>
+                    <p:column>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[8]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[9]}"/>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[10]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[11]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[12]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[13]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <h:outputText value="#{item[14]}"/>
+                    </p:column>
+                    <p:column>
+                        <center>
+                            <p:commandButton onstart="freeze();" image="ui-icon ui-icon-pencil" actionListener="#{vesselServiceBean.handleSelectTable}" title="Update Vessel Schedule" update="serviceVesselDialog:planningV" oncomplete="updateDialog.show();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" actionListener="#{vesselServiceBean.handlePreview}" image="ui-icon ui-icon-search" title="Preview Planning Vessel" update="serviceVesselForm detailPanel" >
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>               
+            </p:panel>
+
+            <p:panel header="Detail Data" id="detailPanel" rendered="#{vesselServiceBean.detailState}">
+                <p:tabView>
+                    <p:tab title="General Info">
+                        <h:panelGrid columns="5" width="100%">
+                            <p:fieldset legend="Vessel" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="No PPKB"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[0]}"/>
+                                    <h:outputText value="Booking Code"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[1]}"/>
+                                    <h:outputText value="Vessel Name"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[2]}"/>
+                                    <h:outputText value="GRT"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[3]}"/>
+                                    <h:outputText value="DWT"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[4]}"/>
+                                    <h:outputText value="BRT"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[5]}"/>
+                                    <h:outputText value="NRT"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[6]}"/>
+                                    <h:outputText value="LOA"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[7]}"/>
+                                    <h:outputText value="Agent"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[8]}"/>
+                                    <h:outputText value="Voy In"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[9]}"/>
+                                    <h:outputText value="Voy Out"/>:
+                                    <h:outputLabel value="#{vesselServiceBean.sv[10]}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="Detail Booking" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:panelGrid columns="3">
+                                        <h:outputLabel/><h:outputLabel/>
+                                        <h:outputText value="Planning" style="font-weight: bold"/>
+                                        <h:outputText value="Disharge"/>:
+                                        <h:outputLabel value="#{vesselServiceBean.sv[11]} box"/>
+                                        <h:outputText value="Load"/>:
+                                        <h:outputLabel value="#{vesselServiceBean.sv[12]} box"/>
+                                    </h:panelGrid>
+                                    <p:spacer width="20"/>
+                                    <h:panelGrid>
+                                        <h:outputText value="Realisasi" style="font-weight: bold"/>
+                                        <h:outputLabel value="#{vesselServiceBean.sv[13]} box"/>
+                                        <h:outputLabel value="#{vesselServiceBean.sv[14]} box"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="Berth Info" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:panelGrid columns="3">
+                                        <h:outputLabel/><h:outputLabel/>
+                                        <h:outputText value="Planning" style="font-weight: bold"/>
+                                        <h:outputText value="Berth Name"/>:
+                                        <h:outputLabel value="#{vesselServiceBean.sv[15]}"/>
+                                        <h:outputText value="Fr Meter"/>:
+                                        <h:outputLabel value="#{vesselServiceBean.sv[16]}"/>
+                                        <h:outputText value="To Meter"/>:
+                                        <h:outputLabel value="#{vesselServiceBean.sv[17]}"/>
+                                    </h:panelGrid>
+                                    <p:spacer width="20"/>
+                                    <h:panelGrid>
+                                        <h:outputText value="Realisasi" style="font-weight: bold"/>
+                                        <h:outputLabel value="#{vesselServiceBean.sv[15]}"/>
+                                        <h:outputLabel value="#{vesselServiceBean.sv[33]}"/>
+                                        <h:outputLabel value="#{vesselServiceBean.sv[34]}"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                    </p:tab>
+
+                    <p:tab title="Time Schedule">
+                        <h:panelGrid columns="3">
+                            <h:panelGrid columns="3">
+                                <h:outputLabel/><h:outputLabel/>
+                                <h:outputText value="Planning" style="font-weight: bold"/>
+                                <h:outputText value="Arrival Time"/>:
+                                <h:outputLabel value="#{vesselServiceBean.sv[18]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="Berthing Time"/>:
+                                <h:outputLabel value="#{vesselServiceBean.sv[19]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="Start Work Time"/>:
+                                <h:outputLabel value="#{vesselServiceBean.sv[20]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="End Work Time"/>:
+                                <h:outputLabel value="#{vesselServiceBean.sv[21]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="Departure Time"/>:
+                                <h:outputLabel value="#{vesselServiceBean.sv[22]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                            </h:panelGrid>
+                            <p:spacer width="20"/>
+                            <h:panelGrid>
+                                <h:outputText value="Realisasi" style="font-weight: bold"/>
+                                <h:outputLabel value="#{vesselServiceBean.sv[23]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{vesselServiceBean.sv[24]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{vesselServiceBean.sv[25]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{vesselServiceBean.sv[26]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{vesselServiceBean.sv[27]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </p:tab>
+
+                    <p:tab title="Closing Time">
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Closing Time Receiving"/>:
+                            <h:outputLabel value="#{vesselServiceBean.sv[28]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Doc. Receiving"/>:
+                            <h:outputLabel value="#{vesselServiceBean.sv[29]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Empty"/>:
+                            <h:outputLabel value="#{vesselServiceBean.sv[30]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Reefer"/>:
+                            <h:outputLabel value="#{vesselServiceBean.sv[31]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Doc. Emp/Reef"/>:
+                            <h:outputLabel value="#{vesselServiceBean.sv[32]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </p:tab>
+                </p:tabView>
+                <f:facet name="footer">
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.close']}" image="ui-icon-circlesmall-close" update="serviceVesselForm" actionListener="#{vesselServiceBean.setToListState}"/>
+                    </div>
+                </f:facet>
+            </p:panel>
+        </h:form>
+
+        <h:form id="serviceVesselDialog">
+            <p:growl id="growl" showDetail="true" globalOnly="true"/>
+            <p:dialog header="Update Vessel Service"  widgetVar="updateDialog" resizable="false" width="580" modal="true">
+                <p:panel id="planningV">
+                    <h:panelGrid columns="4" >
+                        <h:outputText value="No PPKB"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value=":"/>
+                        <h:inputText size="30" disabled="true" value="#{vesselServiceBean.serviceVessel.noPpkb}"/>
+
+                        <h:outputText value="Vessel Name"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value=":"/>
+                        <h:inputText size="30" disabled="true" value="#{vesselServiceBean.planningVessel.preserviceVessel.masterVessel.name}"/>
+
+                        <h:outputText value="Last Port"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value=":"/>
+                        <h:inputText size="30" disabled="true" value="#{vesselServiceBean.planningVessel.preserviceVessel.masterPort1.name}"/>
+
+                        <h:outputText value="Next Port"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value=":"/>
+                        <h:inputText size="30" disabled="true" value="#{vesselServiceBean.planningVessel.preserviceVessel.masterPort.name}"/>
+
+                        <h:outputText value="Voy In"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value=":"/>
+                        <h:inputText size="30" disabled="true" value="#{vesselServiceBean.planningVessel.preserviceVessel.voyIn}"/>
+
+                        <h:outputText value="Voy Out"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value=":"/>
+                        <h:inputText size="30" disabled="true" value="#{vesselServiceBean.planningVessel.preserviceVessel.voyOut}"/>
+
+                        <h:outputText value="Air Kapal (ton) *"/>
+                        <p:spacer width="20"/>
+                        <h:outputText value=":"/>
+                        <h:panelGrid columns="3">
+                            <h:inputText id="airKapalField" value="#{vesselServiceBean.serviceVessel.airKapal}" required="true" requiredMessage="#{msg['application.validation.required']}" size="10"/>
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="airKapalField"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <h:panelGrid columns="6">
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputText value="Planning"/>
+                        <h:outputText value="Realisasi" />
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputText value="Berth Name *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.planningVessel.masterDock.name}"/>
+                        <h:selectOneMenu id="selectedDock" value="#{vesselServiceBean.dock.dockCode}" style="width: 140px;">
+                            <f:selectItems value="#{vesselServiceBean.docks}" var="i" itemValue="#{i.dockCode}" itemLabel="#{i.name}"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputText value="Fr Meter *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.planningVessel.frMeter}"/>
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="frMeter" maxlength="3" value="#{vesselServiceBean.serviceVessel.frMeter}" onkeyup="javascript:cekAlphabet(this);" style="width: 135px;"/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                        <p:message display="icon" for="frMeter"/>
+
+                        <h:outputText value="To Meter *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.planningVessel.toMeter}"/>
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="toMeter" maxlength="3" value="#{vesselServiceBean.serviceVessel.toMeter}" onkeyup="javascript:cekAlphabet(this);" style="width: 135px;"/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                        <p:message display="icon" for="toMeter"/>
+
+                        <h:outputText value="Discharge *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.serviceVessel.estDischarge}"/>
+                        <h:inputText disabled="true" id="dis" value="#{vesselServiceBean.serviceVessel.discharge}" style="width: 135px;"/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                        <h:outputLabel/>
+
+                        <h:outputText value="Load *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.serviceVessel.estLoad}"/>
+                        <h:inputText disabled="true" id="lo" value="#{vesselServiceBean.serviceVessel.load}" style="width: 135px;"/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                        <h:outputLabel/>
+
+                        <h:outputText value="Arrival Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.serviceVessel.eta}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="a" styleClass="cal" value="#{vesselServiceBean.serviceVessel.arrivalTime}" style="width: 135px;">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                        <p:message display="icon" for="a"/>
+
+                        <h:outputText value="Berthing Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.serviceVessel.ebt}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="b" styleClass="cal" value="#{vesselServiceBean.serviceVessel.berhtingTime}" style="width: 135px;">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                        <p:message display="icon" for="b"/>
+
+                        <h:outputText value="Start Work Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.serviceVessel.estStartWork}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="s" styleClass="cal" value="#{vesselServiceBean.serviceVessel.startWorkTime}" style="width: 135px;">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                        <p:message display="icon" for="s"/>
+
+                        <h:outputText value="End Work Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.serviceVessel.estEndWork}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="e" styleClass="cal" value="#{vesselServiceBean.serviceVessel.endWorkTime}" style="width: 135px;">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                        <p:message display="icon" for="e"/>
+
+                        <h:outputText value="Departure *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText disabled="true" value="#{vesselServiceBean.serviceVessel.etd}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="d" styleClass="cal" value="#{vesselServiceBean.serviceVessel.departureTime}" style="width: 135px;">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                        <p:message display="icon" for="d"/>
+                    </h:panelGrid>
+                    <h:inputHidden value="#{vesselServiceBean.planningVessel.preserviceVessel.masterVessel.loa}"/>
+                    <h:inputHidden value="#{vesselServiceBean.planningVessel.vesselCode}"/>
+                    <input type="hidden" id="shipLoa" value="#{vesselServiceBean.planningVessel.preserviceVessel.masterVessel.loa}"/>
+                    <script type="text/javascript">
+                            jQuery("[id=serviceVesselDialog:selectedDock]").change(function(){
+                                updateLink();
+                            });
+                            function updateLink(){
+                                jQuery("#linkPreview").attr("href","#{vesselServiceBean.berthUrl}?dockCode=" + jQuery("[id=serviceVesselDialog:selectedDock]").val());
+                            }
+                            updateLink();
+                    </script>
+                    <script type="text/javascript">
+//                            alert(jQuery('[id=serviceVesselDialog:toMeter]').val());
+                        jQuery('[id=serviceVesselDialog:frMeter]').keyup(function() {
+                            if (is_int(jQuery('[id=serviceVesselDialog:frMeter]').val()))
+                                jQuery('[id=serviceVesselDialog:toMeter]').val(parseInt(jQuery('[id=serviceVesselDialog:frMeter]').val()) + parseInt(jQuery('#shipLoa').val()));
+                        });
+                        jQuery('[id=serviceVesselDialog:toMeter]').keyup(function() {
+                            if (is_int(jQuery('[id=serviceVesselDialog:toMeter]').val())){
+                                var value = parseInt(jQuery('[id=serviceVesselDialog:toMeter]').val()) - parseInt(jQuery('#shipLoa').val());
+//                                        if (value >= 0)
+                                    jQuery('[id=serviceVesselDialog:frMeter]').val(value);
+                            }
+                        });
+                    </script>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <a id="linkPreview" href='' onclick="updateLink(); window.open(jQuery('#linkPreview').attr('href')); return false;" target="_blank"><p:commandButton ajax="false" value="#{msg['application.operation.berth_preview']}"/></a>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" update="serviceVesselForm serviceVesselForm:serviceVesselTable serviceVesselDialog:growl serviceVesselDialog:planningV" oncomplete="handleRequestValidation(xhr, status, args)" actionListener="#{vesselServiceBean.handleSave}"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="updateDialog.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

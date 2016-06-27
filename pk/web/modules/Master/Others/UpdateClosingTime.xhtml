@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+    
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.closing_time']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="ppkbForm">
+            <h:panelGrid columns="5" id="ppkb">
+                <h:outputLabel value="No Ppkb"/>:
+                <h:inputText size="30" value="#{updateClosingTimeBean.no_ppkb}" title="No Ppkb"/>
+                <p:commandButton onstart="freeze();" actionListener="#{updateClosingTimeBean.handleSearch}" value="#{msg['application.operation.search']}" style="font-size: x-small" update="vesselForm:vessel growl"/>
+                <p:commandButton onstart="freeze();" actionListener="#{updateClosingTimeBean.handleClear}" value="#{msg['application.operation.clear']}" style="font-size: x-small" update="vesselForm:vessel ppkbForm:ppkb growl"/>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="vesselForm">
+            <p:panel id="vessel">
+                <h:panelGrid columns="3">
+                    <h:outputText value="No PPKB"/>
+                    <h:outputText value=":"/>
+                    <h:inputText size="30" disabled="true" value="#{updateClosingTimeBean.planningVessel.noPpkb}"/>
+
+                    <h:outputText value="Vessel Name"/>
+                    <h:outputText value=":"/>
+                    <h:inputText size="30" disabled="true" value="#{updateClosingTimeBean.planningVessel.preserviceVessel.masterVessel.name}"/>
+
+                    <h:outputText value="Last Port"/>
+                    <h:outputText value=":"/>
+                    <h:inputText size="30" disabled="true" value="#{updateClosingTimeBean.planningVessel.preserviceVessel.masterPort1.name}"/>
+
+                    <h:outputText value="Next Port"/>
+                    <h:outputText value=":"/>
+                    <h:inputText size="30" disabled="true" value="#{updateClosingTimeBean.planningVessel.preserviceVessel.masterPort.name}"/>
+
+                    <h:outputText value="Voy In"/>
+                    <h:outputText value=":"/>
+                    <h:inputText size="30" disabled="true" value="#{updateClosingTimeBean.planningVessel.preserviceVessel.voyIn}"/>
+
+                    <h:outputText value="Voy Out"/>
+                    <h:outputText value=":"/>
+                    <h:inputText size="30" disabled="true" value="#{updateClosingTimeBean.planningVessel.preserviceVessel.voyOut}"/>
+
+                    <h:outputText value="Closing Time *"/>
+                    <h:outputText value=":"/>
+                    <h:panelGrid columns="3">
+                        <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="a" styleClass="cal" value="#{updateClosingTimeBean.planningVessel.closeRec}" size="30">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:inputText>
+                        <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                        <p:message display="icon" for="a"/>
+                    </h:panelGrid>
+                </h:panelGrid>
+                <f:facet name="footer">
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" disabled="#{empty updateClosingTimeBean.planningVessel.noPpkb}" actionListener="#{updateClosingTimeBean.handleUpdateClosingTime}" value="#{msg['application.operation.update']}" style="font-size: x-small" update="vesselForm:vessel ppkbForm:ppkb growl"/>
+                    </div>
+                </f:facet>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

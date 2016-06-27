@@ -1,0 +1,293 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="bundles">
+        bundles
+    </ui:define>
+
+    <ui:define name="title">
+        title
+    </ui:define>
+
+    <ui:define name="script">
+        script
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="contForm">
+            <div align="center">
+                <h:panelGrid columns="5" id="noContainer">
+                    <h:outputLabel value="Operation" />
+                    <h:outputLabel value=":" />
+                    <h:selectOneRadio id="radio" value="#{searchingContainerPublicBean.tipe}" valueChangeListener="#{searchingContainerPublicBean.onChangeOperation}">
+                        <f:selectItem itemValue="DISCHARGE" itemLabel="Discharge" />
+                        <f:selectItem itemValue="LOAD" itemLabel="Load" />
+                        <f:ajax execute="@this" event="change" render="contForm"/>
+                    </h:selectOneRadio>
+                    <p:message for="radio" display="icon"/>
+                    <h:outputLabel value=" " />
+
+                    <h:outputLabel value="Container No"/>:
+                    <h:inputText size="30" onkeyup="javascript:this.value=this.value.toUpperCase();" value="#{searchingContainerPublicBean.contNo}" title="Container No"/>
+                    <p:commandButton onstart="freeze();" actionListener="#{searchingContainerPublicBean.handleSearch}" value="#{msg['application.operation.search']}" style="font-size: x-small" update="contForm listData growl tracking"/>
+                    <p:commandButton onstart="freeze();" actionListener="#{searchingContainerPublicBean.handleClear}" value="#{msg['application.operation.clear']}" style="font-size: x-small" update="contForm growl tracking listData"/>
+                </h:panelGrid>
+            </div>
+            <br/>
+        </h:form>
+        <h:form id="listData">
+            <p:panel visible="#{searchingContainerPublicBean.detailCont}" id="Form1">
+                <p:dataTable var="item" value="#{searchingContainerPublicBean.listDischarge}"
+                             paginator="true" rows="10" id="listData"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;" />
+                    </f:facet>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="No" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="No PPKB" sortBy="" style="text-align: center" filterBy="#{item[20]}" filterMatchMode="contains"/>
+                            <p:column rowspan="2" headerText="Vessel Name" sortBy="" style="text-align: center" filterBy="#{item[19]}" filterMatchMode="contains"/>
+
+                            <p:column rowspan="2" headerText="Voy In/Out" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Container No" style="text-align: center" sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains"/>
+                            <p:column rowspan="2" headerText="Size" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Type" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Status" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="OH/OW/OL" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Dg" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Dg Label" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Load Port" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Disch. Port" sortBy="" style="text-align: center"/>
+                            <p:column colspan="3" headerText="Stevedoring" style="text-align: center"/>
+                            <p:column colspan="3" headerText="Haulage Trucking" style="text-align: center"/>
+                            <p:column colspan="3" headerText="Lo/Lo/Receiving" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Action" style="text-align: center"/>
+                        </p:row>
+                        <p:row>
+                            <p:column sortBy="" headerText="CC Code" style="text-align: center"/>
+                            <p:column sortBy="" headerText="Start" style="text-align: center"/>
+                            <p:column sortBy="" headerText="End" style="text-align: center"/>
+                            <p:column sortBy="" headerText="HT Code" style="text-align: center"/>
+                            <p:column sortBy="" headerText="Start" style="text-align: center"/>
+                            <p:column sortBy="" headerText="End" style="text-align: center"/>
+                            <p:column sortBy="" headerText="TT Code" style="text-align: center"/>
+                            <p:column sortBy="" headerText="Start" style="text-align: center"/>
+                            <p:column sortBy="" headerText="End" style="text-align: center"/>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{number+1}."/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[20]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[19]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[21]} / #{item[22]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[17]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[18]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[8]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[9]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[10]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[11]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[12]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[13]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[14]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[15]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[16]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <div style="width: 60px">
+                                <p:commandButton onstart="freeze();" image="ui-icon ui-icon-search" actionListener="#{searchingContainerPublicBean.handleView}" title="Tekan tombol untuk melihat detail aktivitas layanan petikemas" update="tracking:Form2 listData:Form1">
+                                    <f:attribute name="ppkb" value="#{item[20]}"/>
+                                    <f:attribute name="cont" value="#{item[0]}"/>
+                                </p:commandButton>
+                            </div>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <h:form id="tracking">
+            <p:panel visible="#{searchingContainerPublicBean.tracking}" id="Form2">
+
+                <p:fieldset >
+
+                    <div align="center">
+                        <table>
+                            <tr>
+                                <td><img src="./../../resources/images/status/03.png" /></td>
+                                <td>Cy</td>
+                                <td>&nbsp;&nbsp;&nbsp;</td>
+                                <td><img src="./../../resources/images/status/vs02.png" /></td>
+                                <td>Truck</td>
+                                <td>&nbsp;&nbsp;&nbsp;</td>
+                                <td><img src="./../../resources/images/status/vs01.png" /></td>
+                                <td>Vessel</td>
+                                <td>&nbsp;&nbsp;&nbsp;</td>
+                                <td><img src="./../../resources/images/status/Cancelled.png" /></td>
+                                <td>Outside</td>
+                            </tr>
+                        </table>
+                    </div>
+                </p:fieldset>
+
+                <br/>
+
+                <p:dataTable id="listTracking" var="item" value="#{searchingContainerPublicBean.listTracking}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" rowIndexVar="No"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;" />
+                    </f:facet>
+                    <p:columnGroup type="header">
+                        <p:row>
+                            <p:column rowspan="2" headerText="No" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="No PPKB" sortBy="" style="text-align: center" filterBy="#{item[1]}" filterMatchMode="contains"/>
+                            <p:column rowspan="2" headerText="BL No" sortBy="" style="text-align: center" filterBy="#{item[2]}" filterMatchMode="contains"/>
+                            <p:column rowspan="2" headerText="Cont. No" style="text-align: center" sortBy="#{item[3]}" filterBy="#{item[3]}" filterMatchMode="contains"/>
+                            <p:column rowspan="2" headerText="Cont. Size" style="text-align: center"  />
+                            <p:column rowspan="2" headerText="Cont. Status" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Cont. Gross" sortBy="" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Seal No" sortBy="" style="text-align: center"/>
+                            <p:column colspan="4" headerText="Lokasi" style="text-align: center"/>
+                            <p:column rowspan="2" headerText="Position" style="text-align: center"/>
+                        </p:row>
+                        <p:row>
+                            <p:column sortBy="" headerText="Block" style="text-align: center"/>
+                            <p:column sortBy="" headerText="Slot" style="text-align: center"/>
+                            <p:column sortBy="" headerText="Row" style="text-align: center"/>
+                            <p:column sortBy="" headerText="Tier" style="text-align: center"/>
+                        </p:row>
+                    </p:columnGroup>
+
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{number+1}."/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[8]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[9]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[10]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <h:outputText value="#{item[11]}"/>
+                    </p:column>
+                    <p:column style="text-align: center">
+                        <img src="./../../resources/images/status/#{item[12]}.png"/>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <p:commandButton onstart="freeze();" value="Close" update="tracking listData:Form1" actionListener="#{searchingContainerPublicBean.tutup}" title="Tekan tombol untuk menutup detail posisi petikemas"/>
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,290 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.cfs_operation.goods_delivery']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.cfs_operation.goods_delivery']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="cfsStrippingForm">
+            <p:panel>
+                <p:dataTable paginatorPosition="bottom" var="item" value="#{goodsDeliveryBean.serviceCfsStrippings}"
+                             paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="number" id="cfsStrippingTable"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" update="multipleSelect listData2" actionListener="#{goodsDeliveryBean.handleAdd}" oncomplete="fromBaplie.show();" onclick="genTitle('dialog','#{msg['application.operation.add']} Goods Delivery Confirm');"/>
+                        </div>
+                    </f:facet>
+
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[9]}" filterBy="#{item[9]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Jobslip" />
+                        </f:facet>
+                        <h:outputText value="#{item[9]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}" filterBy="#{item[3]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="BL No" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Commodity" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Unit" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Volume" />
+                        </f:facet>
+                        <h:outputText value="#{item[7]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[8]}">
+                        <f:facet name="header">
+                            <h:outputText value="Placement Date" />
+                        </f:facet>
+                        <h:outputText value="#{item[8]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{goodsDeliveryBean.handleEditDelete}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Service CFS Stripping">
+                                <f:attribute name="idCont" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{goodsDeliveryBean.handleDelete}" update="cfsStrippingForm:cfsStrippingTable growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog header="Goods Delivery Confirm"  widgetVar="dlg" modal="true" minWidth="400" id="dialog">
+            <h:form id="cfsDialog">
+                <p:panel>
+                    <h:panelGrid columns="5" id="cfsStripping">
+                        <h:outputLabel value="Job Slip *" />
+                        <h:outputLabel value=" : " />
+                        <p:autoComplete completeMethod="#{goodsDeliveryBean.setListAutoComplete}" value="#{goodsDeliveryBean.jobslip}" size="25" id="bl" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:commandButton onstart="freeze();" image="ui-icon-search" style="font-size: x-small" actionListener="#{goodsDeliveryBean.ambilContNo}" update="cfsDialog:cfsStripping cfsDialog:button growl">
+                            <f:attribute name="jobSlip" value="#{goodsDeliveryBean.jobslip}"/>
+                        </p:commandButton>
+                        <p:message for="bl" display="icon"/>
+
+                        <h:outputLabel value="Container No" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.contNo}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.mlo.name}"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="No PPKB" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.noPpkb}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Commodity" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.commodityCode}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="No BL" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.blNo}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Unit" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.unit}" size="25"/>
+                        <h:outputLabel />
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Weight" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.weight}" size="25"/>
+                        <h:outputLabel />
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Volume" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{goodsDeliveryBean.serviceCfsStripping.volume}" size="25"/>
+                        <h:outputLabel />
+                        <h:outputLabel/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup id="button">
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{empty goodsDeliveryBean.serviceCfsStripping.contNo or goodsDeliveryBean.jb}" actionListener="#{goodsDeliveryBean.handleConfirm}" update="cfsStrippingForm:cfsStrippingTable cfsDialog:cfsStripping growl" oncomplete="dlg.hide();"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="List Good Delivery"  widgetVar="fromBaplie" minWidth="750" modal="true">
+            <h:form id="multipleSelect">
+                <p:panel >
+                    <h:panelGrid columns="5" id="cari">
+                        <h:outputLabel value="Masukan Bl No *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{goodsDeliveryBean.deliveryBarangServiceObject.blNo}" requiredMessage="#{msg['application.validation.required']}" size="35"/>
+                        <p:commandButton onstart="freeze();" image="ui-icon-search" value="#{msg['application.operation.search']}" style="font-size: x-small" actionListener="#{goodsDeliveryBean.cariBlNo}" update="multipleSelect growl listData2">
+                            <f:attribute name="blNo" value="#{goodsDeliveryBean.deliveryBarangServiceObject.blNo}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" image="ui-icon-search" value="#{msg['application.operation.show_all']}" style="font-size: x-small" actionListener="#{goodsDeliveryBean.cariBlNo2}" update="multipleSelect growl listData2">
+                            <f:attribute name="blNo" value="#{goodsDeliveryBean.deliveryBarangServiceObject.blNo}"/>
+                        </p:commandButton>
+                    </h:panelGrid>
+                    <br/>
+                </p:panel>
+            </h:form>
+            <br/>
+            <h:form id="listData2">
+                <p:panel>
+                    <div style="height: 300px; overflow: scroll;" >
+                        <p:dataTable var="item" value="#{goodsDeliveryBean.goodsDeliveryList}" rowIndexVar="No" selection="#{goodsDeliveryBean.deliveryBarang}">
+
+                            <f:facet name="header">
+                                <h:outputText value="&nbsp;"/>
+                            </f:facet>
+
+                            <p:column selectionMode="multiple"/>
+
+                            <p:column headerText="No" >
+                                <h:outputText value="#{No+1}" />
+                            </p:column>
+
+                            <p:column filterMatchMode="contains" filterBy="#{item[0]}" headerText="Jobslip">
+                                <h:outputText value="#{item[0]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[1]}" headerText="No PPKB">
+
+                                <h:outputText value="#{item[1]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[3]}" headerText="Bl No" >
+
+                                <h:outputText value="#{item[3]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[6]}" headerText="Cont No">
+
+                                <h:outputText value="#{item[2]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}" headerText="Commodity">
+
+                                <h:outputText value="#{item[4]}" />
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{goodsDeliveryBean.handleSelectClik}"
+                                                 image="ui-icon-check" update="listData2 cfsStrippingForm growl" disabled="#{empty goodsDeliveryBean.goodsDeliveryList or goodsDeliveryBean.jb}"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="fromBaplie.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,136 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.commodity.master_commodity']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.commodity.master_commodity']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="vessel">
+            <p:dataTable paginatorPosition="bottom" value="#{masterCommodityBean.masterCommoditys}" var="item"
+                         paginator="true" rows="10" id="dataType"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" onclick="dialogAddEdit.show()" actionListener="#{masterCommodityBean.handleAdd}" update="addEdit"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <p:commandButton image="ui-icon-pencil" actionListener="#{masterCommodityBean.handleEditDeleteButton}" update="addEdit" oncomplete="dialogAddEdit.show()">
+                        <f:attribute name="commodity_code" value="#{item[0]}"/>
+                    </p:commandButton>
+                    <p:commandButton image="ui-icon-trash" actionListener="#{masterCommodityBean.handleEditDeleteButton}" oncomplete="dialogDel.show()" update="deleteForm">
+                        <f:attribute name="commodity_code" value="#{item[0]}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <p:dialog modal="true"  widgetVar="dialogAddEdit" width="450" header="Master Commodity" id="dialog">
+            <h:form id="addEdit">
+                <p:panel>
+                    <p:focus for="name"/>
+                    <h:inputHidden value="#{masterCommodityBean.masterCommodity.commodityCode}"/>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="Commodity Name *" for="name" />
+                        <h:outputLabel value=":"/>
+                        <h:inputText id="name" required="true" value="#{masterCommodityBean.masterCommodity.name}" title="Name" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="name" display="icon"/>
+
+                        <h:outputLabel value="Commodity Type" />:
+                        <h:selectOneMenu value="#{masterCommodityBean.masterCommodity.masterCommodityType}" title="MasterCustomer" >
+                            <f:selectItems value="#{masterCommodityBean.masterCommodityTypes}" var="i" itemValue="#{i}" itemLabel="#{i.name}"/>
+                        </h:selectOneMenu>
+                        <h:outputText/>
+
+                        <h:outputLabel value="Dangerous" />:
+                        <h:selectOneMenu value="#{masterCommodityBean.masterCommodity.masterDangerousClass}" title="masterDangerousClass" >
+                            <f:selectItem itemValue="#{null}" itemLabel="No Danger"/>
+                            <f:selectItems value="#{masterDangerousClassSelector.masterDangerousClasses}" var="i" itemValue="#{i}" itemLabel="#{i.name} (#{i.description})"/>
+                        </h:selectOneMenu>
+                        <h:outputText/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" actionListener="#{masterCommodityBean.saveEdit}" update="addEdit vessel:dataType growl" oncomplete="handleLoginRequest(xhr, status, args)"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+        function handleLoginRequest(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog').show();
+                } else {
+                        dialogAddEdit.hide();
+                }
+        }
+        </script>
+        <p:growl id="growl2" showDetail="true" life="3000" globalOnly="true"/>
+        <p:dialog  widgetVar="dialogDel" minWidth="400" header="#{msg['application.header.confirm.delete']}">
+            <h:form id="deleteForm">
+                <h:inputHidden value="#{masterCommodityBean.masterCommodity.commodityCode}"/>
+                <h:inputHidden value="#{masterCommodityBean.masterCommodity.masterCommodityType.commodityTypeCode}"/>
+                <h:inputHidden value="#{masterCommodityBean.masterCommodity.name}"/>
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterCommodityBean.delete}" update="deleteForm vessel:dataType growl2" oncomplete="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

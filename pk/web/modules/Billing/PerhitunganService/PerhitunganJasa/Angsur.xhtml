@@ -1,0 +1,478 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_service.perhitungan_jasa_angsur']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_service.perhitungan_jasa_angsur']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                            jQuery('#idBatalNota').show();
+                    } else {
+                            dlg.hide();
+                            dlgBatalNota.hide();
+                    }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{angsurBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{angsurBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{angsurBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{angsurBean.handleSubmitBatalNota}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="growl batalNota receivingServiceForm serviceContDiscForm"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="registrationForm">
+
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText onkeypress="dlgReg.show();" value="#{angsurBean.registration.noReg}" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{angsurBean.registration.masterCustomer.custCode}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{angsurBean.registration.planningVessel.noPpkb}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{angsurBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{angsurBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{angsurBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{angsurBean.registration.statusService}" size="30"/>
+                <h:outputLabel/>
+            </h:panelGrid>
+            <h:panelGrid columns="3" id="payment">
+                <h:outputLabel value="Payment Type &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio disabled="#{not angsurBean.registration.statusService.equals('registrasi')}" value="#{angsurBean.invoice.paymentType}" valueChangeListener="#{angsurBean.onChangeEvent}">
+                    <f:selectItem itemValue="CASH" itemLabel="Cash"/>
+                    <f:selectItem itemValue="KREDIT" itemLabel="Kredit"/>
+                    <f:ajax execute="@this" event="change" render="registrationForm"/>
+                </h:selectOneRadio>
+            </h:panelGrid>
+
+<!--        </h:form>-->
+        <br/>
+<!--        <h:form id="receivingServiceForm">-->
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{angsurBean.angsurServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="receivingServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty angsurBean.registration.noReg or not angsurBean.registration.statusService.equals('registrasi')}" actionListener="#{angsurBean.handleAdd}" update="dsFormDialog:jb dsFormDialog:servContD" oncomplete="dlg.show();"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{empty angsurBean.registration.noReg or empty angsurBean.angsurServices or angsurBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor)}" image="ui-icon-plusthick" title="Batal Nota" update="batalNota" oncomplete="dlgBatalNota.show()" actionListener="#{angsurBean.handleAddCancelInvoice}"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="3" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item[0]}" rowspan="3" headerText="Job Slip" filterMatchMode="contains" filterBy="#{item[0]}"/>
+                        <p:column sortBy="#{item[13]}" rowspan="3" headerText="Bl No" filterMatchMode="contains" filterBy="#{item[13]}"/>
+                        <p:column sortBy="#{item[1]}" rowspan="3" headerText="Container No" filterMatchMode="contains" filterBy="#{item[1]}"/>
+                        <p:column sortBy="#{item[12]}" rowspan="3" headerText="commodity" />
+                        <p:column sortBy="#{item[2]}" rowspan="3" headerText="Status" />
+                        <p:column sortBy="#{item[3]}" rowspan="3" headerText="Size" />
+                        <p:column sortBy="#{item[4]}" rowspan="3" headerText="Type" />
+                        <p:column sortBy="#{item[5]}" rowspan="3" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column sortBy="#{item[8]}" rowspan="3" headerText="Charge &nbsp;(#{angsurBean.symbol})" />
+                        <p:column rowspan="3" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[6]}" rowspan="2" headerText="Dg" />
+                        <p:column sortBy="#{item[7]}" rowspan="2" headerText="Label"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[13]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[12]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column style="text-align: right">  
+                    <div style="float: right">
+                        <h:outputText value="#{item[8]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{angsurBean.handleSelect}" disabled="#{not angsurBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Delivery Service">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="11" footerText="Jumlah Total :" style="text-align: right"/>
+                        <p:column footerText="#{angsurBean.formattedTotal}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="PPN :" style="text-align: right"/>
+                        <p:column footerText="#{angsurBean.formattedPpn}" style="text-align: right" />
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Materai :" style="text-align: right"/>
+                        <p:column footerText="#{angsurBean.formattedMaterai}" style="text-align: right" />
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="11" footerText="Total Tagihan :" style="text-align: right"/>
+                        <p:column footerText="#{angsurBean.formattedJmlTotal}" style="text-align: right" />
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{not angsurBean.registration.statusService.equals('registrasi') or empty angsurBean.angsurServices}" update="growl receivingServiceForm:receivingServiceTable registrationForm:payment registrationDetail" actionListener="#{angsurBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty angsurBean.angsurServices}" actionListener="#{angsurBean.handleDownloadTransactionRecap}" update="receivingServiceForm:receivingServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty angsurBean.angsurServices or (angsurBean.disPrint and not loginSessionBean.supervisor) or angsurBean.disKredit}" actionListener="#{angsurBean.handleDownloadNota}" update="receivingServiceForm:receivingServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty angsurBean.angsurServices or angsurBean.disKredit or angsurBean.disDetail}" actionListener="#{angsurBean.handleDownloadDetail}" update="receivingServiceForm:receivingServiceTable"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{angsurBean.handleDelete}" update="registrationForm growl serviceContDiscForm" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" rowIndexVar="No" value="#{angsurBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{No+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{angsurBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm serviceContDiscForm" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog header="Entry Angsur Petikemas Service"  widgetVar="dlg" modal="true" minWidth="400">
+            <h:form id="dsFormDialog">
+                <p:panel>
+                    <h:panelGrid id="delServ">
+                        <h:panelGrid columns="5" id="servContD">
+                            <h:outputLabel value="Container No *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="cont" onkeypress="dlgCont.show();" onmousedown="dlgCont.show()" value="#{angsurBean.angsurService.contNo}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+                            <p:message for="cont" display="icon"/>
+
+                            <h:outputLabel value="Bl No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{angsurBean.angsurService.blNo}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="MLO" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{angsurBean.angsurService.mlo.name}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{angsurBean.angsurService.contSize}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{angsurBean.angsurService.masterContainerType.name}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{angsurBean.angsurService.contStatus}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{angsurBean.angsurService.contGross}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{angsurBean.angsurService.overSize}" size="25"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Special Equipment *"/>:
+                            <h:selectOneMenu value="#{angsurBean.angsurService.specialEquipment}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{angsurBean.handleConfirm}" update="registrationForm serviceContDiscForm growl dsFormDialog" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="Select Container "  widgetVar="dlgCont" modal="true" minWidth="750">
+            <h:form id="serviceContDiscForm">
+                <p:dataTable id="serviceContDisc" rowIndexVar="No" var="item" value="#{angsurBean.serviceContDischarges}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{No+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[14]}" filterMatchMode="contains" filterBy="#{item[14]}">
+                        <f:facet name="header">
+                            <h:outputText value="Bl No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[14]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                   
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{angsurBean.handleSelectContPick}" value="#{msg['application.operation.select']}" update="dsFormDialog:servContD" oncomplete="dlgCont.hide();">
+                            <f:attribute name="idCont" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" visible="true" rendered="#{not angsurBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="Angsur.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

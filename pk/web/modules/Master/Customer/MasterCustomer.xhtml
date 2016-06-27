@@ -1,0 +1,213 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.customer']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function validation(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+                }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.customer']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl showDetail="true" id="growl" globalOnly="true"/>
+        <h:form id="custForm">
+            <p:dataTable id="dataTbl" paginatorPosition="bottom" value="#{masterCustomerBean.mis}" var="item"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{masterCustomerBean.handleOnAdd}" image="ui-icon-plusthick" oncomplete="dialogAddEdit.show()" update="formAdd"/>
+                    </div>
+                </f:facet>
+                 <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.custCode}" filterMatchMode="contains" filterBy="#{item.custCode}">
+                    <f:facet name="header">
+                        <h:outputText value="Id"/>
+                    </f:facet>
+                    <h:outputText value="#{item.custCode}"/>
+                </p:column>
+                <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.name}"/>
+                </p:column>
+                <p:column sortBy="#{item.npwp}" filterMatchMode="contains" filterBy="#{item.npwp}">
+                    <f:facet name="header">
+                        <h:outputText value="NPWP"/>
+                    </f:facet>
+                    <h:outputText value="#{item.npwp}"/>
+                </p:column>
+                <p:column sortBy="#{item.phone1}" filterMatchMode="contains" filterBy="#{item.phone1}">
+                    <f:facet name="header">
+                        <h:outputText value="Phone"/>
+                    </f:facet>
+                    <h:outputText value="#{item.phone1}"/>
+                </p:column>
+                <p:column sortBy="#{item.fax}" filterMatchMode="contains" filterBy="#{item.fax}">
+                    <f:facet name="header">
+                        <h:outputText value="Fax"/>
+                    </f:facet>
+                    <h:outputText value="#{item.fax}"/>
+                </p:column>
+                <p:column sortBy="#{item.city}" filterMatchMode="contains" filterBy="#{item.city}">
+                    <f:facet name="header">
+                        <h:outputText value="City"/>
+                    </f:facet>
+                    <h:outputText value="#{item.city}"/>
+                </p:column>
+                <p:column sortBy="#{item.masterCustType.name}" filterMatchMode="contains" filterBy="#{item.masterCustType.name}">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterCustType.name}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" image="ui-icon-pencil" update="formAdd, custForm:growl" actionListener="#{masterCustomerBean.handleClick}"
+                                         oncomplete="dialogAddEdit.show();" title="Edit">
+                            <f:attribute name="code" value="#{item.custCode}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" image="ui-icon-trash" oncomplete="confirmation.show();" update="deleteForm" title="Delete" actionListener="#{masterCustomerBean.handleClick}">
+                            <f:attribute name="code" value="#{item.custCode}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="400" header="Master Customer Type">
+            <h:form id="formAdd">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="CustCode" for="custCode" />
+                        <h:outputLabel value=":" />
+                        <h:panelGrid columns="2">
+                            <h:inputText id="custCode" value="#{masterCustomerBean.mi.custCode}" disabled="#{masterCustomerBean.isEdit}" title="CustCode" required="true"/>
+                            <p:message display="icon" for="custCode"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="Name" for="name" />
+                        <h:outputLabel value=":" />
+                        <h:panelGrid columns="2">
+                            <h:inputText id="name" value="#{masterCustomerBean.mi.name}" title="Name" required="true"/>
+                            <p:message display="icon" for="name"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="Address" for="address" />
+                        <h:outputLabel value=":" />
+                        <h:inputTextarea id="address" value="#{masterCustomerBean.mi.address}" title="Address" />
+                        <h:outputLabel value="Phone1" for="phone1" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="phone1" value="#{masterCustomerBean.mi.phone1}" title="Phone1" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="Phone2" for="phone2" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="phone2" value="#{masterCustomerBean.mi.phone2}" title="Phone2" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="Fax" for="fax" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="fax" value="#{masterCustomerBean.mi.fax}" title="Fax" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="City" for="city" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="city" value="#{masterCustomerBean.mi.city}" title="City" />
+                        <h:outputLabel value="Npwp" for="npwp" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="npwp" value="#{masterCustomerBean.mi.npwp}" title="Npwp" size="40"/>
+                        <h:outputLabel value="FlagImgUrl" for="flagImgUrl" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="flagImgUrl" value="#{masterCustomerBean.mi.flagImgUrl}" title="FlagImgUrl" />
+                        <h:outputLabel value="MasterCustType" for="masterCustType" />
+                        <h:outputLabel value=":" />
+                        <h:selectOneMenu id="masterCustType" value="#{masterCustomerBean.mi.masterCustType.custTypeId}" valueChangeListener="#{masterCustomerBean.handleMasterCustTypeChanged}" title="MasterCustType" >
+                            <f:selectItems value="#{masterCustomerBean.mct}" var="i" itemValue="#{i.custTypeId}" itemLabel="#{i.name}"/>
+                            <p:ajax process="@this" event="change" onstart="freeze();" update="loginInfoForm"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel value="MasterCountry" for="masterCountry" />
+                        <h:outputLabel value=":" />
+                        <h:selectOneMenu id="masterCountry" value="#{masterCustomerBean.mi.masterCountry.countryCode}" title="MasterCountry" >
+                            <f:selectItems value="#{masterCustomerBean.mc}" var="i" itemValue="#{i.countryCode}" itemLabel="#{i.name}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <br/>
+                    <p:outputPanel id="loginInfoForm">
+                        <p:fieldset legend="Login Info" rendered="#{masterCustomerBean.isEdit and masterCustomerBean.agent}">
+                            <p:outputPanel rendered="#{empty masterCustomerBean.activeDirectoryUser}" style="border-color:  red;">
+                                <p>This user has not registered to Active Directory<br/>Click '#{msg['application.operation.register']}' button to register it</p>
+                                <br/>
+                                <div style="float: right;"><p:commandButton onstart="freeze();" update="formAdd:loginInfoForm growl" actionListener="#{masterCustomerBean.handleRegisterActiveDirectory}" value="#{msg['application.operation.register']}"/></div>
+                            </p:outputPanel>
+                            <p:outputPanel rendered="#{not empty masterCustomerBean.activeDirectoryUser}">
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Username:" for="username" />
+                                    <h:inputText id="username" value="#{masterCustomerBean.activeDirectoryUser.uid}" title="Username" readonly="true" required="true" requiredMessage="The Username field is required."/>
+                                    <h:outputLabel value="Password:" for="password" />
+                                    <h:inputSecret id="password" redisplay="true" value="#{masterCustomerBean.password}" title="Password" required="true" requiredMessage="The Password field is required."/>
+                                    <h:outputLabel value="Repeat Password:" for="repeatPassword" />
+                                    <h:inputSecret id="repeatPassword" redisplay="true" value="#{masterCustomerBean.repeatPassword}" title="Repeat Password" required="true" requiredMessage="The Password field is required."/>
+                                </h:panelGrid>
+                                <br/>
+                                <div style="float: right;"><p:commandButton onstart="freeze();" update="formAdd:loginInfoForm growl" actionListener="#{masterCustomerBean.handleUnregisterActiveDirectory}" value="#{msg['application.operation.unregister']}"/></div>
+                            </p:outputPanel>
+                        </p:fieldset>
+                    </p:outputPanel>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" image="ui-icon-check" actionListener="#{masterCustomerBean.handleSaveEdit}"
+                                             update="formAdd custForm:dataTbl growl" oncomplete="validation(xhr, status, args);" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" oncomplete="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form id="deleteForm">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{masterCustomerBean.handleOnDelete}"  update="custForm:dataTbl growl" oncomplete="confirmation.hide();"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

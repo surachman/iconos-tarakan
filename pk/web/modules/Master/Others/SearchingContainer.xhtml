@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.searching_container']}"/>
+    </ui:define>
+
+     <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true" />
+
+        <h:form id="formContainers">
+            <p:panel style="width: 300px;">
+                <h:panelGrid columns="4">
+
+                    <h:outputLabel value="Operation" />
+                    <h:outputLabel value=":" />
+                    <h:selectOneRadio id="radio" value="#{pencarianContainer.tipe}" valueChangeListener="#{pencarianContainer.onChangeOperation}">
+                        <f:selectItem itemValue="D" itemLabel="Discharge" />
+                        <f:selectItem itemValue="L" itemLabel="Load" />
+                        <f:ajax execute="@this" event="change" render="containersTable"/>
+                    </h:selectOneRadio>
+                    <p:message for="nob" display="icon"/>
+
+                    <h:outputLabel value="No PPKB" />
+                    <h:outputLabel value=":" />
+                    <h:inputText value="#{pencarianContainer.noPpkb}" id="nob" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                    <p:message for="nob" display="icon"/>
+                </h:panelGrid>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-right">
+                        <p:commandButton value="reset" action="#{pencarianContainer.handleClear}" update="formContainers"/>
+                        <p:commandButton value="search" action="#{pencarianContainer.handleCariContainer}" update="formContainers" />
+                    </div>
+                </f:facet>
+            </p:panel>
+
+            <p:spacer height="10" width="0" />
+            <p:dataTable id="containersTable" value="#{pencarianContainer.listObject}" var="item"  widgetVar="mainTable"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;" />
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="No Registrasi" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Bl No" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}" filterBy="#{item[3]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Jobslip" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}" filterBy="#{item[4]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Container Status" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Container Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Created By" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[9]}">
+                    <f:facet name="header">
+                        <h:outputText value="Created Date" />
+                    </f:facet>
+                    <h:outputText value="#{item[9]}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Modified By" />
+                    </f:facet>
+                    <h:outputText value="#{item[8]}" />
+                </p:column>
+
+
+                <p:column sortBy="#{item[10]}">
+                    <f:facet name="header">
+                        <h:outputText value="Modified Date" />
+                    </f:facet>
+                    <h:outputText value="#{item[10]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton disabled="#{pencarianContainer.edit}" actionListener="#{pencarianContainer.handleEditDelete}" update="deliveryUpdate " oncomplete="dlgReg.show();" image="ui-icon ui-icon-pencil" title="Edit Valid Date"  onstart="freeze();">
+                            <f:attribute name="job_slip" value="#{item[3]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="450">
+            <h:form id="deliveryUpdate">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Job slip"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{pencarianContainer.deliveryService.jobSlip}" disabled="true"/>
+
+                        <h:outputLabel value="Cont No"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{pencarianContainer.deliveryService.contNo}" disabled="true"/>
+
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{pencarianContainer.deliveryService.mlo.name}" disabled="true"/>
+
+                        <h:outputLabel value="Valid Date *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="enduc" value="#{pencarianContainer.deliveryService.validDate}" requiredMessage="#{msg['application.validation.required']}" required="true">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.save']}" onstart="freeze();" actionListener="#{pencarianContainer.saveDeliveryService}" update="formContainers:containersTable growl" oncomplete="dlgReg.hide();" />
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onstart="freeze();" onclick="dlgReg.hide();" type="button" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

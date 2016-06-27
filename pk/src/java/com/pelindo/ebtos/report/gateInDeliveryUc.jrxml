@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="gateInDelivery" language="groovy" pageWidth="212" pageHeight="141" columnWidth="172" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="10">
+	<property name="ireport.zoom" value="2.662000000000002"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<parameter name="blNo" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[
+SELECT
+  (SELECT description FROM m_setting_app WHERE id='ebtos.nama.cabang'
+  ) AS kota,
+  v.no_ppkb,
+  l.voy_in,
+  l.voy_out,
+  m.name,
+  c.bl_no,
+  c.block,
+  c.truck_loosing,
+  md.name dock,
+  (SELECT mc.name FROM m_commodity mc WHERE c.commodity=mc.commodity_code
+  ) AS commodity
+FROM planning_vessel v
+JOIN preservice_vessel l
+ON (v.booking_code=l.booking_code)
+JOIN m_vessel m
+ON (l.vessel_code=m.vessel_code)
+JOIN uncontainerized_service c
+ON (v.no_ppkb=c.no_ppkb)
+JOIN m_dock md
+ON (v.dock_code=md.dock_code)
+WHERE c.bl_no  =$P{blNo}
+AND v.no_ppkb  =$P{no_ppkb}
+]]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="bl_no" class="java.lang.String"/>
+	<field name="block" class="java.lang.String"/>
+	<field name="truck_loosing" class="java.lang.String"/>
+	<field name="dock" class="java.lang.String"/>
+	<field name="commodity" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="23">
+			<staticText>
+				<reportElement x="0" y="0" width="172" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PT PELABUHAN INDONESIA IV (PERSERO)]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="22" width="172" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="0" y="10" width="172" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{kota}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="84" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="1" width="172" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Delivery UC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="11" width="64" height="10"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Vessel Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="19" width="64" height="10"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Voyage In]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="11" width="6" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="19" width="6" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="27" width="64" height="10"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Position]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="27" width="6" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="71" y="11" width="101" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="19" width="101" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{voy_in} + "/" + $F{voy_out}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="71" y="27" width="101" height="20"/>
+				<textElement>
+					<font fontName="Arial" size="16" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{truck_loosing}.contentEquals("TRUE") ? $F{dock} : $F{block}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="37" y="52" width="100" height="20"/>
+				<textElement textAlignment="Center">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{commodity}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

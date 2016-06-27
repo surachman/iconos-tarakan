@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage_uc.load_recap_uc']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage_uc.load_recap_uc']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+
+        <h:form id="dischargeMonitoring">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{loadUcRecapBean.serviceVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" rowIndexVar="No"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{loadUcRecapBean.handleSelectNoPPKB}" value="select" update="utama" oncomplete="dlgVessel.hide();statusDialog.hide();">
+                            <f:attribute name="noPPKB" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+        <h:form id="utama">
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadUcRecapBean.serviceVessel[0]}" onkeypress="dlgVessel.show();" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="dlgVessel.show();" style="font-size: x-small"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadUcRecapBean.serviceVessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadUcRecapBean.serviceVessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{loadUcRecapBean.serviceVessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br/>
+            <!-- LIST DATA DISCHARGE MONITORING  -->
+            <p:dataTable paginatorPosition="bottom" var="item" rowIndexVar="No" value="#{loadUcRecapBean.loadUcRecaps}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="deliveryServiceTable">
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="3" headerText="No. " />
+                        <p:column sortBy="#{item[0]}" rowspan="3" headerText="Job Slip" />
+                        <p:column sortBy="#{item[1]}" rowspan="3" headerText="BL No" />
+                        <p:column sortBy="#{item[2]}" rowspan="3" headerText="Weight" />
+                        <p:column sortBy="#{item[3]}" rowspan="3" headerText="Commodity" />
+                        <p:column sortBy="#{item[4]}" rowspan="3" headerText="Truck Lossing" />
+                        <p:column sortBy="#{item[5]}" rowspan="3" headerText="Placement" />
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                        <p:column colspan="5" headerText="Charge"/>
+                        <p:column sortBy="#{item[8] + item[9] + item[10] + item[11] + item[12]}" rowspan="3" headerText="Total" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[6]}" rowspan="2" headerText="Masa 1" />
+                        <p:column sortBy="#{item[7]}" rowspan="2" headerText="Masa 2"/>
+                        <p:column sortBy="#{item[8]}" rowspan="2" headerText="Lift" />
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                        <p:column sortBy="#{item[11]}" rowspan="2" headerText="Stevedoring" />
+                        <p:column sortBy="#{item[12]}" rowspan="2" headerText="Jasa Dermaga" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[9]}" headerText="Masa 1" />
+                        <p:column sortBy="#{item[10]}" headerText="Masa 2" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[5]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[14]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[8]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[14]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[9]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[14]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[10]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[14]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[11]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[14]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[12]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: left">
+                        <h:outputText value="#{item[14]}"/>
+                    </div>
+                    <div style="float: right">
+                        <h:outputText value="#{item[8] + item[9] + item[10] + item[11] + item[12]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="14" footerText="Jumlah Total :" style="text-align: right"/>
+                        <p:column footerText="#{loadUcRecapBean.formattedTotal}" />
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" disabled="#{empty loadUcRecapBean.loadUcRecaps}" id="buttonPreview" value="#{msg['application.operation.preview']}" actionListener="#{loadUcRecapBean.handleDownload}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" update="utama:buttonPreview"/>
+                        <!--                        <a href="{loadUcRecapBean.url}" class="ui-button-text">
+                                                    <p:button disabled="{empty loadUcRecapBean.loadUcRecaps}" value="{msg['application.operation.download_as_pdf']}"/>
+                                                </a>-->
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

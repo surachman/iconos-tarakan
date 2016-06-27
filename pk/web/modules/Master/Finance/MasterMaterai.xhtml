@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.finance.master_materai']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.finance.master_materai']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogEdit').show();
+            } else {
+                dialogEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">     
+        <p:growl showDetail="true" life="3000" id="growl" globalOnly="true"/>
+        <h:form id="main-form">
+            <p:dataTable paginatorPosition="bottom" value="#{masterMateraiBean.masterMaterais}" var="item"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <h:outputText value="&nbsp;"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.id}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Id"/>
+                    </f:facet>
+                    <h:outputText value="#{item.id}"/>
+                </p:column>
+                <p:column >
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item.description}"/>
+                </p:column>
+                <p:column sortBy="#{item.nilaiMaterai}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Value"/>
+                    </f:facet>
+                    <h:outputText value="#{item.nilaiMaterai}"/>
+                </p:column>
+                <p:column sortBy="#{item.masterCurrency.currCode}" filterMatchMode="contains" filterBy="#{item.masterCurrency.currCode}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Id"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterCurrency.currCode}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton image="ui-icon-pencil" actionListener="#{masterMateraiBean.handleSelect}" update="editForm" onsuccess="dialogEdit.show();" title="Edit" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Materai');">
+                            <f:attribute name="id_materai" value="#{item.id}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogEdit"  widgetVar="dialogEdit" minWidth="450" header="Edit Master Materai">
+            <h:form id="editForm">
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Id *" for="idMaterai" />
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="idMaterai" disabled="#{not empty masterMateraiBean.masterMaterai.id}" value="#{masterMateraiBean.masterMaterai.id}" required="true" requiredMessage="Id Materai field #{msg['application.validation.required']}"/>
+                        <p:message for="idMaterai" display="icon"/>
+
+                        <h:outputLabel value="Description" for="desc" />
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="desc" value="#{masterMateraiBean.masterMaterai.description}" size="40"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Value *" for="nominal" />
+                        <h:outputLabel value=" : "/>
+                        <h:panelGroup>
+                            <h:inputText id="nominal" value="#{masterMateraiBean.masterMaterai.nilaiMaterai}" required="true" requiredMessage="Nominal field #{msg['application.validation.required']}"/>
+                            <h:outputLabel value="must be a numeric" style="color: red;"/>
+                        </h:panelGroup>
+                        <p:message for="nominal" display="icon"/>
+
+                        <h:outputLabel value="Currency" for="curr"/>
+                        <h:outputLabel value=" : "/>
+                        <h:inputText id="curr" disabled="#{not empty masterMateraiBean.masterMaterai.masterCurrency.currCode}" value="#{masterMateraiBean.masterMaterai.masterCurrency.currCode}"/>
+                        <h:outputLabel />
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" image="ui-icon-check" actionListener="#{masterMateraiBean.handleEdit}" update="main-form editForm" oncomplete="validateForm(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogEdit.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel> 
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

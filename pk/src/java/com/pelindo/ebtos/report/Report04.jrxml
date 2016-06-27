@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report04" language="groovy" pageWidth="595" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="533" leftMargin="42" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.6500000000000004"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="5"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object" isForPrompting="false">
+		<defaultValueExpression><![CDATA["D:\\Project\\ebtos-ear\\ebtos\\src\\java\\com\\pelindo\\ebtos\\report\\"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="bulan" class="java.lang.Integer"/>
+	<parameter name="tahun" class="java.lang.Integer"/>
+	<parameter name="owner" class="java.lang.String"/>
+	<parameter name="equipCode" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DELIVERY" class="java.lang.Object"/>
+	<parameter name="SUBREPORT_RECEIVING" class="java.lang.Object"/>
+	<parameter name="SUBREPORT_HANDLING" class="java.lang.Object"/>
+	<queryString>
+		<![CDATA[SELECT
+  (SELECT description FROM m_setting_app WHERE id='ebtos.cabang.kota'
+  ) kota,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.nama.cabang'
+  ) cabang,
+  NVLN(profitpelindo) profitpelindo,
+  NVLN(profitowner) profitowner,
+  owner_name,
+  (SELECT description FROM m_setting_app WHERE id = 'ttd_mo_tpb'
+  ) AS mo_name,
+  (SELECT value_string FROM m_setting_app WHERE id = 'ttd_mo_tpb'
+  ) AS mo_nip,
+  (SELECT description FROM m_setting_app WHERE id = 'ttd_gm_tpb'
+  ) AS gm_name,
+  (SELECT value_string FROM m_setting_app WHERE id = 'ttd_gm_tpb'
+  ) AS gm_nip
+FROM m_owner_equipment
+WHERE owner_code = $P{owner}]]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="cabang" class="java.lang.String"/>
+	<field name="profitpelindo" class="java.math.BigDecimal"/>
+	<field name="profitowner" class="java.math.BigDecimal"/>
+	<field name="owner_name" class="java.lang.String"/>
+	<field name="mo_name" class="java.lang.String"/>
+	<field name="mo_nip" class="java.lang.String"/>
+	<field name="gm_name" class="java.lang.String"/>
+	<field name="gm_nip" class="java.lang.String"/>
+	<variable name="V_Pend_Rec" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{V_Pend_Rec} == null ? java.math.BigDecimal.ZERO : $V{V_Pend_Rec}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="V_Pel_Rec" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{V_Pel_Rec} == null ? java.math.BigDecimal.ZERO : $V{V_Pel_Rec}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="V_Owner_Rec" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{V_Owner_Rec} == null ? java.math.BigDecimal.ZERO : $V{V_Owner_Rec}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="V_Pend_Del" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{V_Pend_Del} == null ? java.math.BigDecimal.ZERO : $V{V_Pend_Del}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="V_Pel_Del" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{V_Pel_Del} == null ? java.math.BigDecimal.ZERO : $V{V_Pel_Del}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="V_Owner_Del" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{V_Owner_Del} == null ? java.math.BigDecimal.ZERO : $V{V_Owner_Del}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="sr_tot1" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{sr_tot1} == null ? 0 : $V{sr_tot1}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="sr_tot2" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{sr_tot2} == null ? 0 : $V{sr_tot2}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<variable name="sr_tot3" class="java.math.BigDecimal">
+		<variableExpression><![CDATA[$V{sr_tot3} == null ? 0 : $V{sr_tot3}]]></variableExpression>
+		<initialValueExpression><![CDATA[0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="48" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="533" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["REKAPITULASI PENDAPATAN HANDLING PETIKEMAS ABMPK MILIK " + $F{owner_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="24" width="533" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["PERIODE BULAN " + ($P{bulan} == 1 ? "JANUARI" :  $P{bulan} == 2 ? "FEBRUARI" :  $P{bulan} == 3 ? "MARET" :  $P{bulan} == 4 ? "APRIL" :  $P{bulan} == 5 ? "MEI" :  $P{bulan} == 6 ? "JUNI" :  $P{bulan} == 7 ? "JULI" :  $P{bulan} == 8 ? "AGUSTUS" :  $P{bulan} == 9 ? "SEPTEMBER" :  $P{bulan} == 10 ? "OKTOBER" :  $P{bulan} == 11 ? "NOVEMBER" :  "DESEMBER") + " " +$P{tahun}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="12" width="533" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["DI PT PELINDO IV (PERSERO) CABANG "+$F{cabang}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="36" splitType="Stretch">
+			<staticText>
+				<reportElement x="34" y="0" width="28" height="36"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Double"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="0" width="147" height="36"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[URAIAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="209" y="0" width="260" height="36"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PENDAPATAN]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band splitType="Stretch">
+			<subreport isUsingCache="false">
+				<reportElement x="172" y="0" width="380" height="0" isRemoveLineWhenBlank="true"/>
+				<subreportParameter name="owner">
+					<subreportParameterExpression><![CDATA[$P{owner}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="bulan">
+					<subreportParameterExpression><![CDATA[$P{bulan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tahun">
+					<subreportParameterExpression><![CDATA[$P{tahun}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="totalBM" toVariable="sr_tot1" calculation="Sum"/>
+				<returnValue subreportVariable="totalPel" toVariable="sr_tot2" calculation="Sum"/>
+				<returnValue subreportVariable="totalCsn" toVariable="sr_tot3" calculation="Sum"/>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_HANDLING}]]></subreportExpression>
+			</subreport>
+			<subreport isUsingCache="false">
+				<reportElement x="0" y="0" width="380" height="0" isRemoveLineWhenBlank="true"/>
+				<subreportParameter name="bulan">
+					<subreportParameterExpression><![CDATA[$P{bulan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tahun">
+					<subreportParameterExpression><![CDATA[$P{tahun}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="owner">
+					<subreportParameterExpression><![CDATA[$P{owner}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="equipCode">
+					<subreportParameterExpression><![CDATA[$P{equipCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="totalProfitPelindo" toVariable="V_Pel_Rec"/>
+				<returnValue subreportVariable="totalProfitOwner" toVariable="V_Owner_Rec"/>
+				<returnValue subreportVariable="jumlahTotal" toVariable="V_Pend_Rec"/>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_RECEIVING}]]></subreportExpression>
+			</subreport>
+			<subreport isUsingCache="false">
+				<reportElement x="32" y="0" width="380" height="0" isRemoveLineWhenBlank="true"/>
+				<subreportParameter name="owner">
+					<subreportParameterExpression><![CDATA[$P{owner}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="tahun">
+					<subreportParameterExpression><![CDATA[$P{tahun}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="bulan">
+					<subreportParameterExpression><![CDATA[$P{bulan}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="equipCode">
+					<subreportParameterExpression><![CDATA[$P{equipCode}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<returnValue subreportVariable="jumlahTotal" toVariable="V_Pend_Del"/>
+				<returnValue subreportVariable="totalProfitPelindo" toVariable="V_Pel_Del"/>
+				<returnValue subreportVariable="totalProfitOwner" toVariable="V_Owner_Del"/>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DELIVERY}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<summary>
+		<band height="200">
+			<staticText>
+				<reportElement x="34" y="57" width="175" height="20"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Double"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL (A+B+C)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="34" y="0" width="28" height="19"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Double"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="34" y="19" width="28" height="19"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Double"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[B]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="0" width="147" height="19"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[HANDLING B/M]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="19" width="147" height="19"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[DELIVERY]]></text>
+			</staticText>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement x="209" y="19" width="260" height="19" isRemoveLineWhenBlank="true"/>
+				<box rightPadding="2">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[0]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement x="209" y="57" width="260" height="20" isRemoveLineWhenBlank="true"/>
+				<box rightPadding="2">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sr_tot1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="33" y="180" width="149" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{gm_nip}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="33" y="107" width="149" height="15"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[GENERAL MANAGER]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="33" y="170" width="149" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{gm_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="317" y="168" width="118" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{mo_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="317" y="108" width="136" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{kota}.substring(0, 1)+$F{kota}.substring(1, $F{kota}.length()).toLowerCase()+", "+($P{bulan} == 1 ? "JANUARI" : $P{bulan} == 2 ? "FEBRUARI" : $P{bulan} == 3 ? "MARET" : $P{bulan} == 4 ? "APRIL" : $P{bulan} == 5 ? "MEI" : $P{bulan} == 6 ? "JUNI" : $P{bulan} == 7 ? "JULI" : $P{bulan} == 8 ? "AGUSTUS" : $P{bulan} == 9 ? "SEPTEMBER" : $P{bulan} == 10 ? "OKTOBER" : $P{bulan} == 11 ? "NOVEMBER" : "DESEMBER") + " " +$P{tahun}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="317" y="178" width="118" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{mo_nip}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="317" y="122" width="118" height="15"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[MANAGER OPERASIONAL]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement x="209" y="0" width="260" height="19"/>
+				<box rightPadding="2">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{sr_tot1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="34" y="38" width="28" height="19"/>
+				<box>
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Double"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[C]]></text>
+			</staticText>
+			<textField pattern="#,##0.00" isBlankWhenNull="false">
+				<reportElement x="209" y="38" width="260" height="19" isRemoveLineWhenBlank="true"/>
+				<box rightPadding="2">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[0]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="62" y="38" width="147" height="19"/>
+				<box leftPadding="5">
+					<pen lineWidth="0.25"/>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25" lineStyle="Solid"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[RECEIVING]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ReportHatchMoves" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f32baabd-b20f-46c5-ac4e-6baba9986330">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<parameter name="operation" class="java.lang.String"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object"/>
+	<queryString>
+		<![CDATA[SELECT sv.no_ppkb, mv.name, pv.voy_in, pv.voy_out FROM service_vessel sv, preservice_vessel pv, m_vessel mv WHERE sv.booking_code = pv.booking_code AND pv.vessel_code = mv.vessel_code AND sv.status IN ( 'Served', 'Servicing') AND sv.no_ppkb=$P{no_ppkb}]]>
+	</queryString>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="25" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="144b0688-1573-4ace-b18b-1abbd23f3060" x="0" y="0" width="555" height="23" isRemoveLineWhenBlank="true" isPrintInFirstWholeBand="true"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Hatch Moves]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="62" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="14d81dfa-b382-4358-80d6-357a0ec8fcb7" x="0" y="15" width="63" height="15"/>
+				<textElement/>
+				<text><![CDATA[Vessel Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b966a62f-3c0b-4b99-a1ef-ee9276218aff" x="0" y="45" width="63" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Voy Out]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e44aaef9-6048-4ed3-87be-53413061e926" x="0" y="30" width="63" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Voy In]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6b209ca3-de11-4b16-a16c-46b704900f7b" x="0" y="0" width="63" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[No_ppkb]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="fa0c7d2b-2121-4608-9b26-39670c32ace3" x="71" y="0" width="100" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_ppkb}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="9b09db61-b2fd-42a1-be62-97a01e568900" x="71" y="15" width="100" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="a7576486-74b7-4ef2-a6ce-6bc074ddb0bf" x="71" y="30" width="100" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{voy_in}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="2f9d35ee-b948-49a3-ba8f-352dbc63e215" x="71" y="45" width="100" height="15"/>
+				<textElement>
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{voy_out}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="b01bbfa1-2a7e-4fd4-8d73-adbdfea1a428" x="63" y="0" width="8" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="02fff770-9d14-47d3-8819-a8e60413da9e" x="63" y="15" width="8" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0e0fc2ce-e62a-41c5-9600-024d01ea9c1d" x="63" y="30" width="8" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a706ca04-41d1-4bf3-b0fc-73b9d6ee8f12" x="63" y="45" width="8" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="33" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="ea25edf1-c45a-47e3-929f-e43945af8fe6" x="78" y="0" width="72" height="33"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Crane]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b7723bc1-0196-4d0d-9f54-17944515acc7" x="240" y="0" width="80" height="33"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Operation]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9a7495cd-4215-4192-8ee9-9bba17380281" x="0" y="0" width="78" height="33"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bay No ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="701c0ee8-8bcf-4fe7-ae07-117e6eb07c0a" x="320" y="0" width="235" height="15"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Equipment]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4cc93334-abb8-432c-b2f6-9a7fb1927904" x="320" y="15" width="51" height="18"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Cc Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="1e3bc921-ffd8-4ad8-aa97-14368d390b58" x="459" y="15" width="96" height="18"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[End Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f5b61a01-a0f7-4e87-915d-a33d0efd15db" x="371" y="15" width="88" height="18"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Start Time]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f32bd36b-c8f9-4eec-8eeb-ea46f71691d5" x="150" y="0" width="90" height="33"/>
+				<box>
+					<pen lineWidth="0.75"/>
+					<topPen lineWidth="0.75"/>
+					<leftPen lineWidth="0.75"/>
+					<bottomPen lineWidth="0.75"/>
+					<rightPen lineWidth="0.75"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Activity]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30" splitType="Stretch">
+			<subreport>
+				<reportElement uuid="b1b8c120-adc2-4f75-baec-cf83b55cc22a" x="0" y="0" width="555" height="30"/>
+				<subreportParameter name="operation">
+					<subreportParameterExpression><![CDATA[$P{operation}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

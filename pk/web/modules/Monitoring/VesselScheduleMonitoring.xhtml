@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ebtos="http://java.sun.com/jsf/composite/tags/module"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.vessel_schedule_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.printElement.min.js"></script>
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.maskedinput-1.3.min.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            jQuery(function($){
+               jQuery(".dateMask").mask("99/99/9999");
+            });
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.berth_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="berthForm">
+            <div class="ui-panel ui-widget ui-widget-content ui-corner-all" style="width:600px;">
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="startDate"  value="From"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="startDate" disabled="true" inputStyleClass="dateMask" size="15" selectListener="#{vesselScheduleMonitoring.handleResetTransactionRecapParameter}" onselect="freeze();" onSelectUpdate="berthForm:endDate" value="#{vesselScheduleMonitoring.startDate}"/>
+                    <h:outputLabel for="endDate" value="To"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="endDate" inputStyleClass="dateMask" size="15" selectListener="#{vesselScheduleMonitoring.handleResetTransactionRecapParameter}" onselect="freeze();" onSelectUpdate="berthForm:endDate" value="#{vesselScheduleMonitoring.endDate}" showOn="button"/>
+                    <h:outputLabel value="Berth Name" for="berthName"/>
+                    <h:outputText value=":"/>
+                    <h:selectOneMenu id="berthName" value="#{vesselScheduleMonitoring.dock}" title="Dock" >
+                        <f:selectItems value="#{vesselScheduleMonitoring.docks}" var="dock" itemValue="#{dock}" itemLabel="#{dock.name}"/>
+                    </h:selectOneMenu>
+                </h:panelGrid>
+                <f:facet name="footer">
+                    
+                </f:facet>
+                <div class="ui-panel-footer ui-widget-content" style="overflow: visible;">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-document" oncomplete="laporanRencanaKedatanganKapal.show();" value="#{msg['menu.report.vessel_arrival_plan_report']}" update="laporanRencanaKedatanganKapalForm" immediate="true" title="#{msg['menu.report.vessel_arrival_plan_report']}"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton image="ui-icon-print" type="button" value="print" onclick="jQuery('[id=berthForm:imagePanel]').printElement();"/>
+                        <p:commandButton value="#{msg['application.operation.filter']}" style="font-size: x-small" image="ui-icon-search" onstart="freeze();" update="berthForm:imagePanel"/>
+                    </div>
+                </div>
+            </div>
+            <br/>
+            <p:outputPanel id="imagePanel">
+                <p:graphicImage alt="berth" value="#{vesselScheduleMonitoring.vesselScheduleMonitoringUrl}" cache="false"/>
+            </p:outputPanel>
+        </h:form>
+
+        <ebtos:LaporanRencanaKedatanganKapal id="laporanRencanaKedatanganKapal"  widgetVar="laporanRencanaKedatanganKapal"/>
+    </ui:define>
+
+</ui:composition>

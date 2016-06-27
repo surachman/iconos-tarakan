@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="JKM_Invoices_subreport" pageWidth="263" pageHeight="802" columnWidth="263" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="3.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="sumber" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT i.no_invoice,
+  i.created_date,
+  i.total_tagihan,
+  i.curr_code,
+  mb.nama
+FROM recap_jurnal_invoice rji
+JOIN invoice i
+ON (rji.no_invoice=i.no_invoice)
+LEFT JOIN m_bank mb
+ON (i.bank       =mb.id)
+WHERE rji.sumber = $P{sumber}]]>
+	</queryString>
+	<field name="no_invoice" class="java.lang.String"/>
+	<field name="created_date" class="java.sql.Timestamp"/>
+	<field name="total_tagihan" class="java.math.BigDecimal"/>
+	<field name="curr_code" class="java.lang.String"/>
+	<field name="nama" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="12">
+			<line>
+				<reportElement x="0" y="11" width="262" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="209" y="0" width="54" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["BANK"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="17" y="0" width="59" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["NO. NOTA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="136" y="0" width="73" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["NILAI NOTA"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="76" y="0" width="60" height="12"/>
+				<textElement textAlignment="Center">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["TGL. NOTA"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="12" splitType="Stretch">
+			<textField>
+				<reportElement x="17" y="0" width="59" height="12"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{no_invoice}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="76" y="0" width="60" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{created_date})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="154" y="0" width="55" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{total_tagihan}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="136" y="0" width="18" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="209" y="0" width="54" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[($F{nama} == null ? "-" : $F{nama})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="16" height="12"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{REPORT_COUNT} + ". "]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="2">
+			<line>
+				<reportElement x="0" y="1" width="262" height="1"/>
+			</line>
+		</band>
+	</columnFooter>
+</jasperReport>

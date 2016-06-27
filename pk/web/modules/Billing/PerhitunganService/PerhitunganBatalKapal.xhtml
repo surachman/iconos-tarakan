@@ -1,0 +1,387 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode"
+                xmlns:qt="http://www.qtasnim.com/currency">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_change_vessel']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_change_vessel']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"></script>
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.blink.js" />
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+        </script>
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+
+            function handleCallback(xhr, status, args) {
+                if(!(args.validationFailed || args.loggedIn == false)) {
+                    dlgBatalNota.hide();
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">
+            <h:panelGrid columns="2">
+                <h:panelGrid columns="5" id="registrationDetail">
+                    <h:outputLabel value="No Registrasi" />
+                    <p:spacer width="17"/>
+                    <h:outputLabel value=" : " />
+                    <h:inputText readonly="true" value="#{perhitunganBatalKapalBean.registration.noReg}" size="30" onmousedown="showRegistrations();" onkeypress="showRegistrations();"/>
+                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" type="button" value="..." style="font-size: x-small" onclick="showRegistrations();"/>
+
+                    <h:outputLabel value="Customer" />
+                    <p:spacer width="17"/>
+                    <h:outputLabel value=" : " />
+                    <h:inputText readonly="true" value="#{perhitunganBatalKapalBean.registration.masterCustomer.name}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="No PPKB" />
+                    <p:spacer width="17"/>
+                    <h:outputLabel value=" : " />
+                    <h:inputText readonly="true" value="#{perhitunganBatalKapalBean.registration.planningVessel.noPpkb}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Vessel Name" />
+                    <p:spacer width="17"/>
+                    <h:outputLabel value=" : " />
+                    <h:inputText readonly="true" value="#{perhitunganBatalKapalBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Voy In" />
+                    <p:spacer width="17"/>
+                    <h:outputLabel value=" : " />
+                    <h:inputText readonly="true" value="#{perhitunganBatalKapalBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Voy Out" />
+                    <p:spacer width="17"/>
+                    <h:outputLabel value=" : " />
+                    <h:inputText readonly="true" value="#{perhitunganBatalKapalBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Status" />
+                    <p:spacer width="17"/>
+                    <h:outputLabel value=" : " />
+                    <h:inputText readonly="true" value="#{perhitunganBatalKapalBean.registration.statusService}" size="30"/>
+                    <h:outputLabel/>
+                </h:panelGrid>
+                <p:fieldset style="height:150px;margin-left: 15px;">
+                    <f:facet name="legend">
+                        <h:outputText value="Change Vesssel To"/>
+                    </f:facet>
+                    <h:panelGrid columns="4" id="newVesselDetail">
+                        <h:outputLabel value="No PPKB"/>:
+                        <h:inputText size="30" id="noPpkb" readonly="true" value="#{perhitunganBatalKapalBean.newPlanningVessel.noPpkb}" title="No PPKB" onmousedown="#{empty perhitunganBatalKapalBean.registration.noReg or not empty perhitunganBatalKapalBean.registration.invoice.noInvoice ? '' : 'showNewVesselsDialog();'}" onkeypress="#{empty perhitunganBatalKapalBean.registration.noReg or not empty perhitunganBatalKapalBean.registration.invoice.noInvoice ? '' : 'showNewVesselsDialog();'}"/>
+                        <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" disabled="#{empty perhitunganBatalKapalBean.registration.noReg or not empty perhitunganBatalKapalBean.registration.invoice.noInvoice}" oncomplete="showNewVesselsDialog();"/>
+                        <h:outputLabel value="Vessel Name" for="vesselName" />:
+                        <h:inputText size="30" id="vesselName" readonly="true" value="#{perhitunganBatalKapalBean.newPlanningVessel.preserviceVessel.masterVessel.name}" title="Vessel Name"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputLabel value="Voyage In" for="voyageIn" />:
+                        <h:inputText size="30" id="voyageIn" readonly="true" value="#{perhitunganBatalKapalBean.newPlanningVessel.preserviceVessel.voyIn}" title="Voyage In"/>
+                        <h:outputText value="&nbsp;"/>
+                        <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                        <h:inputText size="30" id="voyageOut" readonly="true" value="#{perhitunganBatalKapalBean.newPlanningVessel.preserviceVessel.voyOut}" title="Voyage Out"/>
+                        <h:outputText value="&nbsp;"/>
+                    </h:panelGrid>
+                </p:fieldset>
+            </h:panelGrid>
+        </h:form>
+        <br/>
+        <h:form id="changeVesselContainersForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{perhitunganBatalKapalBean.changeVesselServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="changeVesselContainersTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-single-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{empty perhitunganBatalKapalBean.registration.invoice.noInvoice or empty perhitunganBatalKapalBean.changeVesselServices or (perhitunganBatalKapalBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor))}" image="ui-icon-plusthick" title="Batal Nota" update="batalNota" oncomplete="dlgBatalNota.show()" actionListener="#{perhitunganBatalKapalBean.handleAddCancelInvoice}"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item.contNo}" rowspan="2" headerText="Container No" filterMatchMode="contains" filterBy="#{item.contNo}"/>
+                        <p:column sortBy="#{item.contSize}" rowspan="2" headerText="Size" />
+                        <p:column sortBy="#{item.masterContainerType.masterContainerTypeInGeneral.id}" rowspan="2" headerText="Type" />
+                        <p:column sortBy="#{item.contStatus}" rowspan="2" headerText="Status" filterMatchMode="contains" filterBy="#{item.contStatus}"/>
+                        <p:column sortBy="#{item.overSize}" rowspan="2" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column rowspan="2" headerText="Position" />
+                        <p:column rowspan="2" headerText="Charge (#{empty perhitunganBatalKapalBean.masterCurrency.language ? '-' : qt:getCurrencySymbol(perhitunganBatalKapalBean.masterCurrency.language, perhitunganBatalKapalBean.masterCurrency.country)})"/>
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item.dg}" headerText="Dg" />
+                        <p:column sortBy="#{item.dgLabel}" headerText="Label"/>
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contNo}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contSize}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.masterContainerType.masterContainerTypeInGeneral.id}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.contStatus}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.overSize ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.masterCommodity.masterDangerousClass ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.dgLabel ? 'Y' : 'N'}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item.position}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(perhitunganBatalKapalBean.masterCurrency.language, perhitunganBatalKapalBean.masterCurrency.country, item.charge, false, perhitunganBatalKapalBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="9" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganBatalKapalBean.masterCurrency.language, perhitunganBatalKapalBean.masterCurrency.country, perhitunganBatalKapalBean.total, false, perhitunganBatalKapalBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="9" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganBatalKapalBean.masterCurrency.language, perhitunganBatalKapalBean.masterCurrency.country, perhitunganBatalKapalBean.ppn, false, perhitunganBatalKapalBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="9" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganBatalKapalBean.masterCurrency.language, perhitunganBatalKapalBean.masterCurrency.country, perhitunganBatalKapalBean.materaiPrint, false, perhitunganBatalKapalBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="9" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(perhitunganBatalKapalBean.masterCurrency.language, perhitunganBatalKapalBean.masterCurrency.country, perhitunganBatalKapalBean.total + perhitunganBatalKapalBean.ppn + perhitunganBatalKapalBean.materaiPrint, false, perhitunganBatalKapalBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <p:outputPanel id="perhitunganOperationButtonGroup">
+                        <div class="header-panel-single-left">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{not perhitunganBatalKapalBean.registration.statusService.equals('registrasi') or empty perhitunganBatalKapalBean.changeVesselServices or empty perhitunganBatalKapalBean.newPlanningVessel.noPpkb}" update="growl changeVesselContainersForm:changeVesselContainersTable:perhitunganOperationButtonGroup" actionListener="#{perhitunganBatalKapalBean.handleSubmit}"/>
+                            <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty perhitunganBatalKapalBean.changeVesselServices}" actionListener="#{perhitunganBatalKapalBean.handleDownloadTransactionRecap}" update="@none"/>
+                            <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty perhitunganBatalKapalBean.changeVesselServices or (perhitunganBatalKapalBean.disPrint and not loginSessionBean.supervisor) or perhitunganBatalKapalBean.disKredit}" actionListener="#{perhitunganBatalKapalBean.handleDownloadNota}" update="changeVesselContainersForm:changeVesselContainersTable:perhitunganOperationButtonGroup"/>
+                            <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty perhitunganBatalKapalBean.changeVesselServices or perhitunganBatalKapalBean.disKredit or perhitunganBatalKapalBean.disDetail}" actionListener="#{perhitunganBatalKapalBean.handleDownloadDetail}" update="changeVesselContainersForm:changeVesselContainersTable:perhitunganOperationButtonGroup"/>
+                        </div>
+                    </p:outputPanel>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+       <p:confirmDialog message="#{msg['application.operation.cancel']} Change Vessel?" header="#{msg['application.header.confirm.cancel_transaction']}" severity="alert"  widgetVar="cancelTransactionConfirmation">
+            <h:form>
+                <div class="header-panel-single-right">
+                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{perhitunganBatalKapalBean.handleDelete}" update="registrationForm:registrationDetail changeVesselContainersForm:changeVesselContainersTable growl" oncomplete="cancelTransactionConfirmation.hide();" />
+                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="cancelTransactionConfirmation.hide()"/>
+                </div>
+            </h:form>
+        </p:confirmDialog>
+
+        <p:dialog header="Select Registration"  widgetVar="registrationsDialog" modal="true" minWidth="750">
+            <h:form id="registrationsForm">
+                <p:dataTable id="registrationsTable"  widgetVar="registrationsTable"
+                             var="item" value="#{perhitunganBatalKapalBean.registrations}"
+                             paginator="true" rowIndexVar="No" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{perhitunganBatalKapalBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail changeVesselContainersForm registrationForm:newVesselDetail" oncomplete="registrationsDialog.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select New Vessel"  widgetVar="newVesselsDialog" modal="true" minWidth="750">
+            <h:form id="newVesselsForm">
+                <p:dataTable value="#{perhitunganBatalKapalBean.availablePlanningVessels}" var="item" lazy="true"
+                             id="newVesselsTable"  widgetVar="newVesselsTable"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="width: 20px;" >
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterBy="#{item.noPpkb}" sortBy="#{item.noPpkb}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item.noPpkb}" />
+                    </p:column>
+
+                    <p:column  filterBy="#{item.preserviceVessel.masterVessel.name}" filterEvent="keyup" sortBy="#{item.preserviceVessel.masterVessel.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.masterVessel.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyIn}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyIn}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyOut}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyOut}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{perhitunganBatalKapalBean.handleSelectNewVessel}" disabled="#{item.noPpkb.equals(perhitunganBatalKapalBean.registration.planningVessel.noPpkb)}" value="select" update="registrationForm:newVesselDetail changeVesselContainersForm:changeVesselContainersTable:perhitunganOperationButtonGroup" oncomplete="newVesselsDialog.hide();" immediate="true">
+                            <f:setPropertyActionListener target="#{perhitunganBatalKapalBean.newPlanningVessel}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+
+            <h:form>
+                <p:remoteCommand name="showNewVesselsDialog" immediate="true" oncomplete="newVesselsDialog.show();newVesselsTable.clearFilters();"/>
+                <p:remoteCommand name="showRegistrations" immediate="true" actionListener="#{perhitunganBatalKapalBean.handleShowRegistrations}" update="registrationsForm:registrationsTable" oncomplete="registrationsDialog.show();registrationsTable.clearFilters();"/>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{perhitunganBatalKapalBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{perhitunganBatalKapalBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{perhitunganBatalKapalBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganBatalKapalBean.handleSubmitBatalNota}"
+                                                 oncomplete="handleCallback(xhr, status, args)" image="ui-icon-check" update="growl batalNota cancelLoadingForm"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" visible="true" rendered="#{not perhitunganBatalKapalBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="PerhitunganBatalKapal.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.yard_monitoring_planning']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <!--dialog untuk memilih planning vessel-->
+        <p:dialog header="Select Planning Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+            <h:form id="constraintForm">
+                <p:dataTable var="item" value="#{yardMonitoringBean.vessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" id="vesselDetail" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{yardMonitoringBean.handleSelectPpkb}" value="select" update="listData" oncomplete="dlgVessel.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="listData">
+            <h:panelGrid id="planningVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{yardMonitoringBean.vessel[0]}" readonly="true" size="30" onmousedown="dlgVessel.show();"/>
+                <p:commandButton image="ui-icon-folder-open" value="..." onclick="dlgVessel.show();" update="constraintForm:vesselDetail" actionListener="#{yardMonitoringBean.handleViewPpkb}"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{yardMonitoringBean.vessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{yardMonitoringBean.vessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{yardMonitoringBean.vessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br />
+            <p:tabView>
+                <!--LOAD-->
+                <p:tab title="Load">
+
+                    <p:dataTable id="constraintTable" var="item" value="#{yardMonitoringBean.loadingList}"
+                                 paginator="true" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                        <f:facet name="header">
+                            <div class="header-panel-single-left">
+                                &nbsp;
+                            </div>
+                        </f:facet>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{number+1}." />
+                        </p:column>
+
+                        <p:column sortBy="#{item[1]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Size" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[0]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Type" />
+                            </f:facet>
+                            <h:outputText value="#{item[0]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Status" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Gross" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Dangerous" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[6]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Over Size" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[7]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Port Code" />
+                            </f:facet>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[12]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Block" />
+                            </f:facet>
+                            <h:outputText value="#{item[12]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[8]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="count Baplie" />
+                            </f:facet>
+                            <h:outputText value="#{item[8]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[9]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Booking" />
+                            </f:facet>
+                            <h:outputText value="#{item[9]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[10]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Allocated" />
+                            </f:facet>
+                            <h:outputText value="#{item[10]}" style="color: red; font-weight: bold;"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty yardMonitoringBean.vessel[0] or empty yardMonitoringBean.loadingList}">
+                                    <p:dataExporter type="xls" target="constraintTable" fileName="Data_Container_load" excludeColumns="0" postProcessor="#{yardMonitoringBean.postProcessXLS}"/>
+                                </p:commandButton>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Discharge">
+                    <p:dataTable id="constraintTable2" var="item" value="#{yardMonitoringBean.dischargeList}"
+                                 paginator="true" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                        <f:facet name="header">
+                            <div class="header-panel-single-left">
+                                &nbsp;
+                            </div>
+                        </f:facet>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{number+1}." />
+                        </p:column>
+
+                        <p:column sortBy="#{item[1]}">
+                            <f:facet name="header">
+                                <h:outputText value="Size" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[0]}">
+                            <f:facet name="header">
+                                <h:outputText value="Type" />
+                            </f:facet>
+                            <h:outputText value="#{item[0]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Status" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Gross" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Dangerous" />
+                            </f:facet>
+                            <h:outputText value="#{item[5]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[9]}" style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="Block" />
+                            </f:facet>
+                            <h:outputText value="#{item[9]}"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Count" />
+                            </f:facet>
+                            <h:outputText value="#{item[6]}" style="color: blue; font-weight: bold;"/>
+                        </p:column>
+
+                        <p:column sortBy="#{item[7]}">
+                            <f:facet name="header">
+                                <h:outputText value="Allocated" />
+                            </f:facet>
+                            <h:outputText value="#{item[7]}" style="color: red; font-weight: bold;"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-left">
+                                <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty yardMonitoringBean.vessel[0] or empty yardMonitoringBean.dischargeList}">
+                                    <p:dataExporter type="xls" target="constraintTable2" fileName="Data_Container_Bongkaran" excludeColumns="0" postProcessor="#{yardMonitoringBean.postProcessXLS}"/>
+                                </p:commandButton>
+                            </div>
+                        </f:facet>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

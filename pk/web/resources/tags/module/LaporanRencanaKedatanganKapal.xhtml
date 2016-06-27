@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.prime.com.tr/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+  <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="id" required="true"/>
+        <cc:attribute name="widgetVar" required="true" type="java.lang.String"/>
+    </cc:interface>
+
+  <!-- IMPLEMENTATION -->
+  <cc:implementation>
+        <script type="text/javascript">
+            function handleDownloadLRKKRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                    #{cc.attrs.widgetVar}.hide();
+                }
+            }
+        </script>
+        <p:dialog widgetVar="#{cc.attrs.widgetVar}" id="#{cc.attrs.widgetVar}" width="600" modal="true" position="center" header="Laporan Rencana Keatangan Kapal">
+            <h:form id="#{cc.attrs.id}Form">
+                <p:panel>
+                    <h:panelGrid columns="3" cellpadding="10">
+                        <h:outputText value="Periode Bulan/Tahun : "/>
+                        <h:selectOneMenu value="#{laporanRencanaKedatanganKapalBean.bulan}">
+                            <f:selectItem itemValue="1" itemLabel="Januari"/>
+                            <f:selectItem itemValue="2" itemLabel="February"/>
+                            <f:selectItem itemValue="3" itemLabel="Maret"/>
+                            <f:selectItem itemValue="4" itemLabel="April"/>
+                            <f:selectItem itemValue="5" itemLabel="Mei"/>
+                            <f:selectItem itemValue="6" itemLabel="Juni"/>
+                            <f:selectItem itemValue="7" itemLabel="Juli"/>
+                            <f:selectItem itemValue="8" itemLabel="Agustus"/>
+                            <f:selectItem itemValue="9" itemLabel="September"/>
+                            <f:selectItem itemValue="10" itemLabel="Oktober"/>
+                            <f:selectItem itemValue="11" itemLabel="November"/>
+                            <f:selectItem itemValue="12" itemLabel="Desember"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <p:commandButton actionListener="#{laporanRencanaKedatanganKapalBean.handleDownloadReport}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadLRKKRequest(args);" style="font-size: x-small"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" immediate="true" oncomplete="#{cc.attrs.widgetVar}.hide();"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </cc:implementation>
+</html>

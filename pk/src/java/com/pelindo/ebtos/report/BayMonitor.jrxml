@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="BayMonitor" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="username" class="java.lang.String" isForPrompting="false"/>
+	<parameter name="ppkb" class="java.lang.String"/>
+	<parameter name="vessel" class="java.lang.String"/>
+	<parameter name="bay" class="java.lang.String"/>
+	<parameter name="url" class="java.lang.String">
+		<defaultValueExpression><![CDATA["http://localhost:8080/ebtos/bayMonitoring.png?isLoad=t&vessel=%s&bay=%s&ppkb=2012080001"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="vesselName" class="java.lang.String"/>
+	<parameter name="voyagein" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT DISTINCT bay_no FROM m_vessel_profile WHERE vessel_code=$P{vessel} ORDER BY bay_no]]>
+	</queryString>
+	<field name="bay_no" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="102" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="42" width="81" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[No. PPKB]]></text>
+			</staticText>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="91" y="42" width="127" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{ppkb}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Transparent" x="0" y="0" width="555" height="22" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="14" isBold="true" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<text><![CDATA[Bay Monitoring]]></text>
+			</staticText>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="91" y="82" width="127" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{voyagein}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="81" y="42" width="10" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement isPrintRepeatedValues="false" x="91" y="62" width="127" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{vesselName}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="62" width="81" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Vessel Name]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="82" width="10" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="82" width="81" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Voyage]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="81" y="62" width="10" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="125" splitType="Stretch">
+			<image scaleImage="RealSize" hAlign="Center" isUsingCache="false" onErrorType="Blank">
+				<reportElement x="0" y="0" width="555" height="125"/>
+				<box>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<imageExpression class="java.lang.String"><![CDATA[String.format($P{url},$P{vessel},$P{bay},$P{ppkb})]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+</jasperReport>

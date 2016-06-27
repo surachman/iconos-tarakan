@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.gate_monitoring.unrealized_activity_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.gate_monitoring.unrealized_activity_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+
+        <h:form id="appForm">
+            <h:panelGrid id="serviceTypePanel" columns="3">
+                <h:outputLabel value="Service Type" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio id="filter" value="#{unrealizedActivityMonitoringBean.serviceType}" valueChangeListener="#{unrealizedActivityMonitoringBean.onChange}" onclick="dataTable.clearFilters()">
+                    <f:selectItem itemValue="1" itemLabel="Receiving"/>
+                    <f:selectItem itemValue="2" itemLabel="Delivery"/>
+                    <p:ajax update="appTable" process="@this" onstart="freeze();" listener="#{unrealizedActivityMonitoringBean.onChange}"/>
+                </h:selectOneRadio>
+
+            </h:panelGrid>
+            
+            <br/>
+
+            <p:dataTable id="appTable" var="item" value="#{unrealizedActivityMonitoringBean.services}"
+                         paginator="true" rows="10"  widgetVar="dataTable"
+                         paginatorPosition="bottom" rowIndexVar="No"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" >
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;"/>
+                </f:facet>
+
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No" />
+                    </f:facet>
+                    <h:outputText value="#{No+1}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Jobslip" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No PPKB" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}" filterMatchMode="contains" filterBy="#{item[3]}"  style="text-align: left">
+                    <f:facet name="header">
+                        <h:outputText value="Vessel Name" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Voyage" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column sortBy="#{item[5]}" filterMatchMode="contains" filterBy="#{item[5]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Date In" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date"/>
+                    </h:outputText>
+                </p:column>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty unrealizedActivityMonitoringBean.services}">
+                            <p:dataExporter type="xls" target="appTable" fileName="Unrealized Activity Monitoring #{unrealizedActivityMonitoringBean.now}"
+                                            postProcessor="#{unrealizedActivityMonitoringBean.exportToExcel}"/>
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+                
+            </p:dataTable>
+
+
+        </h:form>
+    </ui:define>
+</ui:composition>
+

@@ -1,0 +1,481 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:qt="http://www.qtasnim.com/currency"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.perhitungan_discharge_reefer']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.perhitungan_discharge_reefer']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                if(!(args.validationFailed || args.loggedIn == false)) {
+                    dlgBatalNota.hide();
+                    containerSelectionDialog.hide();
+                }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" onkeypress="showRegistrations();" onmousedown="showRegistrations();" value="#{dischargeReeferBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" type="button" onclick="showRegistrations();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{dischargeReeferBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{dischargeReeferBean.registration.planningVessel.noPpkb}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{dischargeReeferBean.registration.planningVessel.preserviceVessel.masterVessel.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{dischargeReeferBean.registration.planningVessel.preserviceVessel.voyIn}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{dischargeReeferBean.registration.planningVessel.preserviceVessel.voyOut}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" readonly="true" value="#{dischargeReeferBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+            <h:panelGrid columns="3" id="cek">
+                <h:outputLabel value="Payment Type" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio value="#{dischargeReeferBean.registration.invoice.paymentType}" disabled="#{not dischargeReeferBean.registration.statusService.equals('registrasi')}" valueChangeListener="#{dischargeReeferBean.onChangeEvent}">
+                    <f:selectItem itemValue="CASH" itemLabel="Cash"/>
+                    <f:selectItem itemValue="KREDIT" itemLabel="Kredit"/>
+                    <f:ajax execute="@this" event="change" render="cek"/>
+                </h:selectOneRadio>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="deliveryServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{dischargeReeferBean.reeferDischargeServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="deliveryServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty dischargeReeferBean.registration.noReg or not dischargeReeferBean.registration.statusService.equals('registrasi')}" actionListener="#{dischargeReeferBean.handleAdd}" update="containerSelectionForm" oncomplete="containerSelectionDialog.show();"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{dischargeReeferBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor) or empty dischargeReeferBean.reeferDischargeServices}" oncomplete="dlgBatalNota.show()"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item[0]}" rowspan="2" headerText="Job Slip" filterBy="#{item[0]}" filterMatchMode="contains"/>
+                        <p:column sortBy="#{item[1]}" rowspan="2" headerText="Container No" filterBy="#{item[1]}" filterMatchMode="contains"/>
+                        <p:column sortBy="#{item[3]}" rowspan="2" headerText="Size" />
+                        <p:column sortBy="#{item[4]}" rowspan="2" headerText="Type" />
+                        <p:column sortBy="#{item[2]}" rowspan="2" headerText="Status" filterBy="#{item[2]}" filterMatchMode="contains"/>
+                        <p:column sortBy="#{item[5]}" rowspan="2" headerText="Plug On Date" />
+                        <p:column sortBy="#{item[6]}" rowspan="2" headerText="Shift Planning" />
+                        <p:column colspan="2" headerText="Plugging&nbsp;(#{qt:getCurrencySymbol(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country)})"/>
+                        <p:column colspan="2" headerText="Monitoring&nbsp;(#{qt:getCurrencySymbol(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country)})"/>
+                        <p:column sortBy="#{item[8] + item[10]}" rowspan="2" headerText="Total&nbsp;(#{qt:getCurrencySymbol(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country)})" />
+                        <p:column rowspan="2" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[7]}" headerText="Charge" />
+                        <p:column sortBy="#{item[8]}" headerText="Total" />
+                        <p:column sortBy="#{item[9]}" headerText="Charge" />
+                        <p:column sortBy="#{item[10]}" headerText="Total" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[5]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, item[7], false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, item[8], false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, item[9], false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, item[10], false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, item[8] + item[10], false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}"/>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{dischargeReeferBean.handleSelect}" disabled="#{not dischargeReeferBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Reefer Discharge Service">
+                            <f:attribute name="noCont" value="#{item[1]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="12" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, dischargeReeferBean.total, false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="12" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, dischargeReeferBean.total.multiply(dischargeReeferBean.ppnPrint), false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="12" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, dischargeReeferBean.materaiPrint, false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="12" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{qt:getFormattedCurrency(dischargeReeferBean.masterCurrency.language, dischargeReeferBean.masterCurrency.country, dischargeReeferBean.total.add(dischargeReeferBean.total.multiply(dischargeReeferBean.ppnPrint)).add(dischargeReeferBean.materaiPrint), false, dischargeReeferBean.masterCurrency.defaultFractionDigits)}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{empty dischargeReeferBean.reeferDischargeServices or not dischargeReeferBean.registration.statusService.equals('registrasi')}" update="registrationForm:registrationDetail registrationForm:cek deliveryServiceForm growl" actionListener="#{dischargeReeferBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty dischargeReeferBean.reeferDischargeServices}" actionListener="#{dischargeReeferBean.handleDownloadTransactionRecap}" update="deliveryServiceForm:deliveryServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty dischargeReeferBean.reeferDischargeServices or (dischargeReeferBean.registration.invoice.validasiPrint and not loginSessionBean.supervisor) or dischargeReeferBean.disKredit or empty dischargeReeferBean.registration.invoice.noReg}" actionListener="#{dischargeReeferBean.handleDownloadNota}" update="deliveryServiceForm"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty dischargeReeferBean.reeferDischargeServices or empty dischargeReeferBean.registration.invoice.noFakturPajak}" actionListener="#{dischargeReeferBean.handleDownloadDetail}" update="deliveryServiceForm"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Entry Discharge to Load Service"  widgetVar="containerSelectionDialog" modal="true" minWidth="410" id="containerSelectionDialog">
+            <h:form id="containerSelectionForm">
+                <p:panel>
+                    <div style="overflow: auto;">
+                        <h:panelGrid columns="5" style="float:left" id="containerInfoPanel">
+                            <h:outputLabel value="Container No *" style="font-weight: bold;"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="bl" onkeypress="showPluggableContainers();" onmousedown="showPluggableContainers();" value="#{dischargeReeferBean.reeferDischargeService.contNo}" readonly="true" size="20" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:commandButton immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showPluggableContainers();"/>
+                            <p:message for="bl" display="icon"/>
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{dischargeReeferBean.reeferDischargeService.contSize}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{dischargeReeferBean.reeferDischargeService.masterContainerType.masterContainerTypeInGeneral.id}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{dischargeReeferBean.reeferDischargeService.contStatus}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{dischargeReeferBean.reeferDischargeService.contGross}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText readonly="true" value="#{dischargeReeferBean.reeferDischargeService.overSize}" size="20"/>
+                            <h:outputLabel/>
+                            <h:outputLabel/>
+
+                            <h:outputText value="Shift *" style="font-weight: bold;"/>:
+                            <h:inputText id="shift" value="#{dischargeReeferBean.reeferDischargeService.shiftPlanning}" required="true" disabled="#{not empty dischargeReeferBean.serviceContDischargeAsObjectArray[9]}" validator="#{dischargeReeferBean.reeferShiftValidator.validate}"/>
+                            <p:message for="shift" display="icon"/>
+                            <h:outputLabel value="numeric min #{dischargeReeferBean.minimumShift}" style="color:red;"/>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                    </div>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{dischargeReeferBean.handleReeferDischargeConfirm}" update="deliveryServiceForm containerSelectionForm growl" oncomplete="handleRequestValidation(xhr, status, args)" disabled="#{empty dischargeReeferBean.reeferDischargeService.contNo}"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" onclick="containerSelectionDialog.hide();" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="registrationsDialog" modal="true" minWidth="750">
+                <p:dataTable var="item" rowIndexVar="No" id="registrationsTable"  widgetVar="registrationsTable" value="#{dischargeReeferBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{dischargeReeferBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail registrationForm:cek deliveryServiceForm:deliveryServiceTable  serviceContDiscForm:serviceContDisc" oncomplete="registrationsDialog.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{dischargeReeferBean.handleDelete}" update="registrationForm:registrationDetail registrationForm:cek deliveryServiceForm:deliveryServiceTable growl  serviceContDiscForm:serviceContDisc" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{dischargeReeferBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{dischargeReeferBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{dischargeReeferBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{dischargeReeferBean.handleCancelInvoice}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="registrationForm:registrationDetail registrationForm:cek deliveryServiceForm:deliveryServiceTable growl  serviceContDiscForm:serviceContDisc"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" visible="true" rendered="#{not dischargeReeferBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="DischargeReefer.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Service Container Discharge"  widgetVar="pluggableContainersDialog" modal="true" minWidth="700">
+            <h:form id="pluggableContainersForm">
+                <p:dataTable id="pluggableContainersTable"  widgetVar="pluggableContainersTable" var="item" value="#{dischargeReeferBean.serviceContDischarges}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column sortBy="#{item[14]}" filterMatchMode="contains" filterBy="#{item[14]}">
+                        <f:facet name="header">
+                            <h:outputText value="Bl No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[14]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" action="#{dischargeReeferBean.handleSelectPluggableContainer}" value="#{msg['application.operation.select']}" update="containerSelectionForm" oncomplete="pluggableContainersDialog.hide();" immediate="true">
+                            <f:setPropertyActionListener target="#{dischargeReeferBean.serviceContDischargeAsObjectArray}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showPluggableContainers" immediate="true" actionListener="#{dischargeReeferBean.handleShowPluggableContainers}" update="pluggableContainersForm:pluggableContainersTable" onstart="freeze();" oncomplete="pluggableContainersDialog.show();pluggableContainersTable.clearFilters();"/>
+            <p:remoteCommand name="showRegistrations" immediate="true" actionListener="#{dischargeReeferBean.handleShowRegistrations}" update="registrationsForm" onstart="freeze();" oncomplete="registrationsDialog.show();registrationsTable.clearFilters();"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,38 @@
+<facelet-taglib xmlns="http://java.sun.com/xml/ns/javaee"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
+        version="2.0">
+    <namespace>http://www.dycode.com/jsf</namespace>
+    <tag>
+        <tag-name>menubar</tag-name>
+        <component>
+            <component-type>dynamicMenu</component-type>
+        </component>
+        <attribute id="menuRoot">
+            <name>menuRoot</name>
+            <required>true</required>
+            <description>Object Tree berupa menuitem-menuitem</description>
+        </attribute>
+        <attribute id="roleValidator">
+            <name>roleValidator</name>
+            <required>true</required>
+            <description>Berisi custom logic untuk validasi user dan view</description>
+        </attribute>
+        <attribute id="userGroup">
+            <name>userGroup</name>
+            <required>true</required>
+            <description>Tipe User</description>
+        </attribute>
+        <attribute id="contextName">
+            <name>contextName</name>
+            <required>false</required>
+            <description>Context name aplikasi. Masih manual, ada yang tau caranya biar otomatis?</description>
+        </attribute>
+    </tag>
+    <tag>
+        <tag-name>breadcrumb</tag-name>
+        <component>
+            <component-type>dynamicBreadcrumb</component-type>
+        </component>
+    </tag>
+</facelet-taglib>

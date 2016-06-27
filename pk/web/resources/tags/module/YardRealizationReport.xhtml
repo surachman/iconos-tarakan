@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.prime.com.tr/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+
+  <!-- INTERFACE -->
+    <cc:interface>
+        <cc:attribute name="id" required="true"/>
+        <cc:attribute name="widgetVar" required="true" type="java.lang.String"/>
+    </cc:interface>
+
+  <!-- IMPLEMENTATION -->
+  <cc:implementation>
+        <script type="text/javascript">
+            function handleDownloadYardRealizationReportRequest(args) {
+                if(!(args.validationFailed || args.doPrint == false)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                    #{cc.attrs.widgetVar}.hide();
+                }
+            }
+
+            jQuery(document).ready(function(){
+                if (!(jQuery.livequery != undefined || jQuery.ui.timepicker != undefined)) {
+                    jQuery.getScript("./../../resources/scripts/jquery.livequery.min.js", function() {
+                        jQuery.getScript("./../../resources/scripts/jquery-ui-timepicker-addon.js", function() {
+                            jQuery('.dateSelection').livequery(function(){
+                                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy', showTimepicker: false});
+                            });
+                        });
+                    });
+                } else if (jQuery.livequery == undefined) {
+                    jQuery.getScript("./../../resources/scripts/jquery.livequery.min.js", function() {
+                        jQuery('.dateSelection').livequery(function(){
+                            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy', showTimepicker: false});
+                        });
+                    });
+                } else if (jQuery.ui.timepicker == undefined) {
+                    jQuery.getScript("./../../resources/scripts/jquery-ui-timepicker-addon.js", function() {
+                        jQuery('.dateSelection').livequery(function(){
+                            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy', showTimepicker: false});
+                        });
+                    });
+                } else {
+                    jQuery('.dateSelection').livequery(function(){
+                        jQuery(this).datetimepicker({dateFormat:'dd/mm/yy', showTimepicker: false});
+                    });
+                }
+            });
+        </script>
+        <p:dialog widgetVar="#{cc.attrs.widgetVar}" id="#{cc.attrs.widgetVar}" width="600" modal="true" position="center" header="#{msg['menu.report.yard_realization']}">
+            <h:form id="#{cc.attrs.id}Form">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel for="startDate"  value="Start Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="startDate" required="true" requiredMessage="Start Time is Required" styleClass="dateSelection" value="#{yardRealizationReportBean.startDate}">
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                        </h:inputText>
+                        <p:message display="icon" for="startDate"/>
+                        <h:outputLabel for="endDate" value="End Time *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="endDate" required="true" requiredMessage="End Time is Required" styleClass="dateSelection" value="#{yardRealizationReportBean.endDate}">
+                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                        </h:inputText>
+                        <p:message display="icon" for="endDate"/>
+                        <h:outputLabel for="penanggungJawab"  value="Penanggung Jawab Operasional *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="penanggungJawab" value="#{yardRealizationReportBean.penanggungJawab}" required="true"/>
+                        <p:message display="icon" for="penanggungJawab"/>
+                        <h:outputLabel for="koordinator"  value="Koordinator Shift *"/>
+                        <h:outputText value=":"/>
+                        <h:inputText id="koordinator" value="#{yardRealizationReportBean.koordinator}" required="true"/>
+                        <p:message display="icon" for="koordinator"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <p:commandButton actionListener="#{yardRealizationReportBean.handleDownloadReport}" onstart="freeze();" value="#{msg['application.operation.print']}" oncomplete="handleDownloadYardRealizationReportRequest(args);" style="font-size: x-small" update="#{cc.attrs.id}Form"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" immediate="true" oncomplete="#{cc.attrs.widgetVar}.hide();"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </cc:implementation>
+</html>

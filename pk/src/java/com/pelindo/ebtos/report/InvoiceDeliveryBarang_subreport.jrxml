@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PerhitunganDeliveryBarang_subreport" language="groovy" pageWidth="555" pageHeight="514" whenNoDataType="AllSectionsNoDetail" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="2.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_reg" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT ds.cont_no,
+  ds.bl_no,
+  ds.unit,
+  ds.weight,
+  ds.volume,
+  ds.placement_date,
+  NVLN(ds.masa_1)           AS masa_1,
+  NVLN(ds.masa_2)           AS masa_2,
+  NVLN(pls.charge_equipmet) AS charge_equipmet,
+  NVLN(pp.total_charge)     AS total
+FROM delivery_barang_service ds,
+  perhitungan_lift_barang pls,
+  perhitungan_penumpukan_barang pp
+WHERE pls.jobslip = ds.jobslip
+AND pp.jobslip    = ds.jobslip
+AND pls.no_reg    = ds.no_reg
+AND pp.no_reg     = ds.no_reg
+AND ds.no_reg     = $P{no_reg}
+and rownum < 11]]>
+	</queryString>
+	<field name="cont_no" class="java.lang.String"/>
+	<field name="bl_no" class="java.lang.String"/>
+	<field name="unit" class="java.lang.Integer"/>
+	<field name="weight" class="java.lang.Integer"/>
+	<field name="volume" class="java.lang.Integer"/>
+	<field name="placement_date" class="java.sql.Timestamp"/>
+	<field name="masa_1" class="java.lang.Integer"/>
+	<field name="masa_2" class="java.lang.Integer"/>
+	<field name="charge_equipmet" class="java.math.BigDecimal"/>
+	<field name="total" class="java.math.BigDecimal"/>
+	<variable name="charge_equipmet_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{charge_equipmet}]]></variableExpression>
+	</variable>
+	<variable name="total_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total}]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="13">
+			<staticText>
+				<reportElement x="119" y="0" width="19" height="13"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[UNIT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1" y="0" width="15" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="265" y="0" width="21" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[MS 2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="337" y="0" width="54" height="13"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[PNPK]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="138" y="0" width="30" height="13"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[WEIGHT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="16" y="0" width="54" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[NO CONT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="198" y="0" width="46" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[MULAI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="244" y="0" width="21" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[MS 1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="286" y="0" width="51" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[LIFT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="70" y="0" width="49" height="13" isRemoveLineWhenBlank="true"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[BL NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="168" y="0" width="30" height="13"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[VOLUME]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="13" splitType="Stretch">
+			<textField>
+				<reportElement x="16" y="0" width="54" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cont_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="70" y="0" width="49" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{bl_no}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="119" y="0" width="19" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{unit}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="138" y="0" width="30" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{weight}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="168" y="0" width="30" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{volume}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="198" y="0" width="46" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{placement_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0">
+				<reportElement x="244" y="0" width="21" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{masa_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="0">
+				<reportElement x="265" y="0" width="21" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{masa_2}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="286" y="0" width="51" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{charge_equipmet}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="1" y="0" width="15" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$V{REPORT_COUNT} + "."]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="337" y="0" width="54" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{total}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="12" width="391" height="1"/>
+			</line>
+		</band>
+	</detail>
+	<summary>
+		<band height="13">
+			<textField pattern="#,##0">
+				<reportElement x="337" y="0" width="54" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{total_1}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement x="286" y="0" width="51" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{charge_equipmet_2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>

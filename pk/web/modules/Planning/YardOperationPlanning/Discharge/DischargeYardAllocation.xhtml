@@ -1,0 +1,630 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.yard_operation_planning.discharge.discharge_yard_allocation']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlgEditGenerate.hide();
+                    }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.yard_operation_planning.discharge.discharge_yard_allocation']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+
+        <!--
+                <p:dialog modal="true"  widgetVar="statusDialog" header="Please Wait..."
+                          draggable="false" closable="false">
+                    <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+                </p:dialog>-->
+        <h:form id="constraintForm">
+            <!--remote update dialog monitoring-->
+            <p:remoteCommand update="birdViewForm:imageSubForm" name="updateImage" oncomplete="updateSideView();"/>
+            <p:remoteCommand update="birdViewForm:imageSubFormSide" name="updateSideView" oncomplete="statusDialog.hide();monitoringYard.show();"/>
+
+            <!--view untuk  planning vessel-->
+            <p:fieldset legend="PPKB" style="width: 350px;">
+                <h:panelGrid id="planningVesselDetail" columns="4">
+                    <h:outputLabel value="No PPKB" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{dischargeYardAllocationBean.vessel[0]}" readonly="true" size="30" />
+                    <p:commandButton image="ui-icon-folder-open" value="..." onclick="selectableVesselsDialog.show();" onstart="freeze();" update="selectableVesselsForm" actionListener="#{dischargeYardAllocationBean.handleNewPpkb}"/>
+                    <h:outputLabel value="Vessel Name" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{dischargeYardAllocationBean.vessel[1]}" disabled="true" size="30"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage In" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{dischargeYardAllocationBean.vessel[2]}" disabled="true" size="30"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage Out" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{dischargeYardAllocationBean.vessel[3]}" disabled="true" size="30"/>
+                    <h:outputText />
+                </h:panelGrid>
+            </p:fieldset>
+            <br />
+            <br />
+            <!--tampilan dari tabel template-->
+            <p:fieldset legend="#{msg['menu.planning.yard_allocation_filter']}">
+                <p:dataTable id="constraintTable" var="item" value="#{dischargeYardAllocationBean.yardAllocationFilters}"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowStyleClass="#{item[7] != 0 and item[6] le item[7] ? null : 'false-row'}" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            &nbsp;
+                        </div>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Dangerous" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[11]}">
+                        <f:facet name="header">
+                            <h:outputText value="Oversize" />
+                        </f:facet>
+                        <h:outputText value="#{item[11]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[10]}">
+                        <f:facet name="header">
+                            <h:outputText value="Is Import" />
+                        </f:facet>
+                        <h:outputText value="#{item[10]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[9]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Block" />
+                        </f:facet>
+                        <h:outputText value="#{item[9]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Count" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" style="color: blue; font-weight: bold;"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Allocated" />
+                        </f:facet>
+                        <h:outputText value="#{item[7]}" style="color: red; font-weight: bold;"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Yard" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" disabled="false" actionListener="#{dischargeYardAllocationBean.handleButtonYardAllocation}" image="ui-icon ui-icon-pencil" title="Allocation Yard" update="formAddEditConstraint" oncomplete="dlg.show();">
+                            <f:attribute name="idConstraint" value="#{item[8]}" />
+                        </p:commandButton>                        
+                    </p:column>
+                </p:dataTable>
+            </p:fieldset>
+            <br />
+            
+            <ui:remove>
+            <p:fieldset id="generateTable" legend="#{msg['application.operation.generate_result']}">
+                <p:dataTable id="yardAllocationTable" var="item" value="#{dischargeYardAllocationBean.generates}" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            <p:commandButton onstart="freeze();" image="ui-icon-search" value="#{msg['application.operation.preview']}" disabled="#{empty dischargeYardAllocationBean.vessel[0]}" update="birdViewForm:tierSubForm birdViewForm:buttonSubForm birdViewForm:slotSubFormSide birdViewForm:buttonSubFormSide" oncomplete="updateImage();" />
+                        </div>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Container No" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Block" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Slot" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Row" />
+                        </f:facet>
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[8]}">
+                        <f:facet name="header">
+                            <h:outputText value="Tier" />
+                        </f:facet>
+                        <h:outputText value="#{item[8]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Actions" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" disabled="false" actionListener="#{dischargeYardAllocationBean.handleEditGenerate}" image="ui-icon ui-icon-pencil" title="Edit Result Generate" update="formEditGenerate" oncomplete="dlgEditGenerate.show();">
+                            <f:attribute name="idCoordinat" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <f:facet name="footer">
+                        &nbsp;
+                    </f:facet>
+                </p:dataTable>
+            </p:fieldset>
+            </ui:remove>
+        </h:form>
+
+        <!--dialog untuk mengedit hasil generate-->
+        <p:dialog header="Edit Result Generate"  widgetVar="dlgEditGenerate" modal="true" minWidth="450">
+            <h:form id="formEditGenerate">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Cont No." style="font-weight: bolder;"/>
+                        <h:outputLabel value=" : " style="font-weight: bolder;"/>
+                        <h:outputText value="#{dischargeYardAllocationBean.masterYardCoordinat.contNo}" style="font-weight: bolder;color: blue;"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="7">
+                        <h:outputLabel value="Block" />
+                        <p:spacer width="20px" height="0px"/>
+                        <h:outputLabel value="Slot" />
+                        <p:spacer width="20px" height="0px"/>
+                        <h:outputLabel value="Row" />
+                        <p:spacer width="20px" height="0px"/>
+                        <h:outputLabel value="Tier" />
+                        <h:selectOneMenu value="#{dischargeYardAllocationBean.masterYardCoordinat.block}" valueChangeListener="#{dischargeYardAllocationBean.onChangeEvent}">
+                            <f:selectItems var="blok" value="#{dischargeYardAllocationBean.masterYard}" itemValue="#{blok[0]}" itemLabel="#{blok[0]}" />
+                            <f:ajax execute="@this" event="change" render="slots rows tiers"/>
+                        </h:selectOneMenu>
+                        <h:outputText />
+                        <h:selectOneMenu id="slots" value="#{dischargeYardAllocationBean.masterYardCoordinat.slot}">
+                            <f:selectItems value="#{dischargeYardAllocationBean.slots}" />
+                        </h:selectOneMenu>
+                        <h:outputText />
+                        <h:selectOneMenu id="rows" value="#{dischargeYardAllocationBean.masterYardCoordinat.row}">
+                            <f:selectItems value="#{dischargeYardAllocationBean.rows}" />
+                        </h:selectOneMenu>
+                        <h:outputText />
+                        <h:selectOneMenu id="tiers" value="#{dischargeYardAllocationBean.masterYardCoordinat.tier}">
+                            <f:selectItems value="#{dischargeYardAllocationBean.tiers}" />
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{dischargeYardAllocationBean.saveEditGenerate}" update="constraintForm:yardAllocationTable growl" oncomplete="handleRequestValidation(xhr, status, args)" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgEditGenerate.hide();" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <!--dialog untuk konfirmasi menghapus-->
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation" modal="true">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="Are you sure you want to delete this allocation?" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  action="#{dischargeYardAllocationBean.removeYardAllocation}"  update="formAddEditConstraint:yardAllocations formAddEditConstraint:yard formAddEditConstraint:count growl" onclick="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk mengalokasikan yard-->
+        <p:dialog header="Yard Allocation"  widgetVar="dlg" modal="true" minWidth="600" closable="false" >
+            <h:form id="formAddEditConstraint">
+                <p:panel>
+                    <h:panelGrid columns="3" columnClasses=",,first-tr">
+                        <p:fieldset legend="Constraint" style="width: 290px; height: 220px;">
+                            <p:panel>
+                                <h:panelGrid id="formConstraint" columns="3">
+                                    <h:outputLabel value="Type" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText value="#{dischargeYardAllocationBean.constraint[0]}" disabled="true"/>
+                                    <h:outputLabel value="Size"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText value="#{dischargeYardAllocationBean.constraint[1]}" disabled="true"/>
+                                    <h:outputLabel value="Status" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText value="#{dischargeYardAllocationBean.constraint[2]}" disabled="true"/>
+                                    <h:outputLabel value="Gross" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText value="#{dischargeYardAllocationBean.constraint[3]}" disabled="true"/>
+                                    <h:outputLabel value="Dangerous" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText value="#{dischargeYardAllocationBean.constraint[5]}" disabled="true"/>
+                                    <h:outputLabel value="Oversize" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText value="#{dischargeYardAllocationBean.constraint[9]}" disabled="true"/>
+                                    <h:outputLabel value="Is Import" />
+                                    <h:outputLabel value=" : " />
+                                    <h:inputText value="#{dischargeYardAllocationBean.constraint[8]}" disabled="true"/>
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:fieldset>
+                        <p:spacer height="0px" width="10px" />
+                        <p:fieldset legend="Form Yard" style="width: 180px; height: 120px;">
+                            <p:panel>
+                                <h:panelGrid id="yard" columns="3">
+                                    <h:outputText value="Block"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu value="#{dischargeYardAllocationBean.yardAllocation.block}"
+                                                     valueChangeListener="#{dischargeYardAllocationBean.onChangeEvent}" immediate="true">
+                                        <f:selectItems var="item" value="#{dischargeYardAllocationBean.masterYard}" itemValue="#{item[0]}" itemLabel="#{item[0]}" />
+                                        <f:ajax execute="@this" event="change" render="formAddEditConstraint:yard"/>
+                                    </h:selectOneMenu>
+                                    <ui:remove>
+                                    <h:outputText value="From Slot"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu id="frSlot" value="#{dischargeYardAllocationBean.yardAllocation.frSlot}">
+                                        <f:selectItems value="#{dischargeYardAllocationBean.slots}" />
+                                        <p:ajax process="@this" event="change" update="formAddEditConstraint:toSlot formAddEditConstraint:frSlot" onstart="freeze();" listener="#{dischargeYardAllocationBean.handleFrSlotChanged}"/>
+                                    </h:selectOneMenu>
+                                    <h:outputText value="To Slot"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu id="toSlot" value="#{dischargeYardAllocationBean.yardAllocation.toSlot}">
+                                        <f:selectItems value="#{dischargeYardAllocationBean.slots}" />
+                                        <p:ajax process="@this" event="change" update="formAddEditConstraint:toSlot formAddEditConstraint:frSlot" onstart="freeze();" listener="#{dischargeYardAllocationBean.handleToSlotChanged}"/>
+                                    </h:selectOneMenu>
+                                    <h:outputText value="From Row"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu value="#{dischargeYardAllocationBean.yardAllocation.frRow}">
+                                        <f:selectItems value="#{dischargeYardAllocationBean.rows}" />
+                                    </h:selectOneMenu>
+                                    <h:outputText value="to Row"/>
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu value="#{dischargeYardAllocationBean.yardAllocation.toRow}">
+                                        <f:selectItems value="#{dischargeYardAllocationBean.rows}" />
+                                    </h:selectOneMenu>
+                                    </ui:remove>
+                                </h:panelGrid>
+                                <f:facet name="footer">
+                                    <div class="header-panel-left">
+                                        <p:commandButton image="ui-icon-refresh" onstart="freeze();" value="#{msg['application.operation.reset']}" title="reset yard" action="#{dischargeYardAllocationBean.reinitYardAllocation}" update="formAddEditConstraint:yard" />
+                                    </div>
+                                    <div class="header-panel-right">
+                                        <p:commandButton image="ui-icon-disk" onstart="freeze();" value="#{msg['application.operation.save']}" title="save yard" action="#{dischargeYardAllocationBean.saveYardAllocation}" update="formAddEditConstraint:yardAllocations formAddEditConstraint:yard formAddEditConstraint:count growl"/>
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                        </p:fieldset>
+                    </h:panelGrid>
+                    <br />
+                    <p:panel style="width: 320px;">
+                        <p:outputPanel id="yardAllocations">
+                            <p:dataTable value="#{dischargeYardAllocationBean.yardAllocations}" var="item" rowIndexVar="number">
+                                <f:facet name="header">
+                                    <h:outputText value="&nbsp;" />
+                                </f:facet>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Block" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[0]}" />
+                                </p:column>
+                                
+                                <ui:remove>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Fr Slot" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="To Slot" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Fr Row" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="To Row" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[4]}" />
+                                </p:column>
+                                </ui:remove>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Count" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[5]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="&nbsp;" />
+                                    </f:facet>
+                                    <!--                                    <p:commandButton actionListener="{dischargeYardAllocationBean.editYardAllocation}" image="ui-icon-pencil" title="Edit Yard" update="formAddEditConstraint:count formAddEditConstraint:yard">
+                                                                            <f:attribute name="idAllocation" value="{item[7]}"/>
+                                                                        </p:commandButton>-->
+                                    <p:commandButton actionListener="#{dischargeYardAllocationBean.editYardAllocation}" image="ui-icon-trash" title="Delete yard" oncomplete="confirmation.show();">
+                                        <f:attribute name="idAllocation" value="#{item[7]}"/>
+                                    </p:commandButton>
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <h:outputText value="&nbsp;" />
+                                </f:facet>
+
+                            </p:dataTable>
+                        </p:outputPanel>
+                        <f:facet name="footer">
+                            <h:panelGrid id="count" columns="3">
+                                <h:outputText value="Total Allocation Yard"/>
+                                <h:outputLabel value=" : " />
+                                <h:inputText value="#{dischargeYardAllocationBean.totalAllocationPerConstraint}" disabled="true"/>
+                                <h:outputText value="Count Container"/>
+                                <h:outputLabel value=" : " />
+                                <h:inputText value="#{dischargeYardAllocationBean.constraint[6]}" disabled="true"/>                                
+                            </h:panelGrid>
+                        </f:facet>
+                    </p:panel>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.close']}" action="#{dischargeYardAllocationBean.refreshTableAllocation}" update="constraintForm:constraintTable constraintForm:yardAllocationTable constraintForm:generateTable" oncomplete="dlg.hide();"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk monitoring CY-->
+        <p:dialog  widgetVar="monitoringYard" header="Monitoring Yard" modal="true" minWidth="1280">
+            <h:form id="birdViewForm">
+                <p:remoteCommand name="updateAfterBlockChanged" update="birdViewForm:tierSubForm birdViewForm:buttonSubForm birdViewForm:slotSubFormSide birdViewForm:buttonSubFormSide" oncomplete="updateImage();"/>
+                <p:remoteCommand name="updateAfterTierChanged" update="birdViewForm:buttonSubForm birdViewForm:imageSubForm"/>
+                <p:remoteCommand name="updateAfterExistOnlyChanged" oncomplete="updateImage();"/>
+                <p:remoteCommand name="updateAfterSlotChanged" update="birdViewForm:buttonSubFormSide birdViewForm:imageSubFormSide"/>
+
+                <p:panel>
+                    <h:panelGrid columns="6">
+                        <h:outputText value="Blok"/>
+                        <h:outputText value=":"/>
+                        <p:outputPanel id="blockSubForm">
+                            <h:selectOneMenu value="#{dischargeYardAllocationBean.selectedBlock}" valueChangeListener="#{dischargeYardAllocationBean.handleChangeBlock}" onchange="updateAfterBlockChanged();" label="Pilih Block">
+                                <f:selectItems value="#{dischargeYardAllocationBean.blocks}" var="i" itemValue="#{i[0]}" itemLabel="#{i[0]} - #{i[1]}"/>
+                            </h:selectOneMenu>
+                        </p:outputPanel>
+                        <h:outputText value="Exist Only"/>
+                        <h:outputText value=":"/>
+                        <p:outputPanel id="ExistOnlySubForm">
+                            <h:selectOneMenu value="#{dischargeYardAllocationBean.existOnly}" onchange="updateAfterExistOnlyChanged();" label="">
+                                <f:selectItem itemLabel="no" itemValue="f"/>
+                                <f:selectItem itemLabel="yes" itemValue="t"/>
+                            </h:selectOneMenu>
+                        </p:outputPanel>
+                    </h:panelGrid>
+                </p:panel>
+                <p:accordionPanel autoHeight="false">
+                    <p:tab title="Yard Monitoring (#{msg['menu.monitoring.yard_monitoring.bird_view']})">
+                        <h:panelGrid columns="4">
+                            <h:outputText value="Tier"/>
+                            <h:outputText value=":"/>
+                            <p:outputPanel id="tierSubForm">
+                                <h:selectOneMenu value="#{dischargeYardAllocationBean.selectedTier}" onchange="updateAfterTierChanged();" label="Pilih Tier">
+                                    <f:selectItems value="#{dischargeYardAllocationBean.selectTiers}"/>
+                                </h:selectOneMenu>
+                            </p:outputPanel>
+                            <p:outputPanel id="buttonSubForm">
+                                <p:commandButton onstart="freeze();" actionListener="#{dischargeYardAllocationBean.handleClickPrevButtonBird}" update="birdViewForm:tierSubForm birdViewForm:buttonSubForm birdViewForm:imageSubForm" value="down"/>
+                                <p:commandButton onstart="freeze();" actionListener="#{dischargeYardAllocationBean.handleClickNextButtonBird}" update="birdViewForm:tierSubForm birdViewForm:buttonSubForm birdViewForm:imageSubForm" value="up"/>
+                            </p:outputPanel>
+                        </h:panelGrid>
+                        <div style="width: 1152px; height: 400px; overflow: scroll; background-color: #dddddd;" >
+                            <p:outputPanel id="imageSubForm">
+                                <p:graphicImage value="#{dischargeYardAllocationBean.birdViewUrl}" cache="false"/>
+                            </p:outputPanel>
+                        </div>
+
+                    </p:tab>
+                    <p:tab title="Yard Monitoring (Side View)">
+                        <h:panelGrid columns="4">
+                            <h:outputText value="Slot"/>
+                            <h:outputText value=":"/>
+                            <p:outputPanel id="slotSubFormSide">
+                                <h:selectOneMenu value="#{dischargeYardAllocationBean.selectedSlot}" onchange="updateAfterSlotChanged();" label="Pilih Slot">
+                                    <f:selectItems value="#{dischargeYardAllocationBean.selectSlots}"/>
+                                </h:selectOneMenu>
+                            </p:outputPanel>
+                            <p:outputPanel id="buttonSubFormSide">
+                                <p:commandButton onstart="freeze();" actionListener="#{dischargeYardAllocationBean.handleClickPrevButton}" update="birdViewForm:slotSubFormSide birdViewForm:buttonSubFormSide birdViewForm:imageSubFormSide" value="Prev"/>
+                                <p:commandButton onstart="freeze();" actionListener="#{dischargeYardAllocationBean.handleClickNextButton}" update="birdViewForm:slotSubFormSide birdViewForm:buttonSubFormSide birdViewForm:imageSubFormSide" value="Next"/>
+                            </p:outputPanel>
+                        </h:panelGrid>
+                        <div style="width: 1152px; height: 800px; overflow: scroll; background-color: #dddddd;" >
+                            <p:outputPanel id="imageSubFormSide">
+                                <p:graphicImage value="#{dischargeYardAllocationBean.sideViewUrl}" cache="false"/>
+                            </p:outputPanel>
+                        </div>
+                    </p:tab>
+                </p:accordionPanel>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk memilih planning vessel-->
+        <p:dialog header="Select Planning Vessel"  widgetVar="selectableVesselsDialog" modal="true" minWidth="750">
+            <h:form id="selectableVesselsForm">
+                <p:dataTable var="item" value="#{dischargeYardAllocationBean.vessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" id="vesselDetail" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{dischargeYardAllocationBean.handleSelectNoPpkb}" value="select" update="constraintForm:planningVesselDetail constraintForm:constraintTable constraintForm:yardAllocationTable constraintForm:generateTable" oncomplete="selectableVesselsDialog.hide();statusDialog.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

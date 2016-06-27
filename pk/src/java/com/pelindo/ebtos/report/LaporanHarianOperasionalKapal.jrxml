@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LaporanHarianOperasionalKapal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="818" leftMargin="12" rightMargin="12" topMargin="4" bottomMargin="4">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="69"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.Object"/>
+	<parameter name="foreman_name" class="java.lang.String"/>
+	<parameter name="foreman_nipp" class="java.lang.String"/>
+	<parameter name="from" class="java.util.Date"/>
+	<parameter name="to" class="java.util.Date"/>
+	<queryString>
+		<![CDATA[SELECT mv.name,
+  pv.eta,
+  pv.etd,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id = 'ebtos.penanggung_jawab_operasional.nama'
+  ) AS spv_nama,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id = 'ebtos.penanggung_jawab_operasional_nipp'
+  ) AS spv_nipp,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id = 'ebtos.supervisor_operasional.nama'
+  ) AS pj_nama,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id = 'ebtos.supervisor_operasional.nipp'
+  ) AS pj_nipp
+FROM planning_vessel pv
+JOIN m_vessel mv
+ON (pv.vessel_code = mv.vessel_code)
+WHERE no_ppkb      = $P{no_ppkb}]]>
+	</queryString>
+	<field name="name" class="java.lang.String"/>
+	<field name="eta" class="java.sql.Timestamp"/>
+	<field name="etd" class="java.sql.Timestamp"/>
+	<field name="spv_nama" class="java.lang.String"/>
+	<field name="spv_nipp" class="java.lang.String"/>
+	<field name="pj_nama" class="java.lang.String"/>
+	<field name="pj_nipp" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="106" splitType="Stretch">
+			<staticText>
+				<reportElement x="246" y="9" width="307" height="21"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[LAPORAN HARIAN OPERASIONAL KAPAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="29" width="101" height="15"/>
+				<textElement/>
+				<text><![CDATA[NAMA KAPAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="44" width="101" height="15"/>
+				<textElement/>
+				<text><![CDATA[ETA/ETD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="59" width="101" height="15"/>
+				<textElement/>
+				<text><![CDATA[TANGGAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="74" width="101" height="15"/>
+				<textElement/>
+				<text><![CDATA[JAM]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="101" y="29" width="145" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" : " + $F{name}.toUpperCase()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="101" y="44" width="260" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" : " + $F{eta} + " / " + $F{etd}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd/MM/yyyy">
+				<reportElement x="101" y="59" width="145" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" : " + new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date())]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="101" y="74" width="260" height="15"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" : " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($P{from}) + " s/d " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($P{to})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="118" splitType="Stretch">
+			<subreport isUsingCache="false">
+				<reportElement x="0" y="0" width="818" height="118"/>
+				<subreportParameter name="no_ppkb">
+					<subreportParameterExpression><![CDATA[$P{no_ppkb}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="foreman_name">
+					<subreportParameterExpression><![CDATA[$P{foreman_name}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="foreman_nipp">
+					<subreportParameterExpression><![CDATA[$P{foreman_nipp}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="from">
+					<subreportParameterExpression><![CDATA[$P{from}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="to">
+					<subreportParameterExpression><![CDATA[$P{to}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression class="net.sf.jasperreports.engine.JasperReport"><![CDATA[$P{SUBREPORT_DIR}]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="76">
+			<staticText>
+				<reportElement x="33" y="0" width="186" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Top"/>
+				<text><![CDATA[SUPERVISOR OPERASIONAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="296" y="0" width="207" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Top"/>
+				<text><![CDATA[PENANGGUNG JAWAB OPERASIONAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="584" y="0" width="186" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Top"/>
+				<text><![CDATA[FOREMAN]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="584" y="47" width="186" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{foreman_name}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Transparent" x="584" y="61" width="186" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{foreman_nipp} == null ? "" : "NIPP. " + $P{foreman_nipp}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="33" y="47" width="170" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{spv_nama}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="296" y="47" width="207" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="true" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{pj_nama}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="33" y="61" width="170" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["NIPP. " + $F{spv_nipp}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="296" y="61" width="207" height="14" forecolor="#000000" backcolor="#FFFFFF"/>
+				<textElement textAlignment="Center" verticalAlignment="Top" rotation="None" markup="none">
+					<font fontName="SansSerif" size="11" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA["NIPP. " + $F{pj_nipp}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

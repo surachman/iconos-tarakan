@@ -1,0 +1,373 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.booking_online_list']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+            jQuery('.cal').livequery(function(){
+                jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+            });
+
+        </script>
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.booking_online_list']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="formBooking">
+            <p:dataTable paginatorPosition="bottom" value="#{bookingOnlineBean.bookingOnlines}" var="item"
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="bookingOnlineList" rowIndexVar="number"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+
+                <p:column  sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Vessel Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}"  filterMatchMode="contains" filterBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Customer"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}" style="width: 60px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Voy In"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column sortBy="#{item[4]}" style="width: 60px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Voy Out"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="ETA"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="ETD"/>
+                    </f:facet>
+                    <h:outputText value="#{item[6]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column sortBy="#{item[7]}" style="width: 80px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Est. Discharge"/>
+                    </f:facet>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column sortBy="#{item[8]}" style="width: 80px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Est. Load"/>
+                    </f:facet>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column sortBy="#{item[9]}"  filterMatchMode="contains" filterBy="#{item[9]}" style="width: 100px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column style="width: 60px; text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{bookingOnlineBean.handleSelect}" oncomplete="dlg.show()" image="ui-icon-check" title="Verify Booking Online" update="boDialog:boGridJuga dgVessel:dialogVessel dgVessel:vName">
+                            <f:attribute name="idBook" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{bookingOnlineBean.handleSelect}" oncomplete="confirmation.show()" image="ui-icon-arrowreturn-1-w" title="Cancel Booking Online">
+                            <f:attribute name="idBook" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="boDialog">
+            <p:dialog header="Verify Booking Online"  widgetVar="dlg" modal="true" width="810">
+                <p:panel>
+                    <h:panelGrid id="boGridJuga">
+                        <h:panelGrid columns="3">
+                            <p:fieldset legend="Vessel Detail" style="height: 240px; width: 280px;">
+                                <h:panelGrid columns="4" id="boGrid">
+                                    <h:outputText value="Vessel Name"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" required="true" id="vesselname" value="#{bookingOnlineBean.bookingOnline.vesselName}" size="25"/>
+                                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="dialogBooking.show();" style="font-size: x-small"/>
+
+                                    <h:outputText value="GRT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.grt}" size="25"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="DWT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.dwt}" size="25"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="BRT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.brt}" size="25"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="NRT"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.nrt}" size="25"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="LOA"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{bookingOnlineBean.bookingOnline.loa}" size="25"/>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="Voy In *"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.voyIn}" size="25">
+                                        <f:validateLength maximum="10" />
+                                    </h:inputText>
+                                    <h:outputText value=""/>
+
+                                    <h:outputText value="Voy Out *"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.voyOut}" size="25">
+                                        <f:validateLength maximum="10" />
+                                    </h:inputText>
+                                    <h:outputText value=""/>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:spacer width="20"/>
+
+                            <p:fieldset legend="Estimation" style="height: 240px; width: 350px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="Activity"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneRadio disabled="true" layout="LINE_DIRECTION" value="#{bookingOnlineBean.bookingOnline.activity}" >
+                                        <f:selectItem itemValue="1" itemLabel="Discharge"/>
+                                        <f:selectItem itemValue="2" itemLabel="Load"/>
+                                        <f:selectItem itemValue="3" itemLabel="Discharge/Load"/>
+                                    </h:selectOneRadio>
+
+                                    <h:outputText value="Est. Discharge"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.estDischarge}"/>
+
+                                    <h:outputText value="Est. Load"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.estLoad}"/>
+
+                                    <h:outputText value="ETA"/>
+                                    <h:outputText value=":"/>
+                                    <p:inputMask disabled="true" mask="99/99/9999 99:99" value="#{bookingOnlineBean.bookingOnline.eta}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </p:inputMask>
+
+                                    <h:outputText value="ETD"/>
+                                    <h:outputText value=":"/>
+                                    <p:inputMask disabled="true" mask="99/99/9999 99:99" value="#{bookingOnlineBean.bookingOnline.etd}" >
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </p:inputMask>
+
+                                    <h:outputText value="Last Port"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.lastport.name}"/>
+
+                                    <h:outputText value="Next Port"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.nextport.name}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                        <p:spacer height="10"/>
+                        <h:panelGrid columns="3">
+                            <p:fieldset legend="Agent Detail" style="height: 100px; width: 280px;">
+                                <h:panelGrid columns="3" >
+                                    <h:outputText value="Name"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" value="#{bookingOnlineBean.masterCustomer.name}" size="25"/>
+
+                                    <h:outputText value="Phone"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{bookingOnlineBean.masterCustomer.phone1}" size="25"/>
+
+                                    <h:outputText value="Address"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText  disabled="true" value="#{bookingOnlineBean.masterCustomer.address}" size="25"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+
+                            <p:spacer width="20"/>
+
+                            <p:fieldset legend="Booking Confirm" style="height: 100px; width: 350px;">
+                                <h:panelGrid columns="3" >
+                                    <h:outputText value="Open Stack"/>
+                                    <h:outputText value=":"/>
+                                    <h:panelGrid columns="2">
+                                        <h:inputText styleClass="cal" disabled="#{bookingOnlineBean.bookingOnline.activity == 1}" size="25" value="#{bookingOnlineBean.preserviceVessel.openStack}" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </h:inputText>
+                                        <h:outputText value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                    </h:panelGrid>
+
+                                    <h:outputText value="Status"/>
+                                    <h:outputText value=":"/>
+                                    <h:outputText value="#{msg['application.confirm.status']}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" image="ui-icon-check" value="#{msg['application.operation.confirm']}" update="formBooking:bookingOnlineList growl" actionListener="#{bookingOnlineBean.handleSaveConfirm}" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog header="#{msg['application.header.confirm.cancel']}" id="confirmation"  widgetVar="confirmation" minWidth="400">
+            <h:form id="confirmationForm">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.cancel.confirmation']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{bookingOnlineBean.handleDelete}" update="formBooking:bookingOnlineList growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="Master Vessel"  widgetVar="dialogBooking" width="700">
+            <h:form id="dgVessel">
+                <h:panelGrid columns="4" id="vName">
+                    <h:outputText value="Vessel Name :"/>
+                    <h:inputText disabled="true" value="#{bookingOnlineBean.bookingOnline.vesselName}" size="40"/>
+                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.search']}" actionListener="#{bookingOnlineBean.handleFindVessel}" update="dgVessel:dialogVessel growl"/>
+                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.show_all']}" actionListener="#{bookingOnlineBean.handleFindAllVessel}" update="dgVessel:dialogVessel"/>
+                </h:panelGrid>
+                <br/>
+                <p:dataTable id="dialogVessel" value="#{bookingOnlineBean.masterVessels}" var="item" paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" rowIndexVar="number">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item[0]}"  filterMatchMode="contains" filterBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Code"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}"  filterMatchMode="contains" filterBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="GRT"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="DWT"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="BRT"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="NRT"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="LOA"/>
+                        </f:facet>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{bookingOnlineBean.handleSelectVesselCode}" value="#{msg['application.operation.select']}" update="boDialog:boGrid" oncomplete="dialogBooking.hide();">
+                                <f:attribute name="vessel_code" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="#{localeBean.language}"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.prime.com.tr/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <f:view locale="#{localeBean.locale}">
+        <h:head>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+            <link href="#{facesContext.externalContext.requestContextPath}/resources/template/css/themes/redmond/skin.css" rel="stylesheet" type="text/css" />
+            <link href="#{facesContext.externalContext.requestContextPath}/resources/template/css/default.css" rel="stylesheet" type="text/css" />
+            <link href="#{facesContext.externalContext.requestContextPath}/resources/template/css/cssLayoutFullScreen.css" rel="stylesheet" type="text/css" />
+            <ui:insert name="bundles"></ui:insert>
+            <title>.:: #{msg['application.title']} - <ui:insert name="title">title</ui:insert> ::.</title>
+            <ui:insert name="script"></ui:insert>
+        </h:head>
+
+        <h:body>
+            <script type="text/javascript" >
+                jQuery.ajaxSetup({
+                    error: handleXhrError
+                });
+
+                function handleXhrError(xhr) {
+                    conDialog.show();
+                }
+            </script>
+            <p:dialog header="Warning" modal="true" width="300" widgetVar="conDialog" closable="false">
+                <h:form>
+                    <p:panel>
+                        <p>An Error(s) occurred on your connection, <br/>please contact your <b>Technical Support</b> or try <b>reload</b> this page</p>
+                        <f:facet name="footer">
+                            <a href=".">[reload]</a>
+                        </f:facet>
+                    </p:panel>
+                </h:form>
+            </p:dialog>
+            <div id="mark">
+                <ui:insert name="content">Content</ui:insert>
+            </div>
+        </h:body>
+    </f:view>
+</html>

@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite">
+
+  <!-- INTERFACE -->
+  <cc:interface>
+  </cc:interface>
+
+  <!-- IMPLEMENTATION -->
+  <cc:implementation>
+    <applet name="jZebra" id="jZebra" code="jzebra.PrintApplet.class" archive="#{facesContext.externalContext.requestScheme}://#{facesContext.externalContext.requestServerName}:#{facesContext.externalContext.requestServerPort}#{facesContext.externalContext.requestContextPath}/resources/applet/jzebra.jar" width="1" height="1">
+        <param name="printer" value="zebra"/>
+        <!-- <param name="sleep" value="200"> -->
+    </applet>
+    <script type="text/javascript">
+        var applet = jQuery("#jZebra")[0];
+    </script>
+  </cc:implementation>
+</html>

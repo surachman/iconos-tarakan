@@ -1,0 +1,508 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.plugging.perhitungan_plugging_delivery']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.plugging.perhitungan_plugging_delivery']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                             jQuery('#idBatalNota').show();
+                    }else {
+                            //dlg.hide();
+                            dlgBatalNota.hide();
+                    }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+        <script type="text/javascript" src="./../../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{perhitunganPluggingDeliveryBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{perhitunganPluggingDeliveryBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{perhitunganPluggingDeliveryBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganPluggingDeliveryBean.handleCancelInvoice}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="deliveryServiceForm:deliveryServiceTable registrationForm formId:planningcont growl"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="registrationForm">
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganPluggingDeliveryBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganPluggingDeliveryBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="3"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganPluggingDeliveryBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+            <h:panelGrid id="cek" columns="3">
+                <h:outputLabel value="Payment Type" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio value="#{perhitunganPluggingDeliveryBean.invoice.paymentType}" disabled="#{not perhitunganPluggingDeliveryBean.registration.statusService.equals('registrasi')}" valueChangeListener="#{perhitunganPluggingDeliveryBean.onChangeEvent}">
+                    <f:selectItem itemValue="CASH" itemLabel="Cash"/>
+                    <f:selectItem itemValue="KREDIT" itemLabel="Kredit"/>
+                    <f:ajax execute="@this" event="change" render="cek"/>
+                </h:selectOneRadio>
+            </h:panelGrid>
+        </h:form>
+
+        <h:form id="deliveryServiceForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{perhitunganPluggingDeliveryBean.pluggingServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="deliveryServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty perhitunganPluggingDeliveryBean.registration.noReg or not perhitunganPluggingDeliveryBean.registration.statusService.equals('registrasi')}" actionListener="#{perhitunganPluggingDeliveryBean.handleAdd}" update="pluggingReeferServiceForm" oncomplete="dlg.show();"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" oncomplete="dlgBatalNota.show()" disabled="#{perhitunganPluggingDeliveryBean.disCancelInv}" actionListener="#{perhitunganPluggingDeliveryBean.handleKlikCancel}" update="batalNota"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item[0]}" rowspan="2" headerText="Job Slip" filterMatchMode="contains" filterBy="#{item[0]}"/>
+                        <p:column sortBy="#{item[1]}" rowspan="2" headerText="Container No" filterMatchMode="contains" filterBy="#{item[1]}"/>
+                        <p:column sortBy="#{item[2]}" rowspan="2" headerText="Status" filterMatchMode="contains" filterBy="#{item[2]}"/>
+                        <p:column sortBy="#{item[3]}" rowspan="2" headerText="Type" />
+                        <p:column sortBy="#{item[4]}" rowspan="2" headerText="Size" />
+                        <p:column rowspan="2" headerText="Shift" />
+                        <p:column colspan="2" headerText="Massa" />
+                        <p:column colspan="2" headerText="Charge Massa " />
+                        <p:column colspan="4" headerText="Charge Activity" />
+                        <p:column rowspan="2" headerText="Total (Rp.)" />
+                        <p:column rowspan="2" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column headerText="M1" />
+                        <p:column headerText="M2" />
+                        <p:column headerText="M1 (Rp.)" />
+                        <p:column headerText="M2 (Rp.)" />
+
+                        <p:column headerText="Lift Off (Rp.)" />
+                        <p:column headerText="Lift On (Rp.)" />
+                        <p:column headerText="Plugging (Rp.)" />
+                        <p:column headerText="Monitoring (Rp.)" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[5]}">
+
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[7]}"></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[8]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="0" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[9]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="0" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[10]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="0" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[11]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="0" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[12]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="0" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[13]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="0" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[17]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="0" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{perhitunganPluggingDeliveryBean.handleSelect}" disabled="#{not perhitunganPluggingDeliveryBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Reefer Load Service">
+                            <f:attribute name="noCont" value="#{item[0]}"/>
+                            <f:attribute name="idPlug" value="#{item[14]}"/>
+                            <f:attribute name="idMon" value="#{item[15]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="15" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganPluggingDeliveryBean.formattedTotal}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="15" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganPluggingDeliveryBean.formattedPpn}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="15" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganPluggingDeliveryBean.formattedMaterai}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="15" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganPluggingDeliveryBean.formattedJmlTotal}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{empty perhitunganPluggingDeliveryBean.pluggingServices or not perhitunganPluggingDeliveryBean.registration.statusService.equals('registrasi')}" update="registrationForm:registrationDetail registrationForm:cek deliveryServiceForm growl" actionListener="#{perhitunganPluggingDeliveryBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty perhitunganPluggingDeliveryBean.pluggingServices}" actionListener="#{perhitunganPluggingDeliveryBean.handleDownloadTransactionRecap}" update="registrationForm:deliveryServiceTable deliveryServiceForm:deliveryServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty perhitunganPluggingDeliveryBean.pluggingServices or (perhitunganPluggingDeliveryBean.disPrint and not loginSessionBean.supervisor) or perhitunganPluggingReefer.disKredit}" actionListener="#{perhitunganPluggingDeliveryBean.handleDownloadNota}" update="registrationForm:deliveryServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty perhitunganPluggingDeliveryBean.pluggingServices or perhitunganPluggingReefer.disKredit or perhitunganPluggingReefer.disDetail}" actionListener="#{perhitunganPluggingDeliveryBean.handleDownloadDetail}" update="registrationForm:deliveryServiceTable"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Entry Data Plugging"  widgetVar="dlg" modal="true" width="400" >
+            <h:form id="pluggingReeferServiceForm">
+                <p:panel>
+                    <h:panelGrid columns="3"  id="pluggingReeferGrid">
+                        <h:outputLabel value="Container No *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup>
+                            <h:panelGrid columns="3">
+                                <h:inputText onkeypress="cont.show()" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.contNo}" onmousedown="cont.show()" required="true" requiredMessage="#{msg['application.validation.required']}" id="bl"/>
+                                <p:commandButton onstart="freeze();" type="button" onclick="cont.show()" value="..." image="ui-icon-folder-open" title="Browse for Booking Code" style="font-size: x-small"/>
+                                <p:message display="icon" for="bl"/>
+                            </h:panelGrid>
+                        </h:panelGroup>
+
+                        <h:outputLabel value="MLO" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.mlo.name}"/>
+
+                        <h:outputLabel value="Bl No *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup>
+                            <h:inputText disabled="true" maxlength="11" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.blNo}" required="true" requiredMessage="#{msg['application.validation.required']}" id="co"/>
+                            <p:message display="icon" for="co"/>
+                        </h:panelGroup>
+
+                        <h:outputLabel value="Type *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu disabled="true" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.masterContainerType.contType}">
+                            <f:selectItems value="#{perhitunganPluggingDeliveryBean.masterContainerTypes}" var="i" itemValue="#{i[0]}" itemLabel="#{i[1]}" />
+                            <f:ajax execute="@this" event="change" render="containerSize"/>
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Size"/>
+                        <h:outputLabel value=" : " />
+                        <h:panelGrid columns="1">
+                            <h:inputText disabled="true" id="containerSize" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.contSize}" style="width: 20px;" readonly="false"/>
+                        </h:panelGrid>
+
+
+                        <h:outputLabel value="Status *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu disabled="true" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.contStatus}">
+                            <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                            <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                            <f:selectItem itemValue="MTY" itemLabel="EMPTY" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Gross *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup >
+                            <h:inputText disabled="true" maxlength="9" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.contGross}" id="gr" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="numerik" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="gr"/>
+                        </h:panelGroup>
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu disabled="true" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.masterCommodity.commodityCode}">
+                            <f:selectItems value="#{perhitunganPluggingDeliveryBean.masterCommoditys}" var="item" itemValue="#{item[0]}" itemLabel="#{item[1]}" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="OH/OW/OL *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu disabled="true" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.overSize}">
+                            <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Dangerous *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup >
+                            <h:selectOneMenu disabled="true" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.dg}">
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            </h:selectOneMenu>
+
+                            <h:outputLabel value="Label *" />
+                            <h:selectOneMenu disabled="true" value="#{perhitunganPluggingDeliveryBean.pluggingReeferService.dgLabel}">
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                        </h:panelGroup>
+
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganPluggingDeliveryBean.handleSave}" update="pluggingReeferForm:pluggingReeferDetail growl pluggingReeferServiceForm:pluggingReeferGrid deliveryServiceForm:deliveryServiceTable formId" oncomplete="handleRequestValidation(xhr, status, args)" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog  widgetVar="cont" header="Select Container" width="700" modal="true">
+            <h:form id="formId">
+                <p:dataTable var="item" paginator="true" id="planningcont"
+                             value="#{perhitunganPluggingDeliveryBean.listDeliverySelect}"
+                             paginatorPosition="bottom" rowIndexVar="No"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                             >
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[12]}" filterMatchMode="contains" filterBy="#{item[12]}">
+                        <f:facet name="header">
+                            <h:outputText value="Bl No" />
+                        </f:facet>
+                        <h:outputText value="#{item[12]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}" filterMatchMode="contains" filterBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont No" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont Size" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Cont Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{perhitunganPluggingDeliveryBean.handleSelectNoCont}"
+                                             value="select" update="pluggingReeferServiceForm:pluggingReeferGrid"
+                                             oncomplete="cont.hide();">
+                                <f:attribute name="cont_no" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="500">
+                <p:dataTable var="item" value="#{perhitunganPluggingDeliveryBean.registrations}"
+                             paginator="true" rowIndexVar="No" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{perhitunganPluggingDeliveryBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="formId:planningcont registrationForm deliveryServiceForm:deliveryServiceTable" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{perhitunganPluggingDeliveryBean.handleDelete}" update="deliveryServiceForm:deliveryServiceTable formId growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" visible="true" rendered="#{not perhitunganPluggingDeliveryBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="PluggingDelivery.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

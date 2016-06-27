@@ -1,0 +1,341 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.yard_operation.angsur_container']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.yard_operation.angsur_container']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form>
+            <h:panelGrid columns="3">
+                <h:panelGrid columns="3">
+                    <h:outputLabel value="No PPKB:"/>
+                    <h:inputText id="bookingCode" value="#{angsurContainer.planningVessel.noPpkb}" title="No PPKB"/>
+                    <p:commandButton value="..." update="#" actionListener="#" style="font-size: x-small"/>
+                    <h:outputLabel value="Vessel Name:" for="vesselName" />
+                    <h:inputText id="vesselName" value="#{angsurContainer.planningVessel.vesselName}" title="Type"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="Voyyage In:" for="voyyageIn" />
+                    <h:inputText id="voyyageIn" value="#{angsurContainer.planningVessel.voyIn}" title="Dimension"/>
+                    <h:outputText value="&nbsp;"/>
+                    <h:outputLabel value="Voyyage Out:" for="voyyageOut" />
+                    <h:inputText id="voyyageOut" value="#{angsurContainer.planningVessel.voyOut}" title="Eta"/>
+                    <h:outputText value="&nbsp;"/>
+                </h:panelGrid>
+            </h:panelGrid>
+            <br/>
+            <br/>
+
+            <h:panelGrid columns="2" cellpadding="10" width="100%">
+                <p:dataTable paginatorPosition="bottom" var="item" value="#{angsurContainer.serviceContDischarges}" paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <p:column selectionMode="multiple" />
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            <p:commandButton value="#{msg['application.operation.liftoff']}" update="#" actionListener="#" oncomplete="AddDialog.show()"/>
+                            <p:commandButton value="#{msg['application.operation.lifton']}" update="#" actionListener="#" oncomplete="EditDialog.show()"/>
+                        </div>
+                    </f:facet>
+                    <p:column sortBy="#{item.contNo}">
+                        <f:facet name="header">
+                            <h:outputText value="Container N0"/>
+                        </f:facet>
+                        <h:outputText value="#{item.contNo}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.contSize}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item.contSize}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.contType}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item.contType}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.contStatus}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item.contStatus}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.contGross}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item.contGross}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.sealNo}">
+                        <f:facet name="header">
+                            <h:outputText value="Seal No"/>
+                        </f:facet>
+                        <h:outputText value="#{item.sealNo}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.masterYard.block}">
+                        <f:facet name="header">
+                            <h:outputText value="Blok"/>
+                        </f:facet>
+                        <h:outputText value="#{item.masterYard.block}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.ySlot}">
+                        <f:facet name="header">
+                            <h:outputText value="Slot"/>
+                        </f:facet>
+                        <h:outputText value="#{item.ySlot}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.yRow}">
+                        <f:facet name="header">
+                            <h:outputText value="Row"/>
+                        </f:facet>
+                        <h:outputText value="#{item.yRow}"/>
+                    </p:column>
+                    <p:column sortBy="#{item.yTier}">
+                        <f:facet name="header">
+                            <h:outputText value="Tier"/>
+                        </f:facet>
+                        <h:outputText value="#{item.yTier}"/>
+                    </p:column>
+                </p:dataTable>
+            </h:panelGrid>
+
+            <!--ADD DIALOG-->
+
+            <p:dialog modal="true"  widgetVar="AddDialog" width="800" header="Lift Off Container" resizable="false">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid columns="4">
+
+                            <h:outputText value="Container No"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.contNo}"/>
+                            <p:commandButton value="..." style="font-size: x-small" />
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{angsurContainer.serviceContDischarge.mlo.name}" size="25"/>
+                            <h:outputText/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.masterContainerType.contType}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.contSize}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.contGross}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.sealNo}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.masterCommodity.name}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.overSize}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.dangerous}"/>
+                            <h:outputText value="&nbsp;"/>
+                        </h:panelGrid>
+
+                        <p:spacer width="10"/>
+
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Location"/>:
+                            <h:panelGrid columns="8">
+                                B&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.masterYard.block}" size="5"/>
+                                S&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.YSlot}" size="5"/>
+                                R&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.YRow}" size="5"/>
+                                T&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.YTier}" size="5"/>
+                            </h:panelGrid>
+
+                            <h:outputText value="TT Code"/>:
+                            <h:panelGrid columns="6">
+                                <h:selectOneMenu value="#{angsurContainer.equipment.masterEquipment.equipCode}">
+                                    <f:selectItems value="#{angsurContainer.masterEquipments}" var="it" itemValue="#{it.equipCode}" itemLabel="#{it.name}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                            <h:outputText value="H/T Code"/>:
+                            <h:panelGrid columns="6">
+                                <h:selectOneMenu value="#{angsurContainer.equipment.masterEquipment.equipCode}">
+                                    <f:selectItems value="#{angsurContainer.masterEquipments}" var="it" itemValue="#{it.equipCode}" itemLabel="#{it.name}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+
+                            <h:outputText value="Start Time"/>:
+                            <h:inputText value="#{angsurContainer.equipment.startTime}"/>
+                            <h:outputText value="End Time"/>:
+                            <h:inputText value="#{angsurContainer.equipment.endTime}"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.confirm']}"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide()"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+
+            <!--EDIT DIALOG-->
+
+            <p:dialog modal="true"  widgetVar="EditDialog" width="800" header="Lift On Container" resizable="false">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid columns="4">
+
+                            <h:outputText value="Container No"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.contNo}"/>
+                            <p:commandButton value="..." style="font-size: x-small" />
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText disabled="true" value="#{angsurContainer.serviceContDischarge.mlo.name}" size="25"/>
+                            <h:outputText/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.masterContainerType.contType}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.contSize}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.contStatus}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.contGross}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.sealNo}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.masterCommodity.name}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText  value="#{angsurContainer.serviceContDischarge.overSize}"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText value="#{angsurContainer.serviceContDischarge.dangerous}"/>
+                            <h:outputText value="&nbsp;"/>
+                        </h:panelGrid>
+
+                        <p:spacer width="10"/>
+
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Location"/>:
+                            <h:panelGrid columns="8">
+                                B&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.masterYard.block}" size="5"/>
+                                S&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.YSlot}" size="5"/>
+                                R&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.YRow}" size="5"/>
+                                T&nbsp;<h:inputText value="#{angsurContainer.serviceContDischarge.YTier}" size="5"/>
+                            </h:panelGrid>
+
+                            <h:outputText value="TT Code"/>:
+                            <h:panelGrid columns="6">
+                                <h:selectOneMenu value="#{angsurContainer.equipment.masterEquipment.equipCode}">
+                                    <f:selectItems value="#{angsurContainer.masterEquipments}" var="it" itemValue="#{it.equipCode}" itemLabel="#{it.name}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+                            <h:outputText value="H/T Code"/>:
+                            <h:panelGrid columns="6">
+                                <h:selectOneMenu value="#{angsurContainer.equipment.masterEquipment.equipCode}">
+                                    <f:selectItems value="#{angsurContainer.masterEquipments}" var="it" itemValue="#{it.equipCode}" itemLabel="#{it.name}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+
+                            <h:outputText value="Start Time"/>:
+                            <h:inputText value="#{angsurContainer.equipment.startTime}"/>
+                            <h:outputText value="End Time"/>:
+                            <h:inputText value="#{angsurContainer.equipment.endTime}"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+                            <h:outputText value="&nbsp;"/>
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.confirm']}"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide()"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

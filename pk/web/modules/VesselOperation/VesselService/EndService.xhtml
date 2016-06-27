@@ -1,0 +1,396 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.vessel_operation.vessel_service.end_service_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.vessel_operation.vessel_service.end_service_confirm']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <script type="text/javascript">
+            function handleEndServiceValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            messageDialog.show();
+                    } else {
+                            confirmation.hide();
+                    }
+            }
+
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+            
+        </script>
+
+        <h:form id="vesselList">
+            <p:growl showDetail="true" globalOnly="true"/>
+            <p:panel rendered="#{endServiceBean.listState}">
+                <p:dataTable value="#{endServiceBean.serviceVessels}" var="item" id="vesselListTable"
+                             paginatorPosition="bottom" rowIndexVar="no"
+                             paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" image="ui-icon-document" value="Vessel Activity Report" actionListener="#{endServiceBean.handleOpenVesselActivityReportDialog}" update="vesselActivityReportForm" onsuccess="vesselActivityReportDialog.show();" style="font-size: x-small"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-document" value="Vessel Revenues Recap" actionListener="#{endServiceBean.handleOpenVesselActivityReportDialog}" update="vesselRevenuesRecapForm" onsuccess="vesselRevenuesRecapDialog.show();" style="font-size: x-small"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-document" value="Transhipment Recap" actionListener="#{endServiceBean.handleOpenVesselActivityReportDialog}" update="transhipmentRecapForm" onsuccess="transhipmentRecapDialog.show();" style="font-size: x-small"/>
+                        </div>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Agent"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voy In"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voy Out"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Discharge"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Load"/>
+                        </f:facet>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Arrival Time"/>
+                        </f:facet>
+                        <h:outputText value="#{item[7]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column sortBy="#{item[8]}">
+                        <f:facet name="header">
+                            <h:outputText value="Departure Time"/>
+                        </f:facet>
+                        <h:outputText value="#{item[8]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[9]}" sortBy="#{item[9]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[9]}"/>
+                    </p:column>
+                    <p:column style="width: 120px;text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="End Service" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" image="ui-icon-stop" title="Stop Service this Vessel" disabled="#{item[9].equals('Served') || empty item[8]}" actionListener="#{endServiceBean.handleSelectTable}" update="confirmDialog" oncomplete="confirmation.show();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" actionListener="#{endServiceBean.handlePreview}" image="ui-icon ui-icon-search" title="Preview Planning Vessel" update="vesselList detailPanel" >
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" disabled="#{item[9].equals('Servicing')}" actionListener="#{endServiceBean.handleSelectTable}" image="ui-icon-arrowreturn-1-w" title="Cancel End Service Vessel" update="confirmDialogC" oncomplete="confirmationC.show();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" process="@this" ajax="false" disabled="#{not item[9].equals('Served')}" actionListener="#{endServiceBean.handleDownloadBaplie}" image="ui-icon ui-icon-disk" title="Download Baplie">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                                <p:fileDownload value="#{endServiceBean.file}" />
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:panel>
+
+            <p:panel header="Detail Data" id="detailPanel" rendered="#{endServiceBean.detailState}">
+                <p:tabView>
+                    <p:tab title="General Info">
+                        <h:panelGrid columns="5" width="100%">
+                            <p:fieldset legend="Vessel" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="No PPKB"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[0]}"/>
+                                    <h:outputText value="Booking Code"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[1]}"/>
+                                    <h:outputText value="Vessel Name"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[2]}"/>
+                                    <h:outputText value="GRT"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[3]}"/>
+                                    <h:outputText value="DWT"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[4]}"/>
+                                    <h:outputText value="BRT"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[5]}"/>
+                                    <h:outputText value="NRT"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[6]}"/>
+                                    <h:outputText value="LOA"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[7]}"/>
+                                    <h:outputText value="Agent"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[8]}"/>
+                                    <h:outputText value="Voy In"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[9]}"/>
+                                    <h:outputText value="Voy Out"/>:
+                                    <h:outputLabel value="#{endServiceBean.sv[10]}"/>
+                                </h:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="Detail Booking" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:panelGrid columns="3">
+                                        <h:outputLabel/><h:outputLabel/>
+                                        <h:outputText value="Planning" style="font-weight: bold"/>
+                                        <h:outputText value="Disharge"/>:
+                                        <h:outputLabel value="#{endServiceBean.sv[11]} box"/>
+                                        <h:outputText value="Load"/>:
+                                        <h:outputLabel value="#{endServiceBean.sv[12]} box"/>
+                                    </h:panelGrid>
+                                    <p:spacer width="20"/>
+                                    <h:panelGrid>
+                                        <h:outputText value="Realisasi" style="font-weight: bold"/>
+                                        <h:outputLabel value="#{endServiceBean.sv[13]} box"/>
+                                        <h:outputLabel value="#{endServiceBean.sv[14]} box"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:fieldset>
+                            <p:fieldset legend="Berth Info" style="height:220px;">
+                                <h:panelGrid columns="3">
+                                    <h:panelGrid columns="3">
+                                        <h:outputLabel/><h:outputLabel/>
+                                        <h:outputText value="Planning" style="font-weight: bold"/>
+                                        <h:outputText value="Berth Name"/>:
+                                        <h:outputLabel value="#{endServiceBean.sv[15]}"/>
+                                        <h:outputText value="Fr Meter"/>:
+                                        <h:outputLabel value="#{endServiceBean.sv[16]}"/>
+                                        <h:outputText value="To Meter"/>:
+                                        <h:outputLabel value="#{endServiceBean.sv[17]}"/>
+                                    </h:panelGrid>
+                                    <p:spacer width="20"/>
+                                    <h:panelGrid>
+                                        <h:outputText value="Realisasi" style="font-weight: bold"/>
+                                        <h:outputLabel value="#{endServiceBean.sv[15]}"/>
+                                        <h:outputLabel value="#{endServiceBean.sv[16]}"/>
+                                        <h:outputLabel value="#{endServiceBean.sv[17]}"/>
+                                    </h:panelGrid>
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                    </p:tab>
+
+                    <p:tab title="Time Schedule">
+                        <h:panelGrid columns="3">
+                            <h:panelGrid columns="3">
+                                <h:outputLabel/><h:outputLabel/>
+                                <h:outputText value="Planning" style="font-weight: bold"/>
+                                <h:outputText value="Arrival Time"/>:
+                                <h:outputLabel value="#{endServiceBean.sv[18]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="Berthing Time"/>:
+                                <h:outputLabel value="#{endServiceBean.sv[19]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="Start Work Time"/>:
+                                <h:outputLabel value="#{endServiceBean.sv[20]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="End Work Time"/>:
+                                <h:outputLabel value="#{endServiceBean.sv[21]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputText value="Departure Time"/>:
+                                <h:outputLabel value="#{endServiceBean.sv[22]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                            </h:panelGrid>
+                            <p:spacer width="20"/>
+                            <h:panelGrid>
+                                <h:outputText value="Realisasi" style="font-weight: bold"/>
+                                <h:outputLabel value="#{endServiceBean.sv[23]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{endServiceBean.sv[24]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{endServiceBean.sv[25]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{endServiceBean.sv[26]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                                <h:outputLabel value="#{endServiceBean.sv[27]}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                                </h:outputLabel>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </p:tab>
+
+                    <p:tab title="Closing Time">
+                        <h:panelGrid columns="3">
+                            <h:outputText value="Closing Time Receiving"/>:
+                            <h:outputLabel value="#{endServiceBean.sv[28]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Doc. Receiving"/>:
+                            <h:outputLabel value="#{endServiceBean.sv[29]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Empty"/>:
+                            <h:outputLabel value="#{endServiceBean.sv[30]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Reefer"/>:
+                            <h:outputLabel value="#{endServiceBean.sv[31]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                            <h:outputText value="Closing Time Doc. Emp/Reef"/>:
+                            <h:outputLabel value="#{endServiceBean.sv[32]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+                            </h:outputLabel>
+                        </h:panelGrid>
+                    </p:tab>
+                </p:tabView>
+                <f:facet name="footer">
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.close']}" image="ui-icon-circlesmall-close" update="vesselList" actionListener="#{endServiceBean.setToListState}"/>
+                    </div>
+                </f:facet>
+            </p:panel>
+        </h:form>
+
+        <p:dialog header="#{msg['application.header.confirm.end']}"  widgetVar="confirmation" minWidth="400">
+            <h:form id="confirmDialog">
+                    <p:panel>
+                        <h:outputLabel value="#{msg['application.service.end']}"/>
+                        <f:facet name="footer">
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{endServiceBean.handleEndService}" update="vesselList vesselList:vesselListTable messageDialogForm" oncomplete="handleEndServiceValidation(xhr, status, args)" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                            </div>
+                        </f:facet>
+                    </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.rollback']}"  widgetVar="confirmationC" minWidth="400">
+            <h:form id="confirmDialogC">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.service.rollback']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{endServiceBean.handleRollBack}" update="vesselList vesselList:vesselListTable" oncomplete="confirmationC.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmationC.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="messageDialog" modal="true" width="400" header="#{msg['application.header.warning']}">
+            <h:form id="messageDialogForm">
+                <p:panel>
+                    <h:outputText value="#{endServiceBean.messageAll}" escape="false"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-center">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.ok']}" onclick="messageDialog.hide();confirmation.hide();" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" resizable="false" header="Vessel Activity Report" width="260"  widgetVar="vesselActivityReportDialog">
+            <h:form id="vesselActivityReportForm">
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="startDate"  value="From"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="startDate" size="15" selectListener="#{endServiceBean.handleResetTransactionRecapParameter}" onselect="freeze();" pattern="dd/MM/yyyy" onSelectUpdate="vesselActivityReportForm:endDate" value="#{endServiceBean.startDate}" showOn="button"/>
+                    <h:outputLabel for="endDate" value="To"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="endDate" size="15" selectListener="#{endServiceBean.handleResetTransactionRecapParameter}" onselect="freeze();" pattern="dd/MM/yyyy" onSelectUpdate="vesselActivityReportForm:startDate" value="#{endServiceBean.endDate}" showOn="button"/>
+                    <h:outputLabel for="reportButtonGroup" value="Download"/>
+                    <h:outputText value=":"/>
+                    <h:panelGroup id="reportButtonGroup">
+                          <p:commandButton value="Vessel Activity Report" actionListener="#{endServiceBean.handleDownloadTransactionRecap}" onstart="freeze()" id="vesselRecap" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+       <p:dialog modal="true" resizable="false" header="Vessel Revenues Recap" width="260"  widgetVar="vesselRevenuesRecapDialog">
+            <h:form id="vesselRevenuesRecapForm">
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="startDate"  value="From"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="startDate" size="15" selectListener="#{endServiceBean.handleResetTransactionRecapParameter}" onselect="freeze();" pattern="dd/MM/yyyy" onSelectUpdate="vesselRevenuesRecapForm:endDate" value="#{endServiceBean.startDate}" showOn="button"/>
+                    <h:outputLabel for="endDate" value="To"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="endDate" size="15" selectListener="#{endServiceBean.handleResetTransactionRecapParameter}" onselect="freeze();" pattern="dd/MM/yyyy" onSelectUpdate="vesselRevenuesRecapForm:startDate" value="#{endServiceBean.endDate}" showOn="button"/>
+                    <h:outputLabel for="reportButtonGroup" value="Download"/>
+                    <h:outputText value=":"/>
+                    <h:panelGroup id="reportButtonGroup">
+                          <p:commandButton value="Recap" actionListener="#{endServiceBean.handleDownloadRevenuesRecap}" onstart="freeze()" id="Recap" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                          <p:commandButton value="Detail" actionListener="#{endServiceBean.handleDownloadRevenuesRecap}" onstart="freeze()" id="Detail" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" resizable="false" header="Transhhipment Recap" width="260"  widgetVar="transhipmentRecapDialog">
+            <h:form id="transhipmentRecapForm">
+                <h:panelGrid columns="3">
+                    <h:outputLabel for="startDate"  value="From"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="startDate" size="15" selectListener="#{endServiceBean.handleResetTransactionRecapParameter}" onselect="freeze();" pattern="dd/MM/yyyy" onSelectUpdate="vesselRevenuesRecapForm:endDate" value="#{endServiceBean.startDate}" showOn="button"/>
+                    <h:outputLabel for="endDate" value="To"/>
+                    <h:outputText value=":"/>
+                    <p:calendar id="endDate" size="15" selectListener="#{endServiceBean.handleResetTransactionRecapParameter}" onselect="freeze();" pattern="dd/MM/yyyy" onSelectUpdate="vesselRevenuesRecapForm:startDate" value="#{endServiceBean.endDate}" showOn="button"/>
+                    <h:outputLabel for="reportButtonGroup" value="Download"/>
+                    <h:outputText value=":"/>
+                    <h:panelGroup id="reportButtonGroup">
+                        <p:commandButton value="Recap" actionListener="#{endServiceBean.handleDownloadTranshipmentRecap}" onstart="freeze()" id="Recap" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                          <p:commandButton value="Detail" actionListener="#{endServiceBean.handleDownloadTranshipmentRecap}" onstart="freeze()" id="Detail" oncomplete="handleDownloadRequest(args)" style="font-size: x-small"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

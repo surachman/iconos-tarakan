@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:qt="http://www.qtasnim.com/currency"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.gate_monitoring.gate_activity_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.gate_monitoring.gate_activity_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                if(!(args.validationFailed || args.isValid == false)) {
+                    formEditDialog.hide();
+                }
+            }
+        </script>
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        
+        <h:form id="appForm">
+            <p:panel style="width: 450px">
+                    <h:panelGrid id="periodPanel" columns="5">
+                        <h:outputLabel value="Periode" />
+                        <h:outputLabel value=" From : " />
+                        <p:calendar value="#{gateActivityMonitoringBean.startDate}" id="startCal" pattern="dd/MM/yyyy"
+                                    showButtonPanel="true" effect="slideDown"/>
+                        <h:outputLabel value=" To " />
+                        <p:calendar value="#{gateActivityMonitoringBean.endDate}" id="endCal" pattern="dd/MM/yyyy"
+                                    showButtonPanel="true" effect="slideDown"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid id="serviceTypePanel" columns="3">
+                        <h:outputLabel value="Service Type" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneRadio id="filter" value="#{gateActivityMonitoringBean.serviceType}">
+                            <f:selectItem itemValue="1" itemLabel="Receiving"/>
+                            <f:selectItem itemValue="2" itemLabel="Delivery"/>
+                        </h:selectOneRadio>
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="Refresh" actionListener="#{gateActivityMonitoringBean.handleRefresh}"
+                                             onstart="freeze()" update="appTable" onclick="dataTable.clearFilters()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            <br/>
+
+            <p:dataTable id="appTable" var="item" value="#{gateActivityMonitoringBean.services}"
+                         paginator="true" rows="10"  widgetVar="dataTable"
+                         paginatorPosition="bottom" rowIndexVar="No"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" >
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;"/>
+                </f:facet>
+
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No" />
+                    </f:facet>
+                    <h:outputText value="#{No+1}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Jobslip" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}"  style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column sortBy="#{item[3]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column sortBy="#{item[7]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Date In" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date"/>
+                    </h:outputText>
+                </p:column>
+                <p:column sortBy="#{item[8]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Date Out" />
+                    </f:facet>
+                    <h:outputText value="#{item[8]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" type="date"/>
+                    </h:outputText>
+                </p:column>
+                <p:column sortBy="#{item[9]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Vehicle Code" />
+                    </f:facet>
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column sortBy="#{item[10]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No. PPKB" />
+                    </f:facet>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+                <p:column sortBy="#{item[11]}" style="text-align: left">
+                    <f:facet name="header">
+                        <h:outputText value="Vessel Name" />
+                    </f:facet>
+                    <h:outputText value="#{item[11]}"/>
+                </p:column>
+                <p:column sortBy="#{item[12]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Voyage" />
+                    </f:facet>
+                    <h:outputText value="#{item[12]}"/>
+                </p:column>
+                <p:column sortBy="#{item[13]}" style="text-align: left">
+                    <f:facet name="header">
+                        <h:outputText value="Confirm Consignee" />
+                    </f:facet>
+                    <h:outputText value="#{item[13]}"/>
+                </p:column>
+
+                <p:column style="width: 50px;" >
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton actionListener="#{gateActivityMonitoringBean.handleEdit}" 
+                                         update="appForm:formEdit" onsuccess="formEditDialog.show();"
+                                         image="ui-icon ui-icon-pencil" title="Edit Gate Activity Monitoring">
+                            <f:attribute name="sgid" value="#{item[14]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty gateActivityMonitoringBean.services}">
+                            <p:dataExporter type="xls" target="appTable" fileName="Gate Activity Monitoring #{gateActivityMonitoringBean.now}"
+                                            postProcessor="#{gateActivityMonitoringBean.exportToExcel}" excludeColumns=""/>
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+
+            </p:dataTable>
+
+            <p:dialog modal="true"  widgetVar="formEditDialog" closable="false" minWidth="400" header="Edit Service Gate Monitoring">
+                <p:outputPanel id="formEdit">
+                    <p:panel>
+                        <center>
+                            <h:panelGrid id="periodEditPanel" columns="3">
+                                <h:outputLabel value="Date In " />
+                                <h:outputLabel value=" : " />
+                                <p:inputMask mask="99/99/9999 99:99" value="#{gateActivityMonitoringBean.startDateEdited}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date"/>
+                                </p:inputMask>
+
+                                <h:outputLabel value="Date Out " />
+                                <h:outputLabel value=" : " />
+                                <p:inputMask mask="99/99/9999 99:99" value="#{gateActivityMonitoringBean.endDateEdited}" 
+                                             disabled="#{gateActivityMonitoringBean.gatedOut}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" type="date"/>
+                                </p:inputMask>
+
+                            </h:panelGrid>
+                            <f:facet name="footer">
+                                <div class="header-panel-single-right">
+                                    <p:commandButton value="Cancel" onclick="formEditDialog.hide()"/>
+                                    <p:commandButton value="Save" onstart="freeze();" update="growl appTable"
+                                                     actionListener="#{gateActivityMonitoringBean.handleSave}"
+                                                     oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                </div>
+                            </f:facet>
+                        </center>
+                    </p:panel>
+                </p:outputPanel>
+            </p:dialog>
+
+        </h:form>
+    </ui:define>
+</ui:composition>
+

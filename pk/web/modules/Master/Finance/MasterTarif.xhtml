@@ -1,0 +1,457 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.finance.master_tarif']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dialogAddEdit.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9.]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+           
+            var updateRuleVisibilities = (function(){
+                var rows = {
+                    "cont-type" : 1,
+                    "cont-size" : 2,
+                    "cont-type-in-general" : 3,
+                    "shifting-cat": 4,
+                    "oversize" : 5,
+                    "use-sling" : 6,
+                    "dangerous" : 7,
+                    "landed": 8,
+                    "special-eqpmnt": 9,
+                    "open-door": 10,
+                    "uc": 11,
+                    "plugging": 12,
+                    "uc-min-size": 13,
+                    "uc-max-size": 14,
+                    "forklift-type": 15,
+                    "strip-stuff": 16,
+                    "mechanical-cat": 17,
+                    "crane": 18
+                };
+                
+                var showRows = {
+                    "HANDLING": ["cont-type", "cont-size", "cont-type-in-general", "crane", "oversize", "uc", "uc-min-size", "uc-max-size"],
+                    "LOLO": ["cont-type", "cont-size", "oversize", "uc", "uc-min-size", "uc-max-size"],
+                    "SLING": ["cont-size"],
+                    "PASS_GATE": ["cont-size", "cont-size", "uc"],
+                    "PENUMPUKAN": ["cont-type", "cont-size", "crane", "oversize", "plugging", "uc"],
+                    "TRANSHIPMENT": ["cont-type", "cont-size", "crane", "oversize", "uc", "uc-min-size", "uc-max-size"],
+                    "SHIFTING": ["cont-type", "cont-size", "crane", "oversize", "shifting-cat", "uc", "uc-min-size", "uc-max-size", "landed"],
+                    "CANCEL_LOADING": ["cont-type", "cont-size", "uc", "uc-min-size", "uc-max-size"],
+                    "BEHANDLE": ["cont-type", "cont-size", "special_eqpmnt", "uc", "uc-min-size", "uc-max-size"],
+                    "AIR_KAPAL": [],                    
+                    "HATCH_MOVE": ["crane"],
+                    "STRIPPING_STUFFING": ["cont-size","open-door", "strip-stuff", "mechanical-cat"],
+                    "CANCEL_DOCUMENT": [],
+                    "DISCHARGE_TO_LOAD": [],
+                    "SEWA_FORKLIFT": ["forklift-type", "cont-size"],
+                    "SUPERVISI": ["cont-size"],
+                    "PLUGGING": ["cont-size"],
+                    "MONITORING": ["cont-size"],
+                    "JASA_DERMAGA": ["uc"]
+                };
+                
+                var $ = jQuery;
+                
+                var setRow = function(i, visible)
+                {
+                    if(visible)
+                        $(".activity-table tr:nth-child("+i+")").show();
+                    else
+                        $(".activity-table tr:nth-child("+i+")").hide();
+                }
+                  
+                var update = function(){
+                    var value = $("select.activity-select").val();
+                    for(var i = 1; i &lt;= 18; i++)
+                        setRow(i+1, false);
+                    var shownRows = showRows[value];
+                    if(shownRows)
+                    {
+                        for(var i = 0; i &lt; shownRows.length; i++)
+                        {
+                            var rowIndex = rows[shownRows[i]];
+                            if(rowIndex)
+                               setRow(rowIndex+1, true); 
+                        }
+                    }
+                }
+                return update;
+            })();
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.finance.master_tarif']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+        <h:form id="formTable">
+            <p:dataTable paginatorPosition="bottom" value="#{masterTarifBean.tarifConts}" var="item" 
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="tarifTable" rowIndexVar="number"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="Activity Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Activity Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[7]}" filterMatchMode="contains" filterBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Activity Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Amount (IDR)"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[2]}"/>
+                    </div>
+                </p:column>
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Amount (USD)"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[3]}"/>
+                    </div>
+                </p:column>
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Rekening (IDR)"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[5]}"/>
+                    </div>
+                </p:column>
+                
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Rekening (USD)"/>
+                    </f:facet>
+                    <div style="float: right">
+                        <h:outputText value="#{item[6]}"/>
+                    </div>
+                </p:column>
+
+                <p:column  style="width: 60px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{masterTarifBean.handleEdit}" update="formEdit:tarifEdit" oncomplete="dialogAddEdit.show();updateRuleVisibilities();" image="ui-icon ui-icon-pencil" title="Edit Tarif">
+                            <f:attribute name="idTarif" value="#{item[4]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="formEdit">
+            <p:dialog modal="true"  widgetVar="dialogAddEdit" minWidth="850" header="Master Tarif">
+                <p:panel>
+                    <h:panelGrid columns="3" rowClasses="first-tr" id="tarifEdit">
+                        <h:panelGrid columns="4">
+                            <h:outputLabel value="Activity" for="masterActivityCont" />:
+                            <h:inputText size="25" disabled="true" id="masterActivityCont" value="#{masterTarifBean.tarifCont.masterActivity.description}" title="MasterActivityCont"/>
+                            <h:outputLabel />
+                            <h:outputLabel value="Amount (IDR)*" for="amount" />:
+                            <h:inputText size="25" id="amount" value="#{masterTarifBean.tarifCont.amount}" title="Amount" required="true" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                <p:message display="icon" for="amount"/>
+                            </h:panelGrid>
+                            <h:outputLabel value="Amount (USD)*" for="amountUS" />:
+                            <h:inputText size="25" id="amountUS" value="#{masterTarifBean.tarifContUS.amount}" title="Amount USD" required="true" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                <p:message display="icon" for="amountUS"/>
+                            </h:panelGrid>
+                            <h:outputLabel value="Rekening (IDR)*" for="rekening" />:
+                            <h:inputText size="25" id="rekening" value="#{masterTarifBean.tarifCont.rekening}" title="Rekening" required="true" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                <p:message display="icon" for="rekening"/>
+                            </h:panelGrid>
+                            <h:outputLabel value="Rekening (USD)*" for="rekeningUS" />:
+                            <h:inputText size="25" id="rekeningUS" value="#{masterTarifBean.tarifContUS.rekening}" title="Rekening US" required="true" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                <p:message display="icon" for="rekeningUS"/>
+                            </h:panelGrid>
+                            <h:outputLabel value="TMT" />:
+                            <p:inputMask mask="99/99/9999" value="#{masterTarifBean.tarifCont.tmt}" title="TMT">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </p:inputMask>
+                            <h:outputLabel />
+                        </h:panelGrid>
+                        <p:spacer height="0" width="20"/>
+                        <h:panelGrid>
+                            <h:panelGrid columns="4" class="activity-table">
+                                <h:outputLabel value="Activity Type" />:
+                                <h:selectOneMenu class="activity-select" value="#{masterTarifBean.tarifRule.mainActivity}" onchange="updateRuleVisibilities()">
+                                    <f:selectItem itemValue="STEVEDORING" />
+                                    <f:selectItem itemValue="ANGSUR" />
+                                    <f:selectItem itemValue="ANGSURPLYR" />
+                                    <f:selectItem itemValue="PBM" />
+                                    <f:selectItem itemValue="HAULAGE_TRUCKING" />
+                                    <f:selectItem itemValue="STUFFING" />
+                                    <f:selectItem itemValue="STRIPPING" />
+                                    <f:selectItem itemValue="SHIFTING" />
+                                    <f:selectItem itemValue="RELOC_DISC_TO_LOAD" />
+                                    <f:selectItem itemValue="RELOC_BEHANDLE" />
+                                    <f:selectItem itemValue="SEWA_FORKLIFT" />
+                                    <f:selectItem itemValue="LIFT_BARANG" />
+                                    <f:selectItem itemValue="LOLO" />
+                                    
+                                    <f:selectItem itemValue="EXTRA_MOVEMENT" />
+                                    <f:selectItem itemValue="FORKLIFT" />
+                                    <f:selectItem itemValue="JASA_DERMAGA" />
+                                    <f:selectItem itemValue="PASS_GATE" />
+                                    <f:selectItem itemValue="SEWA_REACH_STACKER_PERJAM" />
+                                    <f:selectItem itemValue="REACH_STACKER" />
+                                    
+                                    <f:selectItem itemValue="UPAH_BURUH_HANDLING" />
+                                    
+                                    <f:selectItem itemValue="TRANSHIPMENT" />
+                                    <f:selectItem itemValue="OTHER_CHARGES_HANDLING" />
+                                    <f:selectItem itemValue="UPAH_BURUH_SHIFTING" />
+                                    <f:selectItem itemValue="AIR_KAPAL" />
+                                    <f:selectItem itemValue="PLUGGING" />
+                                    <f:selectItem itemValue="DISCHARGE_LOAD" />
+                                    <f:selectItem itemValue="HANDLING" />
+                                    <f:selectItem itemValue="UPAH_BURUH_BUKATUTUP_PALKA" />
+                                    <f:selectItem itemValue="UPAH_BURUH_STRIPPING" />
+                                    <f:selectItem itemValue="ANGKUT" />
+                                    <f:selectItem itemValue="HATCH_MOVE" />
+                                    <f:selectItem itemValue="DENDA_BOOKING_LOAD" />
+                                    <f:selectItem itemValue="UPAH_BURUH_HANDLING_TRANSHIPMENT" />
+                                    <f:selectItem itemValue="MONITORING" />
+                                    <f:selectItem itemValue="SLING" />
+                                    <f:selectItem itemValue="SHIFTING_VIA_CY" />
+                                    <f:selectItem itemValue="STRIPPING_STUFFING" />
+                                    <f:selectItem itemValue="CANCEL_LOADING" />
+                                    <f:selectItem itemValue="PENUMPUKAN" />
+                                    <f:selectItem itemValue="DENDA_BATAL_DOKUMEN" />
+                                    <f:selectItem itemValue="SUPERVISI" />                                   
+                                  </h:selectOneMenu>
+
+                                <h:outputLabel />
+                                <h:outputLabel value="Container Status" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.contType}">
+                                        <f:selectItem itemValue="FCL"  />
+                                        <f:selectItem itemValue="LCL" />
+                                        <f:selectItem itemValue="MTY" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Container Size" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.contSize}">
+                                        <f:selectItem itemValue="20"  />
+                                        <f:selectItem itemValue="35"  />
+                                        <f:selectItem itemValue="40" />
+                                        <f:selectItem itemValue="45" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Container Type in General" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.contTypeInGen}">
+                                    <f:selectItem />
+                                    <f:selectItem itemValue="BLK" itemLabel="Bulk (BLK)"  />
+                                    <f:selectItem itemValue="FLT" itemLabel="Flatracks (FLT)"  />
+                                    <f:selectItem itemValue="HC" itemLabel="High Cube (HC)"  />
+                                    <f:selectItem itemValue="OPT" itemLabel="Open-top (OPT)"  />
+                                    <f:selectItem itemValue="OPS" itemLabel="Open-site (OPS)"  />
+                                    <f:selectItem itemValue="RFR" itemLabel="Reefer (RFR)"  />
+                                    <f:selectItem itemValue="DRY" itemLabel="Standard (DRY)"  />
+                                    <f:selectItem itemValue="TNK" itemLabel="Tank (TNK)"  />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Shifting Category" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.shippingCat}">
+                                        <f:selectItem />
+                                        <f:selectItem itemValue="NOLANDED"  />
+                                        <f:selectItem itemValue="LANDED"  />
+                                        <f:selectItem itemValue="CY"  />
+                                        <f:selectItem itemValue="d"  />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="OH/OW/OL" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isOverDim}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Use Sling" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isUseSling}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Dangerous" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isDanger}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Uncontainerized Shifting Landed" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isLanded}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Use Special Equipment" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isUseSpecialEqpmnt}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Open Door" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isOpenDoor}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Uncategorized" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isUncateg}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Plugging" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.isPlugging}">
+                                    <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                    <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Uncategorized Min Size" />:
+                                <h:inputText value="#{masterTarifBean.tarifRule.uncategMinSize}">
+                                </h:inputText>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Uncategorized Max Size" />:
+                                <h:inputText value="#{masterTarifBean.tarifRule.uncategMaxSize}">
+                                </h:inputText>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Rent Forklift Type" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.rentForkliftType}">
+                                    <f:selectItem />
+                                    <f:selectItem itemValue="3T"  />
+                                    <f:selectItem itemValue="5T"  />
+                                    <f:selectItem itemValue="7T" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Strip Stuff Full Handling Name" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.stripStuffFhandlingCat}">
+                                    <f:selectItem />
+                                    <f:selectItem itemValue="GeneralCargo"  />
+                                    <f:selectItem itemValue="CurahCair"  />
+                                    <f:selectItem itemValue="CurahKering" />
+                                    <f:selectItem itemValue="PalletsCargo" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Mechanical Category" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.mechanicalCat}">
+                                    <f:selectItem />
+                                    <f:selectItem itemValue="NoPalletsCargo"  />
+                                    <f:selectItem itemValue="PalletsCargo"  />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+
+                                <h:outputLabel value="Crane Category" />:
+                                <h:selectOneMenu value="#{masterTarifBean.tarifRule.shipOrLandCat}">
+                                    <f:selectItem />
+                                    <f:selectItem itemValue="S" itemLabel="Ship Crane" />
+                                    <f:selectItem itemValue="L" itemLabel="Land Crane" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+                                
+                                <h:outputLabel value="Equipment Owner" />:
+                                <h:selectOneMenu>
+                                    <f:selectItem />
+                                    <f:selectItem itemValue="PBM" />
+                                    <f:selectItem itemValue="NON_PBM" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+                                
+                                <h:outputLabel value="Equipment Type" />:
+                                <h:selectOneMenu>
+                                    <f:selectItem />
+                                    <f:selectItem itemValue="CC" />
+                                    <f:selectItem itemValue="CC_NON_PBM" />
+                                    <f:selectItem itemValue="LLC" />
+                                    <f:selectItem itemValue="LLC_NON_PBM" />
+                                    <f:selectItem itemValue="SHIP_PBM" />
+                                    <f:selectItem itemValue="SHIP_NON_PBM" />
+                                </h:selectOneMenu>
+                                <h:outputLabel />
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{masterTarifBean.handleSave}" update="formTable:tarifTable formEdit:tarifEdit growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

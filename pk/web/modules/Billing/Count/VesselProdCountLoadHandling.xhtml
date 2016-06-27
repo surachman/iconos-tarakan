@@ -1,0 +1,641 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.count.vessel_prod_count_load_handling']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.count.vessel_prod_count_load_handling']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <dycode:loadJZebraBundle/>
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+
+
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+        <h:form id="countLoad">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{vesselProdCountLoadHandlingBean.serviceVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" rowIndexVar="number"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{vesselProdCountLoadHandlingBean.handleSelectNoPPKB}" value="select" update="countLoad:serviceVesselDetail countLoad:countLoadTable countLoad:handlingViews" oncomplete="dlgVessel.hide();statusDialog.hide();">
+                            <f:attribute name="noPPKB" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <p:panel header="Pilih PPKB" style="width: 350px;">
+                <h:panelGrid id="serviceVesselDetail" columns="4">
+                    <h:outputLabel value="No PPKB" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{vesselProdCountLoadHandlingBean.serviceVessel[0]}" readonly="true" size="30" onmousedown="dlgVessel.show();" />
+                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." type="button" onclick="dlgVessel.show();"/>
+                    <h:outputLabel value="Vessel Name" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{vesselProdCountLoadHandlingBean.serviceVessel[1]}" disabled="true" size="30"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage In" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{vesselProdCountLoadHandlingBean.serviceVessel[2]}" disabled="true" size="30"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage Out" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{vesselProdCountLoadHandlingBean.serviceVessel[3]}" disabled="true" size="30"/>
+                    <h:outputText />
+                </h:panelGrid>
+            </p:panel>
+            <br/>
+            <p:fieldset legend="Perhitungan Handling Petikemas Paket Muat">
+                <p:panel id="handlingViews" visible="#{!empty vesselProdCountLoadHandlingBean.serviceVessel}">
+                    <!--ini awal table-->
+                    <table style="text-align: left; width: 100%;" border="0"
+                           cellpadding="5" cellspacing="0">
+                        <tbody>
+                            <tr>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="1" rowspan="2"><big>NO.</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="2" rowspan="2"><big>KETERANGAN</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="4" rowspan="1"><big>STANDAR(BOX)</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="4" rowspan="1"><big>OH/OW/OL(BOX)</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="1" rowspan="2"><big>TOTAL</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="1" rowspan="1"><big>CHARGE</big></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>20</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>40</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>45</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>JML</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>20</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>40</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>45</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>JML</big></td>
+                                <td
+                                    style="text-align: center; font-weight: bold; background-color: rgb(59, 170, 227);"><big>(TAGIHAN)</big></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="font-weight: bold; text-align: center; background-color: rgb(59, 170, 227);">I</td>
+                                <td style="font-weight: bold;" colspan="2"
+                                    rowspan="1"><small><big>BUKA TUTUP
+                                            PALKA</big></small></td>
+                                <td><big></big></td>
+                                <td><big></big></td>
+                                <td><big></big></td>
+                                <td><big></big></td>
+                                <td><big></big></td>
+                                <td><big></big></td>
+                                <td><big></big></td>
+                                <td><br/>
+                                </td>
+                                <td><big></big></td>
+                                <td><big></big></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">JUMLAH
+                                    PALKA</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[0]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[1]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="font-weight: bold; text-align: center; background-color: rgb(59, 170, 227);">II</td>
+                                <td style="font-weight: bold;" colspan="2"
+                                    rowspan="1">JASA PETI KEMAS</td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: right;"><big></big></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td
+                                    style="font-weight: bold; background-color: rgb(242, 245, 247);">1.</td>
+                                <td style="font-weight: bold;">CONTAINER
+                                    CRANE/SHORE CRANE</td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: right;"><big></big></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">FCL</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[2]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[3]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[4]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[5]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[6]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[7]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[8]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[9]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>LCL</td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[10]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[11]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[12]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[13]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[14]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[15]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[16]}"/></td>
+                                <td style="text-align: right;"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[17]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">EMPTY</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[18]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[19]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[20]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[21]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[22]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[23]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[24]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[25]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>TRANSHIPMENT</td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: right;"><big></big></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">SHIFTING
+                                    WITH LANDING FULL</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[26]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[27]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[28]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[29]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[30]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[31]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[32]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[33]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>SHIFTING WITHOUT LANDING FULL</td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[34]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[35]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[36]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[37]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[38]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[39]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[40]}"/></td>
+                                <td style="text-align: right;"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[41]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">SHIFTING
+                                    WITH LANDING EMPTY</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[42]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[43]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[44]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[45]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[46]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>SHIFTING WITHOUT LANDING EMPTY</td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[47]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[48]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[49]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[50]}"/></td>
+                                <td style="text-align: right;"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[51]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="text-align: left; background-color: rgb(59, 170, 227);"
+                                    colspan="1" rowspan="1"><span
+                                        style="font-weight: bold;"><br/>
+                                    </span></td>
+                                <td style="background-color: rgb(242, 245, 247);"
+                                    colspan="1"><big></big></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"
+                                    rowspan="1" colspan="10"><span
+                                        style="font-weight: bold;">JUMLAH
+                                        1</span></td>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[52]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td
+                                    style="font-weight: bold; background-color: rgb(242, 245, 247);">2.</td>
+                                <td style="font-weight: bold;">SHIP
+                                    CRANE</td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: right;"><big></big></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">FCL</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[53]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[54]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[55]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[56]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[57]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[58]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[59]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[60]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>LCL</td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[61]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[62]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[63]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[64]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[65]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[66]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[67]}"/></td>
+                                <td style="text-align: right;"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[68]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">EMPTY</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[69]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[70]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[71]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[72]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[73]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[74]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[75]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[76]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>TRANSHIPMENT</td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: center;"><big></big></td>
+                                <td style="text-align: right;"><big></big></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">SHIFTING
+                                    WITH LANDING FULL</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[77]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[78]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[79]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[80]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[81]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[82]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[83]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[84]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>SHIFTING WITHOUT LANDING FULL</td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[85]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[86]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[87]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[88]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[89]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[90]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[91]}"/></td>
+                                <td style="text-align: right;"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[92]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td style="background-color: rgb(215, 235, 249);">SHIFTING
+                                    WITH LANDING EMPTY</td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[93]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[94]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[95]}"/></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"></td>
+                                <td
+                                    style="text-align: center; background-color: rgb(215, 235, 249);"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[96]}"/></td>
+                                <td
+                                    style="text-align: right; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[97]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td style="background-color: rgb(59, 170, 227);"><big></big></td>
+                                <td style="background-color: rgb(242, 245, 247);"><big></big></td>
+                                <td>SHIFTING WITHOUT LANDING EMPTY</td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[98]}"/></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[99]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[100]}"/></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"></td>
+                                <td style="text-align: center;"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[101]}"/></td>
+                                <td style="text-align: right;"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[102]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="font-weight: bold; text-align: left; background-color: rgb(59, 170, 227);"
+                                    colspan="1" rowspan="1"><br/>
+                                </td>
+                                <td style="background-color: rgb(242, 245, 247);"
+                                    colspan="1"><big></big></td>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);"
+                                    rowspan="1" colspan="10">JUMLAH 2</td>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(215, 235, 249);"><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[103]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="12" rowspan="1"><big>JUMLAH 1 + 2</big></td>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(59, 170, 227);"><big><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[104]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></big></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"
+                                    colspan="12" rowspan="1"><big>PPN</big></td>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(242, 245, 247);"><big><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[106]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></big></td>
+                            </tr>
+                            <tr>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(59, 170, 227);"
+                                    colspan="12" rowspan="1"><big>TOTAL</big></td>
+                                <td
+                                    style="text-align: right; font-weight: bold; background-color: rgb(59, 170, 227);"><big><div style="float: left"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[110]}"/></div><div style="float: right"><h:outputText value="#{vesselProdCountLoadHandlingBean.handlings[107]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText></div></big></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!--ini akhir table-->
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <p:commandButton onstart="freeze();" id="buttonPreview" value="#{msg['application.operation.preview']}" actionListener="#{vesselProdCountLoadHandlingBean.handleDownload}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" update="countLoad:buttonPreview"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:fieldset>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

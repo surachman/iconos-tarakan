@@ -1,0 +1,274 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.master_anggaran_trafik']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dialogAddEdit.hide();
+                    }
+            }
+
+            function cekAlphabetForYear(param) {
+                                var regexNum = /^[0-9]+$/;
+                                var regexLetter = /[a-zA-z]/;
+                                if(!regexNum.test(param.value))
+                                    param.value = "";
+                                else if(regexLetter.test(param.value))
+                                    param.value = "";
+            }
+
+            function cekAlphabet(param) {
+                                var regexNum = /^[0-9.]+$/;
+                                var regexLetter = /[a-zA-z]/;
+                                if(!regexNum.test(param.value))
+                                    param.value = "";
+                                else if(regexLetter.test(param.value))
+                                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.others.master_anggaran_trafik']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <p:panel>
+            <h:form id="main-list">
+                <p:dataTable paginatorPosition="bottom" value="#{masterAnggaranTrafikBean.anggarans}" var="item"
+                             paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="number"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <div class="header-panel-left">
+                            <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" oncomplete="dialogAddEdit.show()" actionListener="#{masterAnggaranTrafikBean.handleAdd}" update="formAddEdit"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.generate']}" oncomplete="dialogGenerate.show()"  actionListener="#{masterAnggaranTrafikBean.handleGenerateTahun}" update="generateForm"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.delete_all']}" oncomplete="dialogDeleteAll.show()"  actionListener="#{masterAnggaranTrafikBean.handleDeleteTahun}" update="delAllForm"/>
+                        </div>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Tahun"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[7]}" sortBy="#{item[7]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Activity"/>
+                        </f:facet>
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Produksi Tahun"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}">
+                            <f:convertNumber integerOnly="true"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Triwulan I (%)"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Triwulan II (%)"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Triwulan III (%)"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}" style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="Triwulan IV (%)"/>
+                        </f:facet>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column style="width: 70px">
+                        <f:facet name="header">
+                            <h:outputText value="Action"/>
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" image="ui-icon-pencil" oncomplete="dialogAddEdit.show()" title="Edit" actionListener="#{masterAnggaranTrafikBean.handleSelectTable}" update="formAddEdit">
+                                <f:attribute name="thn" value="#{item[0]}"/>
+                                <f:attribute name="act" value="#{item[1]}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" image="ui-icon-trash" oncomplete="dialogDel.show()" title="Delete" actionListener="#{masterAnggaranTrafikBean.handleSelectTable}">
+                                <f:attribute name="thn" value="#{item[0]}"/>
+                                <f:attribute name="act" value="#{item[1]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+
+        <p:dialog header="Entry Master Anggaran Trafik Bongkar Muat"  widgetVar="dialogAddEdit" width="520">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Tahun" for="tahun" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="tahun" value="#{masterAnggaranTrafikBean.anggaran.masterAnggaranTrafikBmPK.tahun}" title="Tahun" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabetForYear(this);" maxlength="4" disabled="#{masterAnggaranTrafikBean.disEdit}"/>
+                            <p:message display="icon" for="tahun"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="Tipe Pelayaran" />:
+                        <h:selectOneRadio value="#{masterAnggaranTrafikBean.tradeType}" disabled="#{masterAnggaranTrafikBean.disEdit}">
+                            <f:selectItem itemValue="D" itemLabel="Domestik"/>
+                            <f:selectItem itemValue="I" itemLabel="Internasional"/>
+                        </h:selectOneRadio>
+                        <h:outputLabel value="Aktivitas" />:
+                        <h:selectOneRadio value="#{masterAnggaranTrafikBean.act}" disabled="#{masterAnggaranTrafikBean.disEdit}">
+                            <f:selectItem itemValue="B" itemLabel="Bongkar"/>
+                            <f:selectItem itemValue="M" itemLabel="Muat"/>
+                        </h:selectOneRadio>
+                        <h:outputLabel value="Jenis Petikemas" />:
+                        <h:selectOneRadio value="#{masterAnggaranTrafikBean.type}" disabled="#{masterAnggaranTrafikBean.disEdit}" valueChangeListener="#{masterAnggaranTrafikBean.onChangeType}">
+                            <f:selectItem itemValue="F" itemLabel="FULL"/>
+                            <f:selectItem itemValue="E" itemLabel="EMPTY"/>
+                            <f:ajax execute="@this" render="ei ea" event="change"/>
+                        </h:selectOneRadio>
+                        <h:outputLabel value="Reefer" />:
+                        <h:selectBooleanCheckbox id="ei" value="#{masterAnggaranTrafikBean.reefer}" disabled="#{masterAnggaranTrafikBean.type.equals('E') or masterAnggaranTrafikBean.disEdit}">
+                            <f:selectItem itemValue="true" itemLabel="Yes"/>
+                        </h:selectBooleanCheckbox>
+                        <h:outputLabel value="Ukuran Petikemas" />:
+                        <h:selectOneRadio value="#{masterAnggaranTrafikBean.size}" disabled="#{masterAnggaranTrafikBean.disEdit}">
+                            <f:selectItems value="#{containerAttributesBean.containerSizes}"/>
+                        </h:selectOneRadio>
+                        <h:outputLabel value="Aktivitas" />:
+                        <h:selectOneRadio id="ea" value="#{masterAnggaranTrafikBean.satuan}" disabled="#{masterAnggaranTrafikBean.disEdit or masterAnggaranTrafikBean.type.equals('E')}">
+                            <f:selectItem itemValue="B" itemLabel="Box"/>
+                            <f:selectItem itemValue="T" itemLabel="Ton"/>
+                        </h:selectOneRadio>
+                        <h:outputLabel value="Prod Tahun" for="prodTahun" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="prodTahun" value="#{masterAnggaranTrafikBean.anggaran.prodTahun}" title="ProdTahun" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <p:message display="icon" for="prodTahun"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:panelGrid columns="7">
+                        <h:outputLabel value="Persentase Triwulan I" for="prodTriwulan1" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="prodTriwulan1" size="5" maxlength="5" value="#{masterAnggaranTrafikBean.anggaran.triwulan1}" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="%"/>
+                            <p:message display="icon" for="prodTriwulan1"/>
+                        </h:panelGrid>
+                        <p:spacer width="10" height="0"/>
+                        <h:outputLabel value="Persentase Triwulan II" for="prodTriwulan2" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="prodTriwulan2" size="5" maxlength="5" value="#{masterAnggaranTrafikBean.anggaran.triwulan2}" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="%"/>
+                            <p:message display="icon" for="prodTriwulan2"/>
+                        </h:panelGrid>
+                        <h:outputLabel value="Persentase Triwulan III" for="prodTriwulan3" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="prodTriwulan3" size="5" maxlength="5" value="#{masterAnggaranTrafikBean.anggaran.triwulan3}" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="%"/>
+                            <p:message display="icon" for="prodTriwulan3"/>
+                        </h:panelGrid>
+                        <p:spacer width="10" height="0"/>
+                        <h:outputLabel value="Persentase Triwulan IV" for="prodTriwulan4" />:
+                        <h:panelGrid columns="2">
+                            <h:inputText id="prodTriwulan4" size="5" maxlength="5" value="#{masterAnggaranTrafikBean.anggaran.triwulan4}" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="%"/>
+                            <p:message display="icon" for="prodTriwulan4"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" image="ui-icon-check" value="#{msg['application.operation.save']}" update="main-list growl formAddEdit" actionListener="#{masterAnggaranTrafikBean.handleSaveEdit}" oncomplete="handleRequestValidation(xhr, status, args)" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide();"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel" minWidth="400">
+            <h:form>
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.delete.confirmation']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{masterAnggaranTrafikBean.handleDelete}"  update="main-list growl" oncomplete="dialogDel.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.operation.generate']}"  widgetVar="dialogGenerate" width="250">
+            <h:form id="generateForm">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Tahun"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText disabled="true" value="#{masterAnggaranTrafikBean.thn}" size="5"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.generate']}" actionListener="#{masterAnggaranTrafikBean.handleGenerate}"  update="main-list growl" oncomplete="dialogGenerate.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogGenerate.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDeleteAll" width="250">
+            <h:form id="delAllForm">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Tahun"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu value="#{masterAnggaranTrafikBean.thn}" >
+                            <f:selectItems value="#{masterAnggaranTrafikBean.listTahun}" var="i" itemValue="#{i}" itemLabel="#{i}"/>
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.delete_all']}" actionListener="#{masterAnggaranTrafikBean.handleDeleteAll}"  update="main-list growl" oncomplete="dialogDeleteAll.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogDeleteAll.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

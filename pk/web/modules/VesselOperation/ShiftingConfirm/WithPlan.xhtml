@@ -1,0 +1,972 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.vessel_operation.shifting_confirm.with_plan']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.vessel_operation.shifting_confirm.with_plan']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+        <script type="text/javascript">
+        function handleRequestValidation(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog').show();
+                } else {
+                        dlg.hide();dlgRe.hide();dlgUC.hide();dlgReUC.hide();
+                }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="serviceVesselForm">
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB"/>:
+                <h:inputText size="30" id="noPpkb" disabled="true" value="#{withPlanBean.serviceVessel[0]}" title="No PPKB"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgVessel.show();"/>
+                <h:outputLabel value="Vessel Name" for="vesselName" />:
+                <h:inputText size="30" id="vesselName" disabled="true" value="#{withPlanBean.serviceVessel[1]}" title="Vessel Name"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage In" for="voyageIn" />:
+                <h:inputText size="30" id="voyageIn" disabled="true" value="#{withPlanBean.serviceVessel[2]}" title="Voyage In"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                <h:inputText size="30" id="voyageOut" disabled="true" value="#{withPlanBean.serviceVessel[3]}" title="Voyage Out"/>
+                <h:outputText value="&nbsp;"/>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="serviceShiftingForm">
+            <p:growl id="growl" showDetail="true" globalOnly="true"/>
+            <p:tabView>
+                <p:tab title="Container">
+                    <p:dataTable paginatorPosition="bottom" var="item" value="#{withPlanBean.serviceShiftings}" rowIndexVar="no"
+                                 paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="serviceShiftingDetail"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                        <f:facet name="header">
+                            <div class="header-panel-left">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.shifting']}" onclick="genTitle('dlgShifting','#{msg['application.operation.add']} Shifting Confirm Container');"  disabled="#{empty withPlanBean.serviceVessel[0]}" actionListener="#{withPlanBean.handleShifting}" update="dialogShifting:panelDetail dialogContForm:contService" oncomplete="dlg.show();"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <p:commandButton onstart="freeze();" image="ui-icon-refresh" value="#{msg['application.operation.refresh']}"  disabled="#{empty withPlanBean.serviceVessel[0]}" actionListener="#{withPlanBean.handleRefresh}" update="serviceShiftingForm:serviceShiftingDetail"/>
+                            </div>
+                        </f:facet>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{no+1}." />
+                        </p:column>
+                        <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="Container No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[1]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Size"/>
+                            </f:facet>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Type"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Status"/>
+                            </f:facet>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[5]}">
+                            <f:facet name="header">
+                                <h:outputText value="Gross"/>
+                            </f:facet>
+                            <h:outputText value="#{item[5]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Seal No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[7]}">
+                            <f:facet name="header">
+                                <h:outputText value="Shift To"/>
+                            </f:facet>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action"/>
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" value="s" image="ui-icon-pencil" title="Edit Shifting Container" disabled="#{item[11] == true and item[7].equals('LANDED')}" actionListener="#{withPlanBean.handleSelectCont}" update="dialogShifting" oncomplete="dlg.show();" onclick="genTitle('dlgShifting','#{msg['application.operation.edit']} Shifting Confirm Container');">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                    <f:attribute name="idEq" value="#{item[12]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" value="r" image="ui-icon-pencil" title="Edit Reshipping Container" disabled="#{item[11] == false or item[7].equals('NOLANDED')}" actionListener="#{withPlanBean.handleSelectContRe}" update="dialogReshipping" oncomplete="dlgRe.show();">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                    <f:attribute name="idEqRe" value="#{item[13]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" image="ui-icon-refresh" title="Reshipping Container" disabled="#{item[7].equals('NOLANDED') or item[11] == true}" actionListener="#{withPlanBean.handleSelectContRe}"
+                                                 update="dialogReshipping:panelDetailRe dialogReshipping:detailShiftToRe dialogReshipping:detailFromToRe dialogReshipping:crane dialogReshipping:equipOpPanel dialogShifting:startEnd" oncomplete="dlgRe.show();">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" image="ui-icon-trash" title="Delete Container" actionListener="#{withPlanBean.handleSelectDelete}" oncomplete="confirmation.show();">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                    <f:attribute name="idEq" value="#{item[12]}"/>
+                                    <f:attribute name="idEqRe" value="#{item[13]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+                <p:tab title="Uncontainerized">
+                    <p:dataTable paginatorPosition="bottom" var="item" value="#{withPlanBean.ucShiftingServices}" rowIndexVar="no"
+                                 paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="serviceShiftingDetailUC"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                        <f:facet name="header">
+                            <div class="header-panel-left">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.shifting']}" onclick="genTitle('dlgShiftingUc','#{msg['application.operation.add']} Shifting Confirm Uncontainerized');" disabled="#{empty withPlanBean.serviceVessel[0]}" actionListener="#{withPlanBean.handleShifting}" update="dialogShiftingUC:panelDetail dialogContFormUC:contServiceUC" oncomplete="dlgUC.show();"/>
+                            </div>
+                            <div class="header-panel-right">
+                                <p:commandButton onstart="freeze();" image="ui-icon-refresh" value="#{msg['application.operation.refresh']}" disabled="#{empty withPlanBean.serviceVessel[0]}" actionListener="#{withPlanBean.handleRefreshUc}" update="serviceShiftingForm:serviceShiftingDetailUC"/>
+                            </div>
+                        </f:facet>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{no+1}." />
+                        </p:column>
+                        <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="BL No"/>
+                            </f:facet>
+                            <h:outputText value="#{item[1]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[6]}">
+                            <f:facet name="header">
+                                <h:outputText value="Unit"/>
+                            </f:facet>
+                            <h:outputText value="#{item[6]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Weight"/>
+                            </f:facet>
+                            <h:outputText value="#{item[3]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Truck Lossing"/>
+                            </f:facet>
+                            <h:outputText value="#{item[4]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Commodity"/>
+                            </f:facet>
+                            <h:outputText value="#{item[2]}"/>
+                        </p:column>
+                        <p:column sortBy="#{item[7]}">
+                            <f:facet name="header">
+                                <h:outputText value="Shift To"/>
+                            </f:facet>
+                            <h:outputText value="#{item[7]}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action"/>
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" value="s" image="ui-icon-pencil" title="Edit Shifting Uncontainerized" disabled="#{item[9] == true and item[7].equals('LANDED')}" actionListener="#{withPlanBean.handleEdDelContUC}" update="dialogShiftingUC:contNo dialogShiftingUC:detail dialogShiftingUC:detailShiftTo dialogShiftingUC:crane dialogShiftingUC:equipOpPanel dialogShiftingUC:startEnd" oncomplete="dlgUC.show();" onclick="genTitle('dlgShiftingUc','#{msg['application.operation.add']} Shifting Confirm Uncontainerized');">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                    <f:attribute name="idU" value="#{item[5]}"/>
+                                    <f:attribute name="idEq" value="#{item[8]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" value="r" image="ui-icon-pencil" title="Edit Reshipping Uncontainerized" disabled="#{item[9] == false or item[7].equals('NOLANDED')}" actionListener="#{withPlanBean.handleEdDelContUC}" update="dialogReshippingUC:panelDetailRe dialogReshippingUC:detailShiftToRe dialogReshippingUC:detailFromToRe dialogReshippingUC:crane dialogReshippingUC:equipOpPanel dialogReshippingUC:startEnd" oncomplete="dlgReUC.show();">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                    <f:attribute name="idU" value="#{item[5]}"/>
+                                    <f:attribute name="idEq" value="#{item[10]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" image="ui-icon-refresh" title="Reshipping Uncontainerized" disabled="#{item[7].equals('NOLANDED') or item[9] == true}" actionListener="#{withPlanBean.handleEdDelContUC}"
+                                                 update="dialogReshippingUC:panelDetailRe dialogReshippingUC:detailShiftToRe dialogReshippingUC:detailFromToRe dialogReshippingUC:crane dialogReshippingUC:equipOpPanel dialogReshippingUC:startEnd" oncomplete="dlgReUC.show();">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                    <f:attribute name="idU" value="#{item[5]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" image="ui-icon-trash" title="Delete Uncontainerized" actionListener="#{withPlanBean.handleEdDelContUC}" oncomplete="confirmation.show();">
+                                    <f:attribute name="idCont" value="#{item[0]}"/>
+                                    <f:attribute name="idU" value="#{item[5]}"/>
+                                    <f:attribute name="idEq" value="#{item[8]}"/>
+                                    <f:attribute name="idEqRe" value="#{item[10]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+
+
+        <p:dialog header="Shifting Confirm Container"  widgetVar="dlg" modal="true" width="800" id="dlgShifting" >
+            <h:form id="dialogShifting">
+                <p:panel>
+                    <h:panelGrid id="panelDetail" columns="3">
+                        <h:panelGrid>
+                            <h:panelGrid columns="6">
+                                <h:outputText value="Container No *"/><p:spacer width="8"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="contNo" onkeypress="dlgCont.show();" onmousedown="dlgCont.show();" value="#{withPlanBean.serviceShifting.contNo}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" disabled="#{not empty withPlanBean.serviceShifting.contNo}" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+                                <p:message display="icon" for="contNo"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="detail" columns="3">
+                                <h:outputText value="Type"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.masterContainerType.contType}"/>
+
+                                <h:outputLabel value="MLO" />:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.mlo.name}"/>
+
+                                <h:outputText value="Size"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.contSize}"/>
+
+                                <h:outputText value="Status"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.contStatus}"/>
+
+                                <h:outputText value="Gross"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.contGross}"/>
+
+                                <h:outputText value="Seal No"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.sealNo}"/>
+
+                                <h:outputText value="Commodity"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.masterCommodity.name}"/>
+
+                                <h:outputText value="OH/OW/OL"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.overSize ? 'Y' : 'N'}"/>
+
+                                <h:outputText value="21 feet"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.twentyOneFeet ? 'Y' : 'N'}"/>
+
+                                <h:outputText value="Dangerous"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.dg ? withPlanBean.serviceShifting.masterCommodity.masterDangerousClass : 'N'}"/>
+
+                                <h:outputText value="Dangerous Label"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.dgLabel ? 'Y' : 'N'}"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <p:spacer width="10"/>
+                        <h:panelGrid>
+                            <h:panelGrid id="detailShiftTo" columns="4">
+                                <h:outputText value="Shift To"/>
+                                <p:spacer width="5"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.shiftTo}"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="detailFromTo" columns="4">
+                                <h:outputText value="From "/>
+                                <p:spacer width="20"/>:
+                                <h:panelGrid columns="9">
+                                    <h:outputText value="Bay"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" size="3" value="#{withPlanBean.serviceShifting.VBay}"/>
+                                    <h:outputText value="Row"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" size="3" value="#{withPlanBean.serviceShifting.VRow}" />
+                                    <h:outputText value="Tier"/>
+                                    <h:outputText value=":"/>
+                                    <h:inputText disabled="true" size="3" value="#{withPlanBean.serviceShifting.VTier}"/>
+                                </h:panelGrid>
+                                <h:outputText value="To "/>
+                                <p:spacer width="20"/>:
+                                <h:panelGrid columns="9" id="rowR2">
+                                    <h:outputText value="Bay"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu disabled="#{withPlanBean.serviceShifting.shiftTo.equals('LANDED')}" id="bay" value="#{withPlanBean.serviceShifting.VBay}" valueChangeListener="#{withPlanBean.onchangeBay}">
+                                        <f:selectItems value="#{withPlanBean.bayChoices}" />
+                                        <f:ajax execute="@this" event="change" render="rowChoices tierChoices"/>
+                                    </h:selectOneMenu>
+                                    <h:outputText value="Row"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu disabled="#{withPlanBean.serviceShifting.shiftTo.equals('LANDED')}" id="rowChoices" value="#{withPlanBean.serviceShifting.VRow}" valueChangeListener="#{withPlanBean.onChangeRow}">
+                                        <f:selectItems value="#{withPlanBean.rowChoices}" />
+                                        <f:ajax execute="@this" event="change" render="tierChoices"/>
+                                    </h:selectOneMenu>
+                                    <h:outputText value="Tier"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu disabled="#{withPlanBean.serviceShifting.shiftTo.equals('LANDED')}" id="tierChoices" value="#{withPlanBean.serviceShifting.VTier}">
+                                        <f:selectItems value="#{withPlanBean.tierChoices}" />
+                                    </h:selectOneMenu>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <p:spacer height="10"/>
+                            <h:panelGrid id="crane" columns="5">
+                                <h:outputLabel value="Sling " />
+                                <p:spacer width="15"/>
+                                <h:outputLabel value=" : " />
+                                <h:selectBooleanCheckbox value="#{withPlanBean.serviceShifting.isSling}">
+                                    <f:selectItem itemValue="true" itemLabel="Yes"/>
+                                </h:selectBooleanCheckbox>
+                                <h:outputText value=""/>
+                                <ui:remove>
+                                <h:outputLabel value="Crane" />
+                                <p:spacer width="15"/>
+                                <h:outputLabel value=" : " />
+                                <h:selectOneRadio value="#{withPlanBean.serviceShifting.crane}" id="caren" requiredMessage="#{msg['application.validation.required']}" required="true" disabled="#{empty withPlanBean.serviceShifting.contNo}" valueChangeListener="#{withPlanBean.onChangeCrane}">
+                                    <f:selectItem itemValue="L" itemLabel="Land" />
+                                    <f:selectItem itemValue="S" itemLabel="Ship" />
+                                    <f:ajax execute="@this" event="change" render="equipOpPanel" />
+                                </h:selectOneRadio>
+                                <p:message for="caren" display="icon"/>
+                                </ui:remove>
+                            </h:panelGrid>
+                            <h:panelGrid id="equipOpPanel" columns="5">
+                                <h:outputText value="Crane *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="cc" onkeypress="dlgEquipment.show();" onmousedown="dlgEquipment.show();" value="#{withPlanBean.equipment.masterEquipment.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgEquipment.show();"/>
+                                <p:message display="icon" for="cc"/>
+
+                                <h:outputText value="Opt Code "/>:
+                                <h:inputText required="false" requiredMessage="#{msg['application.validation.required']}" disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" id="op" onkeypress="dlgOperator.show();" onmousedown="dlgOperator.show();" value="#{withPlanBean.equipment.masterOperator.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" style="font-size: x-small" onclick="dlgOperator.show();"/>
+                                <p:message display="icon" for="op"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="startEnd" columns="5">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="st" styleClass="cal" value="#{withPlanBean.equipment.startTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="st"/>
+                                <h:outputText value="End Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="et" styleClass="cal" value="#{withPlanBean.equipment.endTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="et"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{withPlanBean.handleConfirm}" update="serviceShiftingForm:serviceShiftingDetail serviceShiftingForm:growl dialogShifting:panelDetail" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Shifting Confirm UC"  widgetVar="dlgUC" modal="true" width="750" id="dlgShiftingUc">
+            <h:form id="dialogShiftingUC">
+                <p:panel>
+                    <h:panelGrid id="panelDetail" columns="2">
+                        <h:panelGrid>
+                            <h:panelGrid columns="6">
+                                <h:outputText value="BL No *"/><p:spacer width="30" height="0"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="contNo" onkeypress="dlgContUC.show();" onmousedown="dlgContUC.show();" value="#{withPlanBean.ucShiftingService.blNo}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" disabled="#{not empty withPlanBean.ucShiftingService.blNo}" value="..." style="font-size: x-small" onclick="dlgContUC.show();"/>
+                                <p:message display="icon" for="contNo"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="detail" columns="4">
+                                <h:outputText value="Commodity"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.commodity}"/>
+                                <h:outputText value="&nbsp;"/>
+
+                                <h:outputText value="Weight"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.weight}"/>
+                                <h:outputText value="&nbsp;"/>
+
+                                <h:outputText value="Unit"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.unit}"/>
+                                <h:outputText value="&nbsp;"/>
+
+                                <h:outputText value="Truck Lossing"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.truckLoosing}"/>
+                                <h:outputText value="&nbsp;"/>
+
+                                <h:outputLabel value="Crane" />
+                                <h:outputLabel value=" : " />
+                                <h:selectOneRadio value="#{withPlanBean.ucShiftingService.crane}" id="caren" requiredMessage="#{msg['application.validation.required']}" required="true" disabled="#{empty withPlanBean.ucShiftingService.blNo}" valueChangeListener="#{withPlanBean.onChangeCrane}">
+                                    <f:selectItem itemValue="L" itemLabel="Land" />
+                                    <f:selectItem itemValue="S" itemLabel="Ship" />
+                                    <f:ajax execute="@this" event="change" render="equipOpPanel" />
+                                </h:selectOneRadio>
+                                <p:message for="caren" display="icon"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <h:panelGrid>
+                            <h:panelGrid id="detailShiftTo" columns="4">
+                                <h:outputText value="Shift To *"/>
+                                <p:spacer width="8" height="0"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.ucShiftingService.shiftTo}"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="equipOpPanel" columns="5">
+                                <h:outputText value="CC Code *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="cc" onkeypress="dlgEquipment.show();" onmousedown="dlgEquipment.show();" value="#{withPlanBean.equipment.masterEquipment.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgEquipment.show();"/>
+                                <p:message display="icon" for="cc"/>
+
+                                <h:outputText value="Opt Code *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="op" onkeypress="dlgOperator.show();" disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" onmousedown="dlgOperator.show();" value="#{withPlanBean.equipment.masterOperator.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" style="font-size: x-small" onclick="dlgOperator.show();"/>
+                                <p:message display="icon" for="op"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="startEnd" columns="5">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="st" styleClass="cal" value="#{withPlanBean.equipment.startTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="st"/>
+                                <h:outputText value="End Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="et" styleClass="cal" value="#{withPlanBean.equipment.endTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="et"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{withPlanBean.handleConfirmUC}" update="serviceShiftingForm:serviceShiftingDetailUC serviceShiftingForm:growl dialogShiftingUC:panelDetail" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgUC.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Reshipping Confirm"  widgetVar="dlgRe" modal="true" width="750" >
+            <h:form id="dialogReshipping">
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:panelGrid id="panelDetailRe" columns="3">
+                            <h:outputText value="Container No"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.contNo}"/>
+
+                            <h:outputLabel value="MLO" />:
+                            <h:inputText value="#{withPlanBean.serviceShifting.mlo.name}" disabled="true"/>
+
+                            <h:outputText value="Type"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.masterContainerType.contType}"/>
+
+                            <h:outputText value="Size"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.contSize}"/>
+
+                            <h:outputText value="Status"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.contStatus}"/>
+
+                            <h:outputText value="Gross"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.contGross}"/>
+
+                            <h:outputText value="Seal No"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.sealNo}"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.masterCommodity.name}"/>
+
+                            <h:outputText value="OH/OW/OL"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.overSize ? 'Y' : 'N'}"/>
+
+                            <h:outputText value="21 feet"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.twentyOneFeet ? 'Y' : 'N'}"/>
+
+                            <h:outputText value="Dangerous"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.dg ? withPlanBean.serviceShifting.masterCommodity.masterDangerousClass : 'N'}"/>
+
+                            <h:outputText value="Dangerous Label"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.dgLabel ? 'Y' : 'N'}"/>
+                        </h:panelGrid>
+                        <p:spacer width="30"/>
+                        <h:panelGrid>
+                            <h:panelGrid id="detailShiftToRe" columns="4">
+                                <h:outputText value="Shift To"/>
+                                <p:spacer width="5"/>:
+                                <h:inputText disabled="true" value="#{withPlanBean.serviceShifting.shiftTo}"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="detailFromToRe" columns="3">
+                                <h:outputText value="Reshipping To "/>:
+                                <h:panelGrid columns="12" id="rowR2Re">
+                                    <h:outputText value="Bay"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu id="bayRe" value="#{withPlanBean.serviceShifting.VBay}" valueChangeListener="#{withPlanBean.onchangeBay}">
+                                        <f:selectItems value="#{withPlanBean.bayChoices}" />
+                                        <f:ajax execute="@this" event="change" render="rowChoicesRe tierChoicesRe"/>
+                                    </h:selectOneMenu>
+                                    <h:outputText value="Row"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu id="rowChoicesRe" value="#{withPlanBean.serviceShifting.VRow}" valueChangeListener="#{withPlanBean.onChangeRow}">
+                                        <f:selectItems value="#{withPlanBean.rowChoices}" />
+                                        <f:ajax execute="@this" event="change" render="tierChoicesRe"/>
+                                    </h:selectOneMenu>
+                                    <h:outputText value="Tier"/>
+                                    <h:outputText value=":"/>
+                                    <h:selectOneMenu id="tierChoicesRe" value="#{withPlanBean.serviceShifting.VTier}">
+                                        <f:selectItems value="#{withPlanBean.tierChoices}" />
+                                    </h:selectOneMenu>
+                                </h:panelGrid>
+                            </h:panelGrid>
+                            <p:spacer height="10"/>
+                            <h:panelGrid id="crane" columns="4">
+                                <h:outputLabel value="Sling " />
+                                <p:spacer width="15"/>
+                                <h:outputLabel value=" : " />
+                                <h:selectBooleanCheckbox value="#{withPlanBean.serviceShifting.isSling}">
+                                    <f:selectItem itemValue="true" itemLabel="Yes"/>
+                                </h:selectBooleanCheckbox>
+
+                                <h:outputLabel value="Crane" />
+                                <p:spacer width="15"/>
+                                <h:outputLabel value=" : " />
+                                <h:selectOneRadio value="#{withPlanBean.serviceShifting.crane}">
+                                    <f:selectItem itemValue="L" itemLabel="Land" />
+                                    <f:selectItem itemValue="S" itemLabel="Ship" />
+                                </h:selectOneRadio>
+                            </h:panelGrid>
+                            <h:panelGrid id="equipOpPanel" columns="5">
+                                <h:outputText value="CC Code *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="cc" onkeypress="dlgEquipment.show();" onmousedown="dlgEquipment.show();" value="#{withPlanBean.equipment.masterEquipment.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgEquipment.show();"/>
+                                <p:message display="icon" for="cc"/>
+
+                                <h:outputText value="Opt Code *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" id="op" onkeypress="dlgOperator.show();" onmousedown="dlgOperator.show();" value="#{withPlanBean.equipment.masterOperator.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" style="font-size: x-small" onclick="dlgOperator.show();"/>
+                                <p:message display="icon" for="op"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="startEnd" columns="5">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="st" styleClass="cal" value="#{withPlanBean.equipment.startTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="st"/>
+                                <h:outputText value="End Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="et" styleClass="cal" value="#{withPlanBean.equipment.endTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="et"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{withPlanBean.handleConfirmReshipping}" update="serviceShiftingForm:serviceShiftingDetail serviceShiftingForm:growl dialogReshipping" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgRe.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Reshipping Confirm UC"  widgetVar="dlgReUC" modal="true" width="700" >
+            <h:form id="dialogReshippingUC">
+                <p:panel>
+                    <h:panelGrid columns="3" id="detailRe">
+                        <h:panelGrid id="panelDetailRe" columns="3">
+                            <h:outputText value="BL No"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.ucShiftingService.blNo}"/>
+
+                            <h:outputText value="Commodity"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.commodity}"/>
+
+                            <h:outputText value="Weight"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.weight}"/>
+
+                            <h:outputText value="Unit"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.unit}"/>
+
+                            <h:outputText value="Truck Lossing"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.uncontainerizedService.truckLoosing}"/>
+
+                            <h:outputText value="Shift To"/>:
+                            <h:inputText disabled="true" value="#{withPlanBean.ucShiftingService.shiftTo}"/>
+                        </h:panelGrid>
+                        <p:spacer width="30"/>
+                        <h:panelGrid>
+                            <h:panelGrid id="crane" columns="4">
+                                <h:outputLabel value="Crane" />
+                                <p:spacer width="15"/>
+                                <h:outputLabel value=" : " />
+                                <h:selectOneRadio value="#{withPlanBean.ucShiftingService.crane}">
+                                    <f:selectItem itemValue="L" itemLabel="Land" />
+                                    <f:selectItem itemValue="S" itemLabel="Ship" />
+                                </h:selectOneRadio>
+                            </h:panelGrid>
+                            <h:panelGrid id="equipOpPanel" columns="5">
+                                <h:outputText value="CC Code *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="cc" onkeypress="dlgEquipment.show();" onmousedown="dlgEquipment.show();" value="#{withPlanBean.equipment.masterEquipment.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgEquipment.show();"/>
+                                <p:message display="icon" for="cc"/>
+
+                                <h:outputText value="Opt Code *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" id="op" onkeypress="dlgOperator.show();" onmousedown="dlgOperator.show();" value="#{withPlanBean.equipment.masterOperator.name}"/>
+                                <p:commandButton onstart="freeze();" immediate="true" image="ui-icon-folder-open" value="..." disabled="#{empty withPlanBean.equipment.masterEquipment.equipCode}" style="font-size: x-small" onclick="dlgOperator.show();"/>
+                                <p:message display="icon" for="op"/>
+                            </h:panelGrid>
+                            <h:panelGrid id="startEnd" columns="5">
+                                <h:outputText value="Start Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="st" styleClass="cal" value="#{withPlanBean.equipment.startTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="st"/>
+                                <h:outputText value="End Time *"/>:
+                                <h:inputText required="true" requiredMessage="#{msg['application.validation.required']}" id="et" styleClass="cal" value="#{withPlanBean.equipment.endTime}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:inputText>
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="et"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{withPlanBean.handleConfirmReshippingUC}" update="serviceShiftingForm:serviceShiftingDetailUC serviceShiftingForm:growl dialogReshippingUC:detailRe" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgReUC.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form id="dialogVesselForm">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{withPlanBean.serviceVessels}" paginatorPosition="bottom"
+                             paginator="true" rows="10" rowsPerPageTemplate="5,10,15" rowIndexVar="no"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{withPlanBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="serviceVesselForm:serviceVesselDetail serviceShiftingForm:serviceShiftingDetail serviceShiftingForm:serviceShiftingDetailUC dialogContForm:contService dialogContFormUC:contServiceUC" oncomplete="dlgVessel.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="dialogContForm">
+            <p:dialog header="Select Service Shifting"  widgetVar="dlgCont" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{withPlanBean.serviceShiftingsPick}" id="contService" rowIndexVar="no"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Size"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Seal No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[6]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Shift To"/>
+                        </f:facet>
+                        <h:outputText value="#{item[7]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{withPlanBean.handleSelectCont}" value="#{msg['application.operation.select']}"
+                                             update="dialogShifting:detail dialogShifting:contNo dialogShifting:detailShiftTo dialogShifting:detailFromTo dialogShifting:crane dialogShifting:equipOpPanel"
+                                             oncomplete="dlgCont.hide();">
+                                <f:attribute name="idCont" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="dialogContFormUC">
+            <p:dialog header="Select Service Shifting UC"  widgetVar="dlgContUC" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{withPlanBean.uncontainerizedServices}" id="contServiceUC" rowIndexVar="no"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[2]}" filterBy="#{item[2]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="BL No"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Commodity"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight"/>
+                        </f:facet>
+                        <h:outputText value="#{item[4]}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Unit"/>
+                        </f:facet>
+                        <h:outputText value="#{item[5]}"/>
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{withPlanBean.handleSelectContUC}" value="#{msg['application.operation.select']}"
+                                             update="dialogShiftingUC:contNo dialogShiftingUC:detail dialogShiftingUC:detailShiftTo dialogShifting:equipOpPanel"
+                                             oncomplete="dlgContUC.hide();">
+                                <f:attribute name="idCont" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="Select Operator"  widgetVar="dlgOperator" modal="true" minWidth="500">
+                <p:dataTable var="item" value="#{withPlanBean.operators}"
+                             paginator="true" rows="10" rowIndexVar="no"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item.optCode}" sortBy="#{item.optCode}">
+                        <f:facet name="header">
+                            <h:outputText value="Operator Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.optCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.isOutsource}">
+                        <f:facet name="header">
+                            <h:outputText value="is Out Source" />
+                        </f:facet>
+                        <h:outputText value="#{item.isOutsource}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{withPlanBean.handleSelectOperator}" value="#{msg['application.operation.select']}" update="dialogShifting:equipOpPanel dialogReshipping:equipOpPanel dialogShiftingUC:equipOpPanel dialogReshippingUC:equipOpPanel" oncomplete="dlgOperator.hide();">
+                                <f:attribute name="idOperator" value="#{item.optCode}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="Select Equipment"  widgetVar="dlgEquipment" modal="true" minWidth="700">
+                <p:dataTable value="#{withPlanBean.equipments}" var="item" paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="no">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{no+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Equipment Code" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Capacity" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Merk" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Made" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{withPlanBean.handleSelectEquipment}" value="#{msg['application.operation.select']}" update="dialogShifting:equipOpPanel dialogReshipping:equipOpPanel dialogShiftingUC:equipOpPanel dialogReshippingUC:equipOpPanel" oncomplete="dlgEquipment.hide();">
+                                <f:attribute name="idEquipment" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{withPlanBean.handleDelete}" update="serviceShiftingForm:serviceShiftingDetail serviceShiftingForm:serviceShiftingDetailUC serviceShiftingForm:growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

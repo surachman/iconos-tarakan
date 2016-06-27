@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.finance.master_fare_sharing']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.finance.master_fare_sharing']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl showDetail="true" life="3000" id="growl" globalOnly="true"/>
+
+        <h:form id="fareSharingsForm">
+            <p:dataTable paginatorPosition="bottom" value="#{masterFareSharingBean.masterTarifSharings}" var="item"
+                         paginator="true" rows="10" rowIndexVar="number"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" onstart="freeze();" actionListener="#{masterFareSharingBean.handleAdd}" update="addEditForm" onclick="dialogAddEdit.show()"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.masterOwnerEquipment.ownerName}" filterMatchMode="contains" filterBy="#{item.masterOwnerEquipment.ownerName}">
+                    <f:facet name="header">
+                        <h:outputText value="Owner"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterOwnerEquipment.ownerName}"/>
+                </p:column>
+                <p:column sortBy="#{item.masterActivitySharing.activityCode}" filterMatchMode="contains" filterBy="#{item.masterActivitySharing.activityCode}">
+                    <f:facet name="header">
+                        <h:outputText value="Activity Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item.masterActivitySharing.activityCode}"/>
+                </p:column>
+                <p:column sortBy="#{item.amount}" filterMatchMode="contains" filterBy="#{item.amount}">
+                    <f:facet name="header">
+                        <h:outputText value="Amount"/>
+                    </f:facet>
+                    <h:outputText value="#{item.amount}"/>
+                </p:column>
+
+                <p:column sortBy="#{item.tmt}">
+                    <f:facet name="header">
+                        <h:outputText value="TMT"/>
+                    </f:facet>
+                    <h:outputText value="#{item.tmt}">
+                        <f:convertDateTime pattern="dd/MM/yyyy" />
+                    </h:outputText>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton image="ui-icon-pencil" onstart="freeze();" actionListener="#{masterFareSharingBean.handleEdit}" update="addEditForm" onclick="dialogAddEdit.show();" title="Edit">
+                            <f:attribute name="selectedId" value="#{item.id}"/>
+                        </p:commandButton>
+                        <p:commandButton image="ui-icon-trash" onstart="freeze();" actionListener="#{masterFareSharingBean.handleSelectTable}" update="deleteConfirmationForm" onclick="dialogDel.show();" title="Delete">
+                            <f:attribute name="selectedId" value="#{item.id}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="600" header="Edit Fare Sharing">
+            <h:form id="addEditForm">
+                <p:panel>                    
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Activity Code" for="activityCode" />:
+                        <h:selectOneMenu id="activityCode" value="#{masterFareSharingBean.masterTarifSharing.masterActivitySharing.activityCode}" title="MasterActivitySharing" >
+                            <f:selectItems value="#{masterFareSharingBean.masterActivitySharings}" var="i" itemValue="#{i.activityCode}" itemLabel="#{i.activityCode}"/>
+                        </h:selectOneMenu>
+                        <h:outputText/>
+
+                        <h:outputLabel value="Owner Equipment" for="ownerEquipment" />:
+                        <h:selectOneMenu id="ownerEquipment" value="#{masterFareSharingBean.masterTarifSharing.masterOwnerEquipment.ownerCode}" title="MasterActivitySharing" >
+                            <f:selectItems value="#{masterFareSharingBean.masterOwnerEquipments}" var="i" itemValue="#{i.ownerCode}" itemLabel="#{i.ownerCode} || #{i.ownerName}"/>
+                        </h:selectOneMenu>
+                        <h:outputText/>
+
+                        <h:outputLabel value="Amount" for="amount" />:
+                        <h:inputText id="amount" value="#{masterFareSharingBean.masterTarifSharing.amount}" title="Amount" required="true" requiredMessage="Amount field #{msg['application.validation.required']}" />
+                        <h:message for="amount" styleClass="msg-error"/>
+
+                        <h:outputLabel value="Tmt" for="tmt" />:
+                        <p:calendar id="tmt" size="15" pattern="dd/MM/yyyy" value="#{masterFareSharingBean.masterTarifSharing.tmt}" showOn="button" title="Tmt" required="true" requiredMessage="Amount field #{msg['application.validation.required']}"/>
+                        <h:message for="tmt" styleClass="msg-error"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" onstart="freeze();" image="ui-icon-check" actionListener="#{masterFareSharingBean.handleSaveEdit}" update="fareSharingsForm addEditForm growl" onsuccess="dialogAddEdit.hide()" oncomplete="validateForm(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="deleteConfirmationForm">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" onstart="freeze();" actionListener="#{masterFareSharingBean.handleDelete}" update="fareSharingsForm deleteConfirmationForm growl" onsuccess="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

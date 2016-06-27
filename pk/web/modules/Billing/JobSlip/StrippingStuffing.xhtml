@@ -1,0 +1,494 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.job_slip.job_slip_stripping_stuffing']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.job_slip.job_slip_stripping_stuffing']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+     <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <p:panel id="tes" visible="#{striffingStuffingBean.panel}">
+            <h:form id="registrationForm">
+                <h:panelGrid columns="4" id="registrationDetail">
+                    <h:outputLabel value="No Registrasi" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText onkeypress="dlgReg.show();" value="#{striffingStuffingBean.registration.noReg}" size="30"/>
+                    <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                    <h:outputLabel value="Customer" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText disabled="true" value="#{striffingStuffingBean.registration.masterCustomer.name}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="No PPKB" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText disabled="true" value="#{striffingStuffingBean.registration.planningVessel.noPpkb}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Vessel Name" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText disabled="true" value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Voy In" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText disabled="true" value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Voy Out" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText disabled="true" value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                    <h:outputLabel/>
+
+                    <h:outputLabel value="Status" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText disabled="true" value="#{striffingStuffingBean.registration.statusService}" size="30"/>
+                    <h:outputLabel/>
+                </h:panelGrid>
+                <br />
+            </h:form>
+            <h:form id="tableForm">
+                <p:dataTable paginatorPosition="bottom" rowIndexVar="number" var="item" value="#{striffingStuffingBean.listJobslip}" paginator="true" rows="10"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" id="tableList">
+                    <f:facet name="header">
+                        &nbsp;
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Job Slip" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Container No" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Over Size" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Valid Date"/>
+                        </f:facet>
+                        <h:outputText value="#{item[7]}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" image="ui-icon ui-icon-search" title="Preview Jobslip" actionListener="#{striffingStuffingBean.report}" update="tes testForm testFormRec">
+                                <f:attribute name="jobSlip" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-left">
+                            <!--                            <a href="{striffingStuffingBean.printUrl}" class="ui-button-text" target="blank">
+                                                             <p:remoteCommand actionListener="{striffingStuffingBean.handleClick}" name="counter"/>
+                                                            <p:button onclick="counter();" value="{msg['application.operation.print_all']}" disabled="{empty striffingStuffingBean.listJobslip or striffingStuffingBean.enablePrintAll}"/>
+                                                        </a>-->
+                            <dycode:directPrint id="jobSlipDeliveryUrl" onstart="freeze();" value="#{msg['application.operation.print_all']}" actionListener="#{striffingStuffingBean.handleDownload}" disabled="#{empty striffingStuffingBean.listJobslip or striffingStuffingBean.enablePrintAll}" update="tableForm"/>
+
+                        </div>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+        </p:panel>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" rowIndexVar="number" value="#{striffingStuffingBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[3]}" sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Service Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{striffingStuffingBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail tableForm:tableList tableForm" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <p:panel visible="#{striffingStuffingBean.panelDel}" id="testForm">
+            <h:form id="panelForm">
+                <table width="70%" border="1" align="center">
+                    <tr>
+                        <td style="background-color: #1C4257"><img alt=""  src="#{facesContext.externalContext.requestContextPath}/resources/images/pelindo.jpg" width="40px" height="40px"/>
+                            <font color="#ffffff" style="vertical-align: top">
+                                <b>&nbsp;&nbsp;&nbsp;PT. PELABUHAN INDONESIA IV</b></font>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center">
+                            <div>&nbsp;</div>
+                            <div>
+                                <font style="font-size: large"><b>JASA STRIPPING</b></font>
+                            </div>
+                            <div>&nbsp;</div>
+                            <table border="1" width="90%">
+                                <tr>
+                                    <td rowspan="4" width="70%">
+                                        <table border="0" width="90%">
+                                            <tr>
+                                                <td width="15%">No Jobslip </td>
+                                                <td width="3%">:</td>
+                                                <td width="32%"><h:outputLabel value="#{striffingStuffingBean.strippingService.jobSlip}"  /></td>
+                                                <td width="15%">Container No </td>
+                                                <td width="3%">:</td>
+                                                <td width="32%"><h:outputLabel value="#{striffingStuffingBean.strippingService.contNo}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>No Registrasi</td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.strippingService.registration.noReg}"/></td>
+                                                <td>Size </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.strippingService.contSize}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>No PPKB </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.noPpkb}"/></td>
+                                                <td>Status </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.strippingService.contStatus}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Vessel Name </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.masterVessel.name}"/></td>
+                                                <td>Type </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.strippingService.masterContainerType.contType}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Voyage In/Out </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.voyIn}"/></td>
+                                                <td>Gross </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.strippingService.contGross}"/></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>Est. Arrival </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.voyOut}">
+                                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                                    </h:outputLabel>
+                                                </td>
+                                                <td>Posisi</td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.block} || #{striffingStuffingBean.slot} || #{striffingStuffingBean.row} || #{striffingStuffingBean.tier}"/></td>
+                                            </tr>
+                                        </table>
+                                    </td>                                    
+                                </tr>                               
+                            </table>
+
+                            <table width="90%" border="1">
+                                <tr>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">Tanggal</td>
+                                    <td align="center" valign="middle">Kode Alat </td>
+                                    <td align="center" valign="middle">Mulai</td>
+                                    <td align="center" valign="middle">Selesai</td>
+                                    <td align="center" valign="middle">Keterangan</td>
+                                </tr>
+                                <tr>
+                                    <td height="40" align="center" valign="middle">LIFT ON </td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td height="40" align="center" valign="middle">LIFT OFF </td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                </tr>
+                            </table>
+
+                            <table width="90%" border="0">
+                                <tr>
+                                    <td>Tanda Tangan Pengguna Jasa</td>
+                                    <td>&nbsp;</td>
+                                    <td align="right">STAMP/SIGN
+                                        CONT GATE IN/OUT
+                                        DATE TIME  </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"><BR/><br/><br/><br/>&nbsp;</td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <!--                                        <a href="{striffingStuffingBean.url}" class="ui-button-text" target="blank">
+                                                                                    <p:remoteCommand actionListener="{striffingStuffingBean.handleClick2}" name="counter2"/>
+                                                                                    <p:button onclick="counter2();" value="{msg['application.operation.download_as_pdf']}" disabled="{striffingStuffingBean.enablePrint}"/>
+                                                                                </a>-->
+                                        <dycode:directPrint id="jobSlipDeliveryUrl1" onstart="freeze();" value="#{msg['application.operation.print']}" actionListener="#{striffingStuffingBean.handleDownloadOne}" update="panelForm"/>
+
+                                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.close']}" update="tes testForm testFormRec" actionListener="#{striffingStuffingBean.tutup}" />
+                                    </td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </table>
+                        </td></tr>
+                </table>
+            </h:form>
+        </p:panel>
+
+        <p:panel visible="#{striffingStuffingBean.panelRec}" id="testFormRec">
+            <h:form id="panelForm2">
+                <table width="70%" border="1" align="center">
+                    <tr>
+                        <td style="background-color: #1C4257"><img alt=""  src="#{facesContext.externalContext.requestContextPath}/resources/images/pelindo.jpg" width="40px" height="40px"/>
+                            <font color="#ffffff" style="vertical-align: top">
+                                <b>&nbsp;&nbsp;&nbsp;PT. PELABUHAN INDONESIA IV</b></font>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td align="center">
+                            <div>&nbsp;</div>
+                            <div>
+                                <font style="font-size: large"><b>JASA STUFFING</b></font>
+                            </div>
+                            <div>&nbsp;</div>
+                            <table border="1" width="90%">
+                                <tr>
+                                    <td rowspan="4" width="70%">
+                                        <table border="0" width="90%">
+                                            <tr>
+                                                <td width="15%">No Jobslip </td>
+                                                <td width="3%">:</td>
+                                                <td width="32%"><h:outputLabel value="#{striffingStuffingBean.stuffingService.jobSlip}"  /></td>
+                                                <td width="15%">Container No </td>
+                                                <td width="3%">:</td>
+                                                <td width="32%"><h:outputLabel value="#{striffingStuffingBean.stuffingService.contNo}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>No Registrasi</td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.stuffingService.registration.noReg}"/></td>
+                                                <td>Size </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.stuffingService.contSize}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>No PPKB </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.noPpkb}"/></td>
+                                                <td>Status </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.stuffingService.contStatus}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Vessel Name </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.masterVessel.name}"/></td>
+                                                <td>Type </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.stuffingService.masterContainerType.masterContainerTypeInGeneral.id}"/></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Voyage In/Out </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.voyIn} || #{striffingStuffingBean.registration.planningVessel.preserviceVessel.voyOut}"/></td>
+                                                <td>Gross </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.stuffingService.contGross}"/></td>
+                                            </tr>
+
+                                            <tr>
+                                                <td>Est. Arrival </td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.registration.planningVessel.preserviceVessel.eta}">
+                                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                                    </h:outputLabel>
+                                                </td>
+                                                <td>Posisi</td>
+                                                <td>:</td>
+                                                <td><h:outputLabel value="#{striffingStuffingBean.block} || #{striffingStuffingBean.slot} || #{striffingStuffingBean.row} || #{striffingStuffingBean.tier}"/></td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <table width="90%" border="1">
+                                <tr>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">Tanggal</td>
+                                    <td align="center" valign="middle">Kode Alat </td>
+                                    <td align="center" valign="middle">Mulai</td>
+                                    <td align="center" valign="middle">Selesai</td>
+                                    <td align="center" valign="middle">Keterangan</td>
+                                </tr>
+                                <tr>
+                                    <td height="40" align="center" valign="middle">LIFT ON </td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td height="40" align="center" valign="middle">LIFT OFF </td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                    <td align="center" valign="middle">&nbsp;</td>
+                                </tr>
+                            </table>
+
+                            <table width="90%" border="0">
+                                <tr>
+                                    <td>Tanda Tangan Pengguna Jasa</td>
+                                    <td>&nbsp;</td>
+                                    <td align="right">STAMP/SIGN
+                                        CONT GATE IN/OUT
+                                        DATE TIME  </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"><br/><br/><br/><br/>&nbsp;</td>
+                                </tr>
+
+                                <tr>
+                                    <td>
+                                        <!--                                        <a href="{striffingStuffingBean.url}" class="ui-button-text" target="blank">
+                                                                                    <p:remoteCommand actionListener="{striffingStuffingBean.handleClick2}" name="counter3"/>
+                                                                                    <p:button onclick="counter3();" value="{msg['application.operation.download_as_pdf']}" disabled="{striffingStuffingBean.enablePrint}"/>
+                                                                                </a>-->
+                                        <dycode:directPrint id="jobSlipDeliveryUrl2" onstart="freeze();" value="#{msg['application.operation.print']}" actionListener="#{striffingStuffingBean.handleDownloadOne}" disabled="#{striffingStuffingBean.enablePrint}" update="panelForm2"/>
+
+                                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.close']}" update="tes testForm testFormRec" actionListener="#{striffingStuffingBean.tutup}" />
+                                    </td>
+                                    <td>&nbsp;</td>
+                                    <td>&nbsp;</td>
+                                </tr>
+                            </table>
+                        </td></tr>
+                </table>
+            </h:form>
+        </p:panel>
+
+    </ui:define>
+</ui:composition>

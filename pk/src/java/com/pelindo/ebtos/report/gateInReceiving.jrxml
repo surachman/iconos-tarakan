@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="gateInReceiving" language="groovy" pageWidth="612" pageHeight="396" orientation="Landscape" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="2" bottomMargin="0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="vessel_name" class="java.lang.String"/>
+	<parameter name="cont_no" class="java.lang.String"/>
+	<parameter name="block" class="java.lang.String"/>
+	<parameter name="slot" class="java.lang.String"/>
+	<parameter name="fr_row" class="java.lang.String"/>
+	<parameter name="to_row" class="java.lang.String"/>
+	<parameter name="cont_type" class="java.lang.String"/>
+	<parameter name="voyyage_in" class="java.lang.String"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT v.no_ppkb,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.nama.cabang'
+  ) AS cabang,
+  l.voy_in,
+  l.voy_out,
+  m.name AS vessel,
+  c.cont_no,
+  c.cont_type,
+  mt.name,
+  c.cont_weight,
+  bd.cont_status
+FROM planning_vessel v,
+  preservice_vessel l,
+  m_vessel m,
+  service_gate_receiving c,
+  m_container_type mt,
+  receiving_service bd
+WHERE v.booking_code= l.booking_code
+AND l.vessel_code   = m.vessel_code
+AND v.no_ppkb       = c.no_ppkb
+AND mt.cont_type    = c.cont_type
+AND v.no_ppkb       = bd.no_ppkb
+AND c.cont_no       = bd.cont_no
+AND c.cont_no       = $P{cont_no}
+AND v.no_ppkb       = $P{no_ppkb}]]>
+	</queryString>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="cabang" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="vessel" class="java.lang.String"/>
+	<field name="cont_no" class="java.lang.String"/>
+	<field name="cont_type" class="java.lang.Integer"/>
+	<field name="name" class="java.lang.String"/>
+	<field name="cont_weight" class="java.lang.String"/>
+	<field name="cont_status" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="288"/>
+	</columnHeader>
+	<detail>
+		<band height="94" splitType="Stretch">
+			<textField>
+				<reportElement x="301" y="50" width="32" height="37"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="28" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{block}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="340" y="59" width="22" height="16"/>
+				<textElement textAlignment="Right">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{slot}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="315" y="18" width="6" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="251" y="18" width="64" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Voyage In]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="321" y="18" width="99" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{voy_in} + ' / ' + $F{voy_out}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="248" y="38" width="172" height="12"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cont_no} + ' / ' + $F{name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="329" y="62" width="12" height="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[S:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="251" y="28" width="64" height="10"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Gross]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="315" y="28" width="6" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="321" y="30" width="88" height="10"/>
+				<textElement>
+					<font fontName="Arial" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{cont_weight}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

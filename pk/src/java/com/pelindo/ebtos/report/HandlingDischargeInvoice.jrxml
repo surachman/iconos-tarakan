@@ -1,0 +1,1490 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HandlingLoadInvoice" language="groovy" pageWidth="612" pageHeight="792" whenNoDataType="AllSectionsNoDetail" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="ba5157b0-9505-4749-abd1-af2a6e7347ac">
+	<property name="ireport.zoom" value="1.5"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="573"/>
+	<property name="ireport.background.image" value="D:\sharePakNur\Faktur pajak pelindo.jpg"/>
+	<property name="ireport.background.image.properties" value="true,true,0.25,-8,-8,0,0,628,803"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<parameter name="terbilang" class="java.lang.String"/>
+	<parameter name="username" class="java.lang.String"/>
+	<parameter name="curr_code" class="java.lang.String">
+		<defaultValueExpression><![CDATA[]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+  (SELECT description ||', ' ||
+    (SELECT description FROM m_setting_app WHERE id IN ('ebtos.cabang.kota')
+    )
+  FROM m_setting_app
+  WHERE id IN ('ebtos.cabang.alamat')
+  ) alamat,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.cabang.kota'
+  ) kota,
+  (SELECT description FROM m_setting_app WHERE id='ttd_ebtos_mgr_keu'
+  ) description,
+  (SELECT value_string FROM m_setting_app WHERE id='ttd_ebtos_mgr_keu'
+  ) nama_ttd,
+  (SELECT value_nip FROM m_setting_app WHERE id='ttd_ebtos_mgr_keu'
+  ) nip_ttd,
+  sv.no_ppkb,
+  sv.discharge_service_type,
+  prv.voy_in,
+  prv.voy_out,
+  mv.name vessel_name,
+  mc.name customer_name,
+  mc.address,
+  mc.npwp,
+  r.no_reg,
+  i.no_invoice,
+  i.created_date invoice_date,
+  i.no_faktur_pajak,
+  (NVLN(rh.handling_charge) + NVLN(rhu.handling_charge)) handling_charge,
+  (NVLN(rp.total_charge)    + NVLN(rpu.total_charge)) penumpukan_charge,
+  NVLN(rhm.total_charge) hatchmoves_charge,
+  (NVLN(rh.transhipment_charge) + NVLN(rhu.transhipment_charge)) transhipment_charge,
+  (NVLN(rh.shifting_charge)     + NVLN(rhu.shifting_charge)) shifting_charge,
+  NVLN(rak.total_charge) air_kapal_charge,
+  i.additional_charge upah_buruh_charge,
+  i.total_tagihan,
+  i.jumlah_tagihan,
+  (SELECT value_string FROM m_setting_app WHERE id = 'ebtos.company.npwp'
+  ) npwp_company,
+  (SELECT value_string
+  FROM m_setting_app
+  WHERE id = 'ebtos.company.ppkp'
+  ) ppkp_company,
+  changedate(TO_CHAR(
+  (SELECT value_date FROM m_setting_app WHERE id = 'ebtos.company.ppkp_tmt'
+  ), 'dd/mm/yyyy')) AS ppkp_tmt_company,
+  i.ppn,
+  i.materai,
+  mgr.description nama_mgr,
+  mgr.value_string nip_mgr,
+  ws.value_string workstation,
+  ms.service_name,
+  mcr.language,
+  mcr.country,
+  mcr.default_fraction_digits,
+  (EXTRACT (DAY FROM i.created_date)
+  || ' '
+  || bulan(i.created_date)
+  || ' '
+  || EXTRACT (YEAR FROM i.created_date)) formatted_invoice_date
+FROM ((service_vessel sv
+JOIN (planning_vessel pv
+JOIN m_vessel mv
+ON (pv.vessel_code=mv.vessel_code))
+ON (sv.no_ppkb    =pv.no_ppkb))
+JOIN (preservice_vessel prv
+JOIN m_customer mc
+ON (prv.cust_code  =mc.cust_code))
+ON (pv.booking_code=prv.booking_code))
+JOIN
+  (
+  SELECT $P{no_ppkb} no_ppkb, $P{curr_code} curr_code
+  FROM DUAL
+  ) q
+ON (q.no_ppkb=sv.no_ppkb)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(
+    CASE
+      WHEN activity = 'DISCHARGE'
+      THEN total_charge
+      ELSE 0
+    END) handling_charge,
+    SUM(
+    CASE
+      WHEN activity = 'TRANSHIPMENT'
+      THEN total_charge
+      ELSE 0
+    END) transhipment_charge,
+    SUM(
+    CASE
+      WHEN activity = 'SHIFTING'
+      THEN total_charge
+      ELSE 0
+    END) shifting_charge
+  FROM vw_perhitungan_handling_petike
+  WHERE operation = 'DISCHARGE'
+  GROUP BY no_ppkb,
+    curr_code
+  ) rh
+ON (q.no_ppkb  =rh.no_ppkb
+AND q.curr_code=rh.curr_code)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(total_charge) total_charge
+  FROM vw_perhitungan_penumpukan_bong
+  GROUP BY no_ppkb,
+    curr_code
+  ) rp
+ON (q.no_ppkb  =rp.no_ppkb
+AND q.curr_code=rp.curr_code)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(total_charge) total_charge
+  FROM recap_penumpukan_uc
+  WHERE operation = 'DISCHARGE'
+  GROUP BY no_ppkb,
+    curr_code
+  ) rpu
+ON (q.no_ppkb  =rpu.no_ppkb
+AND q.curr_code=rpu.curr_code)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(
+    CASE
+      WHEN activity = 'SHIFTING'
+      THEN total_charge
+      ELSE 0
+    END) shifting_charge,
+    SUM(
+    CASE
+      WHEN activity = 'TRANSHIPMENT'
+      THEN total_charge
+      ELSE 0
+    END) transhipment_charge,
+    SUM(
+    CASE
+      WHEN activity = 'LOAD'
+      OR activity   = 'DISCHARGE'
+      THEN total_charge
+      ELSE 0
+    END) handling_charge
+  FROM recap_handling_uc
+  WHERE operation = 'DISCHARGE'
+  GROUP BY no_ppkb,
+    curr_code
+  ) rhu
+ON (q.no_ppkb  =rhu.no_ppkb
+AND q.curr_code=rhu.curr_code)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(total_charge) total_charge
+  FROM recap_hatch_move
+  GROUP BY no_ppkb,
+    curr_code
+  ) rhm
+ON (q.no_ppkb  =rhm.no_ppkb
+AND q.curr_code=rhm.curr_code)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(total_charge) total_charge
+  FROM recap_upah_buruh
+  WHERE operation = 'DISCHARGE'
+  GROUP BY no_ppkb,
+    curr_code
+  ) rub
+ON (q.no_ppkb  =rub.no_ppkb
+AND q.curr_code=rub.curr_code)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(total_charge) total_charge
+  FROM recap_upah_buruh_uc
+  WHERE operation = 'DISCHARGE'
+  GROUP BY no_ppkb,
+    curr_code
+  ) rubu
+ON (q.no_ppkb  =rubu.no_ppkb
+AND q.curr_code=rubu.curr_code)
+LEFT JOIN
+  (SELECT no_ppkb,
+    curr_code,
+    SUM(total_charge) total_charge
+  FROM recap_air_kapal
+  GROUP BY no_ppkb,
+    curr_code
+  ) rak
+ON (q.no_ppkb  =rak.no_ppkb
+AND q.curr_code=rak.curr_code)
+JOIN ((registration r
+JOIN (invoice i
+JOIN m_currency mcr
+ON (i.curr_code=mcr.curr_code))
+ON (r.no_reg   =i.no_reg))
+JOIN m_service ms
+ON (r.service_code=ms.service_code))
+ON (sv.no_ppkb    =r.no_ppkb),
+  (SELECT description,
+    value_string
+  FROM m_setting_app
+  WHERE id='ebtos.ttd.invoice'
+  ) mgr,
+  (SELECT value_string FROM m_setting_app WHERE id='ebtos.workstation'
+  ) ws
+WHERE r.service_code = 'SCHDD'
+AND i.curr_code      = q.curr_code]]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="description" class="java.lang.String"/>
+	<field name="nama_ttd" class="java.lang.String"/>
+	<field name="nip_ttd" class="java.lang.String"/>
+	<field name="alamat" class="java.lang.String"/>
+	<field name="no_ppkb" class="java.lang.String"/>
+	<field name="discharge_service_type" class="java.lang.String"/>
+	<field name="voy_in" class="java.lang.String"/>
+	<field name="voy_out" class="java.lang.String"/>
+	<field name="vessel_name" class="java.lang.String"/>
+	<field name="customer_name" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="npwp" class="java.lang.String"/>
+	<field name="no_reg" class="java.lang.String"/>
+	<field name="no_invoice" class="java.lang.String"/>
+	<field name="invoice_date" class="java.sql.Timestamp"/>
+	<field name="no_faktur_pajak" class="java.lang.String"/>
+	<field name="handling_charge" class="java.math.BigDecimal"/>
+	<field name="penumpukan_charge" class="java.math.BigDecimal"/>
+	<field name="hatchmoves_charge" class="java.math.BigDecimal"/>
+	<field name="transhipment_charge" class="java.math.BigDecimal"/>
+	<field name="shifting_charge" class="java.math.BigDecimal"/>
+	<field name="air_kapal_charge" class="java.math.BigDecimal"/>
+	<field name="upah_buruh_charge" class="java.math.BigDecimal"/>
+	<field name="total_tagihan" class="java.math.BigDecimal"/>
+	<field name="jumlah_tagihan" class="java.math.BigDecimal"/>
+	<field name="npwp_company" class="java.lang.String"/>
+	<field name="ppkp_company" class="java.lang.String"/>
+	<field name="ppkp_tmt_company" class="java.lang.String"/>
+	<field name="ppn" class="java.math.BigDecimal"/>
+	<field name="materai" class="java.math.BigDecimal"/>
+	<field name="nama_mgr" class="java.lang.String"/>
+	<field name="nip_mgr" class="java.lang.String"/>
+	<field name="workstation" class="java.lang.String"/>
+	<field name="service_name" class="java.lang.String"/>
+	<field name="language" class="java.lang.String"/>
+	<field name="country" class="java.lang.String"/>
+	<field name="default_fraction_digits" class="java.lang.Integer"/>
+	<field name="formatted_invoice_date" class="java.lang.String"/>
+	<variable name="tanggal_cetak" class="java.util.Date" resetType="None">
+		<variableExpression><![CDATA[new java.util.Date()]]></variableExpression>
+	</variable>
+	<variable name="curr_code" class="java.lang.String">
+		<variableExpression><![CDATA[com.qtasnim.el.QTasnim.getCurrencySymbol($F{language}, $F{country})]]></variableExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="76" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="d2afef20-e34d-4811-9adc-a41d34f7d136" x="425" y="53" width="143" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_faktur_pajak}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="cf71a931-3e41-432b-b54c-2ffd8424b46c" x="111" y="50" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ppkp_company}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="5cf0093c-c327-4d01-9197-ea03cfc76809" x="111" y="62" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ppkp_tmt_company}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="27187263-4c31-4535-92c2-01773496e9c7" x="111" y="38" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{npwp_company}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="2f2ac3b4-a683-4d21-b2f0-efee17dd9b7d" x="42" y="25" width="232" height="13"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{alamat}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="16" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="103" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="199f93f1-efee-4f55-8b8b-1f06f9223264" x="49" y="35" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Debitur]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2f5840bd-50f9-45f5-854a-ccf8f10f280d" x="129" y="22" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="a508233f-d771-4fe5-bd23-ae4465f0d6f2" x="139" y="35" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="671202d8-e682-4ebe-9e9f-fe16a0a255c0" x="139" y="22" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(VOY. " + $F{voy_in} + "/" + $F{voy_out} + ") " + $F{vessel_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="1d81cdb9-d697-4200-8250-66fecb4a6a44" x="49" y="61" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[NPWP]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="1609d168-03e0-4683-89e6-b31bbd719aec" x="139" y="9" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{no_ppkb}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="05a520ab-1cf5-4c01-bcdc-d6fc5983a87a" x="49" y="9" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PPKB]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="802eb81d-90fe-4052-8cb1-d53988af6ca8" x="139" y="48" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="4c80e957-3b98-4ee0-ae3d-f646fac6559a" x="129" y="9" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4bd72621-b23e-448a-93c1-d7aa8cd1236b" x="129" y="61" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="375a8799-2911-43fe-9c1b-613f9a8a1962" x="129" y="48" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e610117b-cee3-4d08-8ca3-5077315f166c" x="49" y="48" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b1a2ad89-6482-4cfa-8bcc-f9d98d4feea6" x="323" y="62" width="80" height="11"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[User ID / Cetak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4c015139-da7e-4065-a172-5baa84d82cd3" x="49" y="22" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Voy. / Nama Kapal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="01f9fc7b-7f7d-4e58-a3b9-1a4cf13db031" x="129" y="35" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f9e26610-99f8-4651-bbd8-eaf4ef7d3cd6" x="323" y="49" width="80" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No Nota / Tgl]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement uuid="24a9c9a7-8185-4d2d-8bc4-64665df213a9" x="413" y="62" width="190" height="11"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{username} + " ,  " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($V{tanggal_cetak})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="64e5a1fd-48ff-4158-8836-052d5322d467" x="403" y="62" width="10" height="11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="be5fc4b8-0435-4d5d-9c70-22b8a55b6762" x="139" y="61" width="163" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{npwp}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="de117655-2394-4795-92e5-7f646d3748f0" x="413" y="49" width="190" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_invoice} + " (" + new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{invoice_date}) + ")"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="673904dc-b000-46db-b974-5038f090426a" x="403" y="49" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="6f489a98-ad73-4217-b4f5-8dec124e4097" x="403" y="35" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="83b30323-cfb1-484f-986b-570abbbbe047" x="323" y="35" width="80" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No. Sistem]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="547514b6-43bc-410b-b07c-afe6e428557a" x="413" y="35" width="190" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(" + $F{no_reg} + ")"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a178ca83-bba3-41d5-b741-aa275fd88546" x="323" y="10" width="80" height="13"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Kegiatan / Jasa]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5c427e7f-95f2-4ecd-9d26-37b708d24fe2" x="403" y="10" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="a05bcd78-fe39-4a8f-9e44-86698caa2d0a" x="413" y="10" width="190" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{service_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c0bfaa23-6343-4ac3-96f2-9b02eac1d44d" x="129" y="75" width="10" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="16a5d94e-791d-45fa-ad88-e12443590993" x="139" y="75" width="163" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{discharge_service_type}.equals("PTP") ? "Port To Port" : $F{discharge_service_type}.equals("CTC") ? "CY To CY" : ""]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="0b9134da-47c1-438e-9201-f61fa1f196ef" x="49" y="75" width="80" height="13"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Tipe Pelayanan]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="565" splitType="Stretch">
+			<line>
+				<reportElement uuid="569b82b0-f5ef-4d8d-aa05-e97a4f95cbef" x="220" y="118" width="134" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="1a63a094-310a-4827-9d48-6f2328a9f3bd" x="58" y="171" width="169" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="dc62ccd7-c8f8-4f12-be22-7db220f9c77b" x="227" y="136" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="943c47d4-26c2-4aa1-81af-5ae100b69317" x="227" y="152" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="890b932f-9b1f-41d8-a6c7-d1911de89d97" x="227" y="120" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="80d108b9-3bcc-4cb1-9e3f-57f122533140" x="58" y="120" width="169" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[SUBTOTAL PERHITUNGAN JASA (1 s/d 6)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="716f2d35-7ff9-4198-8787-3d488212af18" x="58" y="152" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[MATERAI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="79958ea1-3c32-4fb5-89ab-8f4553f1e700" x="227" y="171" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8cff968b-43c1-4508-abb4-990df0234360" x="58" y="136" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[PPN 10%]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="98c0619d-6b37-411c-826a-0b4bfcd4514f" x="227" y="86" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="b4185fc1-d88c-426e-9dd3-fbbe7a032f16" x="254" y="120" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{jumlah_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="0acc99e3-b3c0-42b2-b2d9-8829662a140e" x="237" y="120" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9a4071e4-599d-418f-9d47-d649458f1f83" x="237" y="136" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="509d9723-77c8-4fbf-a7d0-75d08ec421f5" x="237" y="152" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="adcbe848-d6b7-4da7-9993-3c4bb56acf7d" x="237" y="171" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="8ca3e8b1-4b3c-4810-aa9c-7542748556d4" x="254" y="136" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{ppn},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="491a6182-a0ca-4dc9-baf3-e1be36cf1098" x="254" y="152" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{materai},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="0e34f014-2135-48f0-b90c-e34d8a801a66" x="254" y="171" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{total_tagihan}.subtract($F{upah_buruh_charge}),false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b9f04257-0589-48d8-b2e2-2cd1345a2346" x="237" y="38" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="0c99c966-dd45-47de-838f-3df1135cff11" x="254" y="38" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{penumpukan_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="403d1444-a4df-43e0-851e-88af7f1734ed" x="227" y="38" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="0e23d039-1dde-4cc2-bf95-72f7aa7f353c" x="227" y="54" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="020e539e-7384-4539-875a-f12c19c5d4ef" x="237" y="54" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="56eb2ffa-9246-4841-b6fd-974e75ec90d6" x="58" y="54" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[BUKA TUTUP PALKA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="d4716088-7d8b-4f97-a640-68dde77a2409" x="58" y="38" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[PENUMPUKAN PETI KEMAS]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="5252fd9f-95f5-41d5-8320-3d35aa8693f4" x="254" y="23" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{handling_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="bea5ba6d-4d49-40cd-b9f0-3d7bd88042a2" x="237" y="23" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="3f71c799-8bf8-417b-b0a3-aa1fb2f9b938" x="227" y="23" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="78ec3c29-f61b-4247-8258-b5aec6d3c8e1" x="58" y="23" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[PAKET HANDLING]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="045b7750-ed79-48fe-bed1-a9578ce2d054" x="220" y="168" width="134" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="9006bcc9-6900-4570-b037-bf1852d0935a" x="42" y="2" width="103" height="19"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PERHITUNGAN JASA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="fb7bc3b5-99c3-4c46-92c4-828116eeae37" x="42" y="470" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Alamat]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="2806c02f-58bb-468e-b1f7-496b74ad54a8" x="128" y="446" width="165" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(VOY. " + $F{voy_in} + "/" + $F{voy_out} + ") " + $F{vessel_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="81a1e938-93c2-4ccb-a7e8-df725bdb83a9" x="425" y="318" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_ttd}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="dc911af4-48d2-4710-a351-955d2fd04aac" x="36" y="552" width="103" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH NOTA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="92aadd7e-1fca-4f72-9104-1e82a164617c" x="42" y="458" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Nama Debitur]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement uuid="22b2c96d-28cf-43d8-a1f9-684a3c909d8f" x="195" y="427" width="229" height="13"/>
+				<box>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_invoice} + "(" + new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{invoice_date}) + ")"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="a66730e6-134a-4ba8-84b2-a6d1461f40ab" x="139" y="552" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ddcfa4f6-a28e-4ec0-81bf-0943c45ab6f6" x="128" y="470" width="165" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="de3a9977-6d43-48f0-a1f4-2d6f126df5b8" x="163" y="512" width="103" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{ppn},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="820bac17-988c-4e95-974e-3dba680b8d43" x="163" y="552" width="103" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{total_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="2eec49c4-59b9-4816-ac51-72519f82988d" x="36" y="512" width="74" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PPN]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="305fd9b9-dd2a-440d-a204-c10a60d78b0d" x="425" y="236" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{workstation} + ", " + $F{formatted_invoice_date}]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="true">
+				<reportElement uuid="9ba6a54a-f2a6-4c32-8560-7d2d1839489d" x="442" y="439" width="161" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{username} + " ,  " + new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format($V{tanggal_cetak})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="74c426aa-dabe-41df-a0b1-e1fbf426b452" x="149" y="552" width="14" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="6c2840b9-f0ce-442a-bcab-325de87524dd" x="36" y="500" width="103" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[PERHITUNGAN JASA]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="ef417376-67b7-4c68-9e48-bd1f6dfc5e8d" x="163" y="500" width="103" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{jumlah_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="7ee5bf9b-aa1c-4224-8f1b-a6c7e80243c9" x="122" y="458" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="74f0cdf1-a32b-4b2c-9a50-43a46fc039ba" x="122" y="470" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="99d98266-ea3f-4a9e-8c56-d5eeccf86668" x="425" y="264" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="67ddd70f-1d00-4f7d-9299-1770ca48226e" x="149" y="524" width="14" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="107b2954-a0db-4c0a-8c3f-b28bbfe7c13f" x="36" y="524" width="74" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[MATERAI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="57808157-c545-47fc-b4e4-12a924045ad0" x="42" y="446" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[Voy. / Nama Kapal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="8f22ce34-a479-451d-99ad-7d1a1cc96488" x="434" y="439" width="8" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="fc65a9eb-9909-449c-8d87-75d6e2f3b60d" x="137" y="550" width="129" height="1"/>
+			</line>
+			<staticText>
+				<reportElement uuid="f07aa865-c8b6-4212-af23-020836bfaeae" x="42" y="483" width="80" height="13"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No. Seri Faktur Pajak]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="083deac9-d06a-4f9c-936f-7d909922fd98" x="139" y="512" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="2e27dc46-2768-423b-b670-e20d8c5c208e" x="139" y="524" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="9ed2f4fd-d2f8-4718-9290-bd224309fe9b" x="427" y="468" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{workstation} + ", " + $F{formatted_invoice_date}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="709c1b0e-3514-42cc-a33e-d6cf061b31e0" x="372" y="439" width="62" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[User ID / Cetak]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="c4a32a9c-a167-483d-b53b-08cf704c1765" x="163" y="524" width="103" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{materai},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="449a6000-0fc7-44ed-a0a3-f2ea57cc069e" x="425" y="254" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[AN. GENERAL MANAGER]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="384590c5-d83f-41ee-a945-0357c6d24d9e" x="149" y="500" width="14" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="8863f0dc-ad2c-4eaa-9ea7-0cf3c81668d3" x="122" y="483" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="aee6a10d-c259-4d6f-8a6a-b22cb52b7ba5" x="139" y="500" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="96d535d1-c191-48f6-8e95-07d7f37e46c4" x="496" y="416" width="96" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{no_invoice}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="1be0322d-f24d-4143-90f1-aa6b57d9e9c3" x="128" y="458" width="165" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer_name}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="10d9c884-0214-4407-ad50-a851c4b5dcd8" x="122" y="446" width="6" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="c86ab034-1a52-4971-8550-dcef5664a6b0" x="149" y="512" width="14" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="ab0afb4e-2972-4cfe-84c6-3178edfb5b3f" x="26" y="290" width="41" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[Terbilang]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="848e7c28-3e98-485c-817c-150ff2f68c94" x="67" y="290" width="11" height="20"/>
+				<textElement verticalAlignment="Top">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="0223097e-98a9-421e-bee6-b57a749ae633" x="78" y="291" width="290" height="64"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Top">
+					<font fontName="Arial" size="8" isItalic="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(" + $P{terbilang} + ".)"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="83f8dbff-dda4-4d5f-8887-07f6113fa9a6" x="227" y="70" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="a1bd62b1-f0da-4735-8ea7-5f2ebfd49dc3" x="58" y="70" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[TRANSHIPMENT]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="dd590275-6fe7-48d7-b69a-d09434c5833a" x="237" y="70" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="8522e9bf-6e4e-4387-9c7d-deb44a4df2a0" x="254" y="70" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{transhipment_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="ebfbfd06-ea6d-4a16-8474-98297aa3d311" x="227" y="224" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ade86172-e115-47f8-b6ff-2dd3de959b27" x="42" y="224" width="185" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH UPER / UANG PANJAR]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="f9c2a514-e725-4df7-b668-eb442951fc1e" x="237" y="224" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="34631253-4df8-44e5-b35c-5cb23342c434" x="42" y="242" width="185" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[PIUTANG]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e2cd5ae2-7bcf-4b83-98da-055aa8c930e0" x="227" y="242" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="42083257-c35e-482d-9666-6b8af93ff2b8" x="237" y="242" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="f61642ae-b89b-421b-abfb-128d147b848e" x="227" y="261" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="f0dfd0dd-4288-4297-82b1-766d8ad36145" x="237" y="261" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="627f87c3-37c2-4d5e-a28d-dafeaf138280" x="42" y="261" width="185" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[SISA UPER / UTIP]]></text>
+			</staticText>
+			<line>
+				<reportElement uuid="4eb1d76d-d39c-4937-b216-59369ca76be3" x="220" y="222" width="134" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="9a590261-5657-457f-9424-2ad159c1f1a7" x="220" y="240" width="134" height="1"/>
+			</line>
+			<line>
+				<reportElement uuid="cd72bdda-8244-4e06-b568-dbe7a43b1f49" x="220" y="258" width="134" height="1"/>
+			</line>
+			<textField pattern="#,##0">
+				<reportElement uuid="269e7d73-d4e9-4bda-880d-d437f69759de" x="254" y="242" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{total_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="fee97431-6513-4d56-8e5f-a7f1db167244" x="42" y="23" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[1.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c905328f-ef8e-47a4-96ba-f13adc33320b" x="26" y="2" width="16" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="39e74cbe-6087-4fee-9b35-10597c03856d" x="42" y="38" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[2.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="aa3703a6-7ecd-4d7c-b535-2191e0d21e58" x="42" y="54" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[3.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b68de23d-7215-4c5e-91f1-85ff35de8403" x="42" y="70" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[4.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="eb5f31ee-c160-40b8-9ad2-9ebcf182b619" x="58" y="86" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[SHIFTING]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="d68a7272-f18e-4e94-878b-3487ec3bf38f" x="237" y="86" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c94d48c9-6c90-4d88-a013-91397153b411" x="42" y="86" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[5.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="63f1b1cd-6695-476a-99d5-e02ea8a28743" x="42" y="136" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[7.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="bb671f79-0581-4b3d-a703-1f7fb55760a3" x="42" y="152" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[8.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="b7b79cfe-f944-40e2-bd5c-c5a85696b904" x="26" y="224" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[II]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="3c48728b-6459-439c-b2a4-02e867c2f42a" x="26" y="261" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[IV]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="e79fc85b-142b-4c7b-b1f1-44ab14ad9328" x="26" y="242" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[III]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="7594ee0f-0dfd-493a-8963-b6ec8e5bea9f" x="128" y="483" width="165" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{npwp}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="532f8cda-73da-41c9-ac72-e30e6a8d7046" x="278" y="537" width="149" height="13"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{customer_name}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="c142068d-caf5-4a9d-bd7a-604fc4884dfa" x="254" y="86" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{shifting_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="fac48c23-6e5e-4847-825c-952ad0c21c68" x="254" y="54" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{hatchmoves_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="eddc7893-3ae9-42f5-8b0b-760c5aaf24cb" x="254" y="261" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},java.math.BigDecimal.ZERO,false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="e6b9d5fc-b2c6-48dc-90b2-519e68a25930" x="254" y="224" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},java.math.BigDecimal.ZERO,false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="93eacb82-5fd8-490b-9b08-7fa347fe763f" x="58" y="206" width="169" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[JUMLAH II]]></text>
+			</staticText>
+			<textField pattern="#,##0">
+				<reportElement uuid="3974c965-96c9-47a1-8562-2273fad1ac69" x="254" y="206" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{total_tagihan},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="301d66f4-37b8-47ce-903a-481abf8f13fc" x="237" y="187" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement uuid="e5f4d19d-5db5-441a-b6a1-674fa21b777c" x="220" y="203" width="134" height="1"/>
+			</line>
+			<textField pattern="#,##0">
+				<reportElement uuid="6d65cd81-d68c-4c2b-9e30-3dd1395906e6" x="254" y="187" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{upah_buruh_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="69a6318d-5260-4741-a5c5-5babadc8f736" x="227" y="206" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="ddee882a-c3f1-43d8-8ba6-0050e6d3f925" x="237" y="206" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="25ecc4fc-e027-4276-871d-dfa7d188e2ee" x="58" y="187" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[BIAYA HANDLING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9675547a-e3c1-42f6-a402-e1b1d6500d80" x="42" y="187" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[9.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c0100f72-6a31-4182-9de8-0a5629bdced1" x="227" y="187" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="f7cfff06-7eec-4c7d-9a58-a40022da9a42" x="139" y="536" width="10" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="5e9c123f-b270-431b-87e7-29e00783482a" x="36" y="536" width="74" height="13"/>
+				<box leftPadding="2"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BIAYA HANDLING]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="cc4e4426-bcc6-4967-a889-618be8abdfad" x="149" y="536" width="14" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="7edf9c1e-1448-474d-b2b6-7faeb2194806" x="163" y="536" width="103" height="13" isRemoveLineWhenBlank="true"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{upah_buruh_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="aa9c382b-b780-401d-8767-1e61c0b5c5dc" x="237" y="102" width="17" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{curr_code}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0">
+				<reportElement uuid="b775653c-2501-4473-a8e1-c0a817b8539a" x="254" y="102" width="100" height="15"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($F{language},$F{country},$F{air_kapal_charge},false,$F{default_fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="c8a725d7-4ba3-47bb-99fa-c408839100e1" x="227" y="102" width="10" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="ca8b2286-4772-427b-8473-d21336fa8740" x="58" y="102" width="169" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[AIR KAPAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="10442230-4d34-4806-8157-44fef93bb37e" x="42" y="102" width="16" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<text><![CDATA[6.]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="657753f9-ab36-4444-980e-b11694c8eabc" x="442" y="452" width="161" height="13"/>
+				<box leftPadding="0"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["(" + $F{no_reg} + ")"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement uuid="6eca3606-e77c-40d2-b6c4-f64cbb2cbaae" x="372" y="452" width="62" height="13"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[No. Sistem]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="4971878c-1275-4c21-8b43-73034c11adbd" x="434" y="452" width="8" height="13"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="5207f2b6-0157-4731-ab29-ebc56940ec33" x="42" y="433" width="232" height="13"/>
+				<textElement>
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{alamat}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="05e13060-de04-4b9a-80f8-ff310a346739" x="425" y="329" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NIP " + $F{nip_ttd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b4bab084-8601-4e41-aad8-a8beb1e731a0" x="427" y="526" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["NIP " + $F{nip_ttd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="dd79921e-596e-4620-a5a9-b276be0ad57a" x="427" y="515" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8" isBold="true" isUnderline="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{nama_ttd}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="9d742ae8-dfcf-40f6-a09e-380a4af07dce" x="427" y="478" width="111" height="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

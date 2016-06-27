@@ -1,0 +1,335 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.kapal_bayangan_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.kapal_bayangan_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+
+        <script type="text/javascript">
+            function validateChangeVessel(args) {
+                if (args.validationFailed || args.isRowsSelected == false) {
+                    rowsNotSelectedConfirmation.show();
+                } else {
+                    showAvailableVesselsDialog();
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="dummyVesselForm">
+            <h:panelGrid columns="4" id="dummyVesselPanel">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText readonly="true" value="#{kapalBayanganMonitoringBean.dummyVessel.noPpkb}" size="40" onkeypress="showDummyVessels();" onmousedown="showDummyVessels();"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="showDummyVessels();"/>
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{kapalBayanganMonitoringBean.dummyVessel.preserviceVessel.masterVessel.name}" readonly="true" size="40"/>
+                <h:outputText />
+
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{kapalBayanganMonitoringBean.dummyVessel.preserviceVessel.voyIn}" readonly="true" size="40"/>
+                <h:outputText />
+
+                <h:outputLabel value="ETA" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{kapalBayanganMonitoringBean.dummyVessel.eta}" readonly="true" size="40">
+                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                </h:inputText>
+                <h:outputText />
+            </h:panelGrid>
+        </h:form>
+        <br />
+        <h:form id="notAllocatedContainersForm">
+            <p:dataTable id="notAllocatedContainersTable"  widgetVar="notAllocatedContainersTable_var"
+                         var="item" value="#{kapalBayanganMonitoringBean.notAllocatedContainers}"
+                         selection="#{kapalBayanganMonitoringBean.selectedNotAllocatedContainers}" 
+                         paginator="true" rows="20" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,35,50" rowIndexVar="number">
+                
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton id="changeVessel" action="#{kapalBayanganMonitoringBean.handleValidateChangeVessel}" onstart="freeze();" process="@this notAllocatedContainersTable" value="Change Vessel" oncomplete="validateChangeVessel(args);" update="newVesselsForm:selectedContainers"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton action="#{kapalBayanganMonitoringBean.handleChangeVessel}" onstart="freeze();" value="Refresh" update="notAllocatedContainersForm" oncomplete="notAllocatedContainersTable_var.clearFilters();"/>
+                    </div>
+                </f:facet>
+
+                
+                <p:column selectionMode="multiple"/>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+
+                <p:column  sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="Cont No"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Size"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" style="text-align: center;" filterMatchMode="contains" filterBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+
+               <p:column sortBy="#{item[3]}" filterMatchMode="contains" filterBy="#{item[3]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+               </p:column>
+
+               <p:column sortBy="#{item[14]}" style="text-align: right;">
+                    <f:facet name="header">
+                        <h:outputText value="Gross"/>
+                    </f:facet>
+                    <h:outputText value="#{item[14]}"/>
+                </p:column>
+
+               <p:column sortBy="#{item[16]}" style="text-align: left;">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity"/>
+                    </f:facet>
+                    <h:outputText value="#{item[16]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[4]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Over Size"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4] ? 'Y' : 'N'}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[5]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Dg"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5] ? 'Y' : 'N'}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[6]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Dg Label"/>
+                    </f:facet>
+                    <h:outputText value="#{item[6] ? 'Y' : 'N'}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[7]}" filterMatchMode="contains" filterBy="#{item[7]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="POD"/>
+                    </f:facet>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[9]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Placement Date"/>
+                    </f:facet>
+                    <h:outputText value="#{item[9]}">
+                        <f:convertDateTime type="date" pattern="dd-MM-yyyy"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[10]}" filterMatchMode="contains" filterBy="#{item[7]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Block"/>
+                    </f:facet>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[11]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Slot"/>
+                    </f:facet>
+                    <h:outputText value="#{item[11]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[12]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Row"/>
+                    </f:facet>
+                    <h:outputText value="#{item[12]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[13]}" style="text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="Tier"/>
+                    </f:facet>
+                    <h:outputText value="#{item[13]}"/>
+                </p:column>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty kapalBayanganMonitoringBean.notAllocatedContainers}">
+                            <p:dataExporter type="xls" target="notAllocatedContainersTable" fileName="calon_muatan_#{kapalBayanganMonitoringBean.dummyVessel.noPpkb}" postProcessor="#{kapalBayanganMonitoringBean.postProcessXLS}"/>
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Select New Vessel"  widgetVar="availableVesselsDialog" modal="true" minWidth="750">
+            <h:form id="newVesselsForm">
+                <p:outputPanel id="selectedContainers">
+                    <p style="font-weight: bold;">
+                        Info: #{fn:length(kapalBayanganMonitoringBean.selectedNotAllocatedContainers)} containers selected
+                    </p>
+                </p:outputPanel>
+                <br />
+                <p:dataTable value="#{kapalBayanganMonitoringBean.availableVessels}" var="item" lazy="true"
+                             id="availableVesselsTable"  widgetVar="availableVesselsTable_var"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="width: 20px;" >
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterBy="#{item.noPpkb}" sortBy="#{item.noPpkb}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item.noPpkb}" />
+                    </p:column>
+
+                    <p:column  filterBy="#{item.preserviceVessel.masterVessel.name}" filterEvent="keyup" sortBy="#{item.preserviceVessel.masterVessel.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.masterVessel.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyIn}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyIn}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyOut}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyOut}" />
+                    </p:column>
+
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" action="#{kapalBayanganMonitoringBean.handleChangeVessel}" disabled="#{item.equals(kapalBayanganMonitoringBean.dummyVessel)}" value="select" update="notAllocatedContainersForm:notAllocatedContainersTable growl" oncomplete="availableVesselsDialog.hide();notAllocatedContainersTable_var.clearFilters();" immediate="true">
+                            <f:setPropertyActionListener target="#{kapalBayanganMonitoringBean.vessel}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Select Vessel"  widgetVar="dummyVesselsDialog" modal="true" minWidth="750">
+            <h:form id="dummyVesselsForm">
+                <p:dataTable value="#{kapalBayanganMonitoringBean.dummyVessels}" var="item" lazy="true"
+                             id="dummyVesselsTable"  widgetVar="dummyVesselsTable_var"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="width: 20px;" >
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterBy="#{item.noPpkb}" sortBy="#{item.noPpkb}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item.noPpkb}" />
+                    </p:column>
+
+                    <p:column  filterBy="#{item.preserviceVessel.masterVessel.name}" filterEvent="keyup" sortBy="#{item.preserviceVessel.masterVessel.name}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.masterVessel.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyIn}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyIn}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.preserviceVessel.voyOut}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item.preserviceVessel.voyOut}" />
+                    </p:column>
+
+                    <p:column style="text-align: center;">
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" action="#{kapalBayanganMonitoringBean.handleSelectDummyVessel}" value="select" update="notAllocatedContainersForm:notAllocatedContainersTable dummyVesselForm:dummyVesselPanel" oncomplete="dummyVesselsDialog.hide();notAllocatedContainersTable_var.clearFilters();" immediate="true">
+                            <f:setPropertyActionListener target="#{kapalBayanganMonitoringBean.dummyVessel}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:confirmDialog message="You must select at least 1 container!" header="Warning" severity="alert" modal="true"  widgetVar="rowsNotSelectedConfirmation">
+            <div class="header-panel-single-right">
+                <p:commandButton value="OK" onclick="rowsNotSelectedConfirmation.hide()" type="button" />
+            </div>
+        </p:confirmDialog>
+
+        <h:form>
+            <p:remoteCommand name="showAvailableVesselsDialog" onstart="freeze();" immediate="true" oncomplete="availableVesselsDialog.show();availableVesselsTable_var.clearFilters();"/>
+            <p:remoteCommand name="showDummyVessels" onstart="freeze();" immediate="true" oncomplete="dummyVesselsDialog.show();dummyVesselsTable_var.clearFilters();"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

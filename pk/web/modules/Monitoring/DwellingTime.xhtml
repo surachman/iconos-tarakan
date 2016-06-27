@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:ebtos="http://java.sun.com/jsf/composite/tags/module"
+                xmlns:f="http://java.sun.com/jsf/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.dwelling_time']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.dwelling_time']}"/>
+    </ui:define>
+    <ui:define name="content">
+
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+
+        <h:form id="appForm">
+            <h:panelGrid columns="1">
+                <h:selectOneRadio value="#{dwellingTimeBean.selectedPeriode}" valueChangeListener="#{dwellingTimeBean.onChangeEvent}">
+                    <f:selectItem itemLabel="0 s.d. 15 day" itemValue="A" />
+                    <f:selectItem itemLabel="16 s.d. 30 day" itemValue="B" />
+                    <f:selectItem itemLabel="> 30 day" itemValue="C" />
+                    <f:ajax execute="@this" event="change" render="appTable"/>
+                </h:selectOneRadio>
+            </h:panelGrid>
+
+            <p:dataTable value="#{dwellingTimeBean.objects}" rowIndexVar="number" var="item" id="appTable"
+                         paginator="true" rows="15"
+                         paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,15,20">
+
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="No" />
+                        <p:column rowspan="2" headerText="Container No" filterBy="#{item[0]}" filterMatchMode="contains" sortBy="#{item[0]}" style="text-align: center"/>
+                        <p:column rowspan="2" headerText="Size" sortBy="#{item[1]}" style="text-align: center"/>
+                        <p:column rowspan="2" headerText="Type" sortBy="#{item[2]}" style="text-align: center"/>
+                        <p:column rowspan="2" headerText="Status" sortBy="#{item[3]}" style="text-align: center"/>
+                        <p:column rowspan="2" headerText="Commodity" sortBy="#{item[4]}"/>
+                        <p:column rowspan="2" headerText="Gross" sortBy="#{item[5]}" style="text-align: center"/>
+                        <p:column rowspan="2" headerText="Over Size" sortBy="#{item[6]}" style="text-align: center"/>
+                        <p:column colspan="3" headerText="Dangerous"/>
+                        <p:column rowspan="2" headerText="Is Export/Import" sortBy="#{item[10]}" style="text-align: center"/>
+                        <p:column colspan="4" headerText="Position"/>
+                        <p:column colspan="5" headerText="Vessel"/>
+                        <p:column rowspan="2" headerText="Confirm Consignee" sortBy="#{item[20]}"/>
+                        <p:column rowspan="2" headerText="Placement Date" sortBy="#{item[21]}"/>
+                        <p:column rowspan="2" headerText="Today Date" sortBy="#{item[22]}"/>
+                        <p:column rowspan="2" headerText="Dwelling Time" sortBy="#{item[23]}" style="text-align: center"/>
+                    </p:row>
+
+                    <p:row>
+                        <p:column headerText="Is Dangerous" sortBy="#{item[7]}" style="text-align: center"/>
+                        <p:column headerText="Label" sortBy="#{item[8]}" style="text-align: center"/>
+                        <p:column headerText="Class" sortBy="#{item[9]}" style="text-align: center"/>
+                        <p:column headerText="Block" sortBy="#{item[11]}" style="text-align: center"/>
+                        <p:column headerText="Slot" sortBy="#{item[12]}" style="text-align: center"/>
+                        <p:column headerText="Row" sortBy="#{item[13]}" style="text-align: center"/>
+                        <p:column headerText="Tier" sortBy="#{item[14]}" style="text-align: center"/>
+                        <p:column headerText="No PPKB" filterBy="#{item[15]}" filterMatchMode="contains" sortBy="#{item[15]}" style="text-align: center"/>
+                        <p:column headerText="Vessel Name" filterBy="#{item[16]}" filterMatchMode="contains" sortBy="#{item[165]}"/>
+                        <p:column headerText="Voyage" sortBy="#{item[17]}"/>
+                        <p:column headerText="Shipping Type" sortBy="#{item[18]}" style="text-align: center"/>
+                        <p:column headerText="Agent" filterBy="#{item[19]}" filterMatchMode="contains" sortBy="#{item[19]}"/>
+                    </p:row>
+
+                </p:columnGroup>
+
+                <p:column>
+                    <h:outputText value="#{number+1}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[11]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[12]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[13]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[14]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[15]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[16]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[17]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[18]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[19]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[20]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[21]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[22]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[23]}" >
+                        <f:convertNumber pattern="###0"/>
+                    </h:outputText>
+                </p:column>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton ajax="false" value="Export to Excel" disabled="#{empty dwellingTimeBean.objects}">
+                            <p:dataExporter type="xls" target="appTable" fileName="DWELLING TIME " excludeColumns="0,10" postProcessor="#{dwellingTimeBean.postProcessXLS}"/>
+                        </p:commandButton>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+    </ui:define>
+
+</ui:composition>

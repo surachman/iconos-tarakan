@@ -1,0 +1,413 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ebtos="http://java.sun.com/jsf/composite/tags/module"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.service_registration']}" />
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.service_registration']}" />
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function validateRegistrationForm(xhr, status, args) {
+                if (!(args.validationFailed || args.isValid == false)) {
+                    registrationDialog.hide();
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true" life="3000"/>
+        <h:form id="registrationsForm">
+            <p:dataTable var="item" value="#{serviceRegistrationBean.registrations}"
+                         paginator="true" rows="10" id="registrasi"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15"
+                         paginatorPosition="bottom" rowIndexVar="No">
+
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" onclick="registrationDialog.show(); genTitle('dialog','#{msg['application.operation.add']} Service Registration');" actionListener="#{serviceRegistrationBean.handleAdd}" update="reg"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton value="#{msg['application.operation.history']}" immediate="true" image="ui-icon-document" oncomplete="registrationHistoriesTable.clearFilters();registrationHistoriesDialog.show();" actionListener="#{serviceRegistrationBean.handleFilterRegistrationHistories}" update="registrationHistoriesForm:registrationHistoriesTable"/>
+                        <p:commandButton onstart="freeze();" image="ui-icon-document" oncomplete="counterReport.show();" value="#{msg['menu.report']}" update="counterReportForm" immediate="true" title="#{msg['menu.report']}"/>
+                    </div>
+                </f:facet>
+
+                <p:column style="width: 20px;" >
+                    <f:facet name="header">
+                        <h:outputText value="No" />
+                    </f:facet>
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+
+                <p:column filterMatchMode="contains" filterBy="#{item.noReg}" sortBy="#{item.noReg}">
+                    <f:facet name="header">
+                        <h:outputText value="No Registration" />
+                    </f:facet>
+                    <h:outputText value="#{item.noReg}" />
+                </p:column>
+
+                <p:column filterMatchMode="contains" filterBy="#{item.masterCustomer.name}" sortBy="#{item.masterCustomer.name}" >
+                    <f:facet name="header">
+                        <h:outputText value="Customer" />
+                    </f:facet>
+                    <h:outputText value="#{item.masterCustomer.name}" />
+                </p:column>
+
+                <p:column sortBy="#{item.masterService.serviceName}" style="width: 250px;" filterMatchMode="contains" filterBy="#{item.masterService.serviceName}">
+                    <f:facet name="header">
+                        <h:outputText value="Service" />
+                    </f:facet>
+                    <h:outputText value="#{item.masterService.serviceName}" />
+                </p:column>
+
+                <p:column sortBy="#{item.statusService}" style="width: 100px;" filterMatchMode="contains" filterBy="#{item.statusService}">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item.statusService}" />
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton disabled="#{not item.statusService.equals('registrasi')}" image="ui-icon ui-icon-pencil" title="Edit" update="reg:regPanel reg:planning" oncomplete="registrationDialog.show();" onclick="genTitle('dialog','#{msg['application.operation.edit']} Service Registration');">
+                            <f:setPropertyActionListener target="#{serviceRegistrationBean.registration}" value="#{item}" />
+                        </p:commandButton>
+                        <p:commandButton disabled="#{not item.statusService.equals('registrasi')}" image="ui-icon ui-icon-trash" title="Delete" oncomplete="confirmation.show();">
+                            <f:setPropertyActionListener target="#{serviceRegistrationBean.registration}" value="#{item}" />
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <ebtos:CounterReport id="counterReport"  widgetVar="counterReport"/>
+
+        <h:form>
+            <p:confirmDialog message="#{msg['application.delete.message']} Service Registration?" header="#{msg['application.header.confirm.delete']}" severity="alert"  widgetVar="confirmation">
+                <div class="header-panel-single-right">
+                    <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{serviceRegistrationBean.delete}" onsuccess="confirmation.hide()" update="registrationsForm:registrasi growl reg"/>
+                    <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" />
+                </div>
+            </p:confirmDialog>
+        </h:form>
+
+        <p:dialog header="Registration Form"  widgetVar="registrationDialog" modal="true" minWidth="850" id="dialog">
+            <h:form id="reg">
+                <p:panel>
+                    <h:panelGrid columns="3" rowClasses="first-tr">
+                        <h:panelGrid>
+                            <p:fieldset legend="Customer Detail" style="min-height: 200px;" id="vessel">
+                                <h:panelGrid columns="4" id="regPanel" columnClasses="first-td">
+                                    <h:outputLabel value="Nama" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="2">
+                                        <h:inputText id="customer" onkeypress="showCustomers()" onmousedown="showCustomers()" value="#{serviceRegistrationBean.registration.masterCustomer.name}" required="true" requiredMessage="Nama Customer #{msg['application.validation.required']}"/>
+                                        <p:commandButton image="ui-icon-folder-open" value="..." onclick="showCustomers()" style="font-size: x-small" type="button"/>
+                                    </h:panelGrid>
+                                    <p:message for="customer" display="icon"/>
+
+                                    <h:outputLabel value="Address" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputTextarea disabled="true" value="#{serviceRegistrationBean.registration.masterCustomer.address}" rows="3" />
+                                    </h:panelGrid>
+                                    <h:outputText />
+
+                                    <h:outputLabel value="NPWP" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputText disabled="true" value="#{serviceRegistrationBean.registration.masterCustomer.npwp}" size="23"/>
+                                    </h:panelGrid>
+                                    <h:outputText />
+
+                                    <h:outputLabel value="Phone" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputText disabled="true" value="#{serviceRegistrationBean.registration.masterCustomer.phone1}" size="23"/>
+                                    </h:panelGrid>
+                                    <h:outputText />
+
+                                    <h:outputLabel value="Pengurus D.O *" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="2">
+                                        <h:inputText id="do" value="#{serviceRegistrationBean.registration.pengurusDo}" size="30" maxlength="100" required="true" requiredMessage="Nama Customer #{msg['application.validation.required']}"/>
+                                        <p:message for="do" display="icon"/>
+                                    </h:panelGrid>
+                                    <h:outputText />
+
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                        <p:spacer height="10"/>
+                        <h:panelGrid>
+                            <p:fieldset legend="Vessel Detail" style="min-height: 200px;" id="planning">
+                                <h:panelGrid columns="3" columnClasses="first-td">
+                                    <h:outputLabel value="Service" />
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu value="#{serviceRegistrationBean.registration.masterService}">
+                                        <f:selectItems value="#{serviceRegistrationBean.masterServices}" var="item" itemValue="#{item}" itemLabel="#{item.serviceName}" />
+                                        <f:ajax execute="@this" event="change" render="planning"/>
+                                    </h:selectOneMenu>
+
+                                    <h:outputLabel value="No PPKB" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="3">
+                                        <h:inputText value="#{serviceRegistrationBean.registration.planningVessel.noPpkb}" id="noPpkb" size="30" required="true"  onmousedown="showVessels();" onkeypress="showVessels();"/>
+                                        <p:commandButton image="ui-icon-folder-open" value="..." onclick="showVessels()" style="font-size: x-small" disabled="#{serviceRegistrationBean.registration.masterService.serviceCode.equals('SC003')}" type="button"/>
+                                        <p:message display="icon" for="noPpkb"/>
+                                    </h:panelGrid>
+
+                                    <h:outputLabel value="Vessel" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputText disabled="true" value="#{serviceRegistrationBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                                    </h:panelGrid>
+
+                                    <h:outputLabel value="Voy In" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputText disabled="true" value="#{serviceRegistrationBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                                    </h:panelGrid>
+
+                                    <h:outputLabel value="Voy Out" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputText disabled="true" value="#{serviceRegistrationBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                                    </h:panelGrid>
+
+                                    <h:outputLabel value="ETA" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputText disabled="true" value="#{serviceRegistrationBean.registration.planningVessel.preserviceVessel.eta}" size="30" >
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+                                        </h:inputText>
+                                    </h:panelGrid>
+
+                                    <h:outputLabel value="ETD" />
+                                    <h:outputLabel value=" : " />
+                                    <h:panelGrid columns="1">
+                                        <h:inputText disabled="true" value="#{serviceRegistrationBean.registration.planningVessel.preserviceVessel.etd}" size="30">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm:ss" />
+                                        </h:inputText>
+                                    </h:panelGrid>
+
+                                </h:panelGrid>
+                            </p:fieldset>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.submit']}" actionListener="#{serviceRegistrationBean.saveEdit}" oncomplete="validateRegistrationForm(xhr, status, args)" update="registrationsForm:registrasi reg growl" onstart="freeze();"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="registrationDialog.hide();" update="reg" actionListener="#{serviceRegistrationBean.handleAdd}"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog modal="true" header="Booking Agent"  widgetVar="customersDialog" id="customersDialog" width="750">
+                <p:dataTable id="customersTable"  widgetVar="customersTable"
+                             value="#{serviceRegistrationBean.masterCustomers}" var="itemm"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    
+                    <p:column style="width: 20px;" >
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[0]}" sortBy="#{itemm[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer Code"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[0]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[1]}" sortBy="#{itemm[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Agent Name"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[1]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[2]}" sortBy="#{itemm[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Phone"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[2]}"/>
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{itemm[3]}" sortBy="#{itemm[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Addres"/>
+                        </f:facet>
+                        <h:outputText value="#{itemm[3]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{serviceRegistrationBean.handleSelectVesselCustCode}" value="select" update="reg:vessel" oncomplete="customersDialog.hide();">
+                            <f:attribute name="cust_code" value="#{itemm[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+            </p:dialog>
+        </h:form>
+
+        <p:dialog header="Select Planning Vessel"  widgetVar="vesselsDialog" modal="true" minWidth="750">
+            <h:form id="vesselsForm">
+                <p:dataTable id="vesselsTable"  widgetVar="vesselsTable"
+                             value="#{serviceRegistrationBean.planningVessels}" var="item"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="No">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="width: 20px;" >
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{serviceRegistrationBean.handleSelectNoPpkb}" value="select" update="reg:planning" oncomplete="vesselsDialog.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Registration Histories"  widgetVar="registrationHistoriesDialog" modal="true" minWidth="750">
+            <h:form id="registrationHistoriesForm">
+                <div class="ui-panel ui-widget ui-widget-content ui-corner-all" style="width:270px;">
+                    <h:panelGrid columns="3" style="padding:15px;">
+                        <h:outputText value="Date"/>
+                        <h:outputText value=":"/>
+                        <p:calendar size="15" onselect="freeze();" pattern="dd/MM/yyyy" value="#{serviceRegistrationBean.dateFilter}" showOn="button"/>
+                    </h:panelGrid>
+                    <div class="ui-panel-footer ui-widget-content" style="overflow: visible;">
+                        <div class="header-panel-single-right">
+                            <p:outputPanel id="buttonSubForm">
+                                <p:commandButton onstart="freeze();" update="registrationHistoriesForm:registrationHistoriesTable" oncomplete="registrationHistoriesTable.clearFilters();" actionListener="#{serviceRegistrationBean.handleFilterRegistrationHistories}" value="#{msg['application.operation.filter']}"/>
+                            </p:outputPanel>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <p:dataTable var="item" value="#{serviceRegistrationBean.registrationHistories}"
+                             paginator="true" rows="10" id="registrationHistoriesTable"  widgetVar="registrationHistoriesTable"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15"
+                             paginatorPosition="bottom" rowIndexVar="No">
+
+                    <f:facet name="header">
+                        &nbsp;
+                    </f:facet>
+
+                    <p:column style="width: 20px;" >
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item.noReg}" sortBy="#{item.noReg}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item.noReg}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item.masterCustomer.name}" sortBy="#{item.masterCustomer.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item.masterCustomer.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.masterService.serviceName}" filterMatchMode="contains" filterBy="#{item.masterService.serviceName}">
+                        <f:facet name="header">
+                            <h:outputText value="Service" />
+                        </f:facet>
+                        <h:outputText value="#{item.masterService.serviceName}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.statusService}" style="width: 100px;" filterMatchMode="contains" filterBy="#{item.statusService}">
+                        <f:facet name="header">
+                            <h:outputText value="Status" />
+                        </f:facet>
+                        <h:outputText value="#{item.statusService}" />
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showVessels" actionListener="#{serviceRegistrationBean.handleShowVessels}" oncomplete="vesselsDialog.show();vesselsTable.clearFilters();" update="vesselsForm"/>
+            <p:remoteCommand name="showCustomers" oncomplete="customersDialog.show();customersTable.clearFilters();"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

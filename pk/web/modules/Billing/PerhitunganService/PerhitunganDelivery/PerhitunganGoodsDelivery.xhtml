@@ -1,0 +1,504 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_delivery.perhitungan_goods_delivery']}" />
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.perhitungan_delivery.perhitungan_goods_delivery']}" />
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../../resources/scripts/dycode.framework.directprint.js"></script>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();dlgBatalNota.hide();
+                    }
+            }
+
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">            
+            <h:panelGrid columns="5" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganGoodsDeliveryBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganGoodsDeliveryBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganGoodsDeliveryBean.registration.planningVessel.noPpkb}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganGoodsDeliveryBean.registration.planningVessel.preserviceVessel.masterVessel.name}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganGoodsDeliveryBean.registration.planningVessel.preserviceVessel.voyIn}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganGoodsDeliveryBean.registration.planningVessel.preserviceVessel.voyOut}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <p:spacer width="17"/>
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{perhitunganGoodsDeliveryBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+            <h:panelGrid id="cek" columns="3">
+                <h:outputLabel value="Payment Type" />
+                <h:outputLabel value=" : " />
+                <h:selectOneRadio value="#{perhitunganGoodsDeliveryBean.invoice.paymentType}" valueChangeListener="#{perhitunganGoodsDeliveryBean.onChangeEvent}" disabled="#{not perhitunganGoodsDeliveryBean.registration.statusService.equals('registrasi')}">
+                    <f:selectItem itemValue="CASH" itemLabel="Cash"/>
+                    <f:selectItem itemValue="KREDIT" itemLabel="Kredit"/>
+                    <f:ajax execute="@this" event="change" render="cek"/>
+                </h:selectOneRadio>
+            </h:panelGrid>
+            <br/>
+
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{perhitunganGoodsDeliveryBean.deliveryBarangServices}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="deliveryBarangServiceTable" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty perhitunganGoodsDeliveryBean.registration.noReg or not perhitunganGoodsDeliveryBean.registration.statusService.equals('registrasi')}" actionListener="#{perhitunganGoodsDeliveryBean.handleAdd}" update="dsFormDialog:servContD" oncomplete="dlg.show();" onclick="genTitle('dialog','#{msg['application.operation.add']} Goods Delivery');"/>
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" value="#{msg['menu.billing.batal_nota']}" disabled="#{perhitunganGoodsDeliveryBean.disCancelInv or not (loginSessionBean.supervisorKeuangan or loginSessionBean.supervisor)}" oncomplete="dlgBatalNota.show()"/>
+                    </div>
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="3" headerText="No" style="text-align: center"/>
+                        <p:column sortBy="#{item[0]}" rowspan="3" headerText="Job Slip" />
+                        <p:column sortBy="#{item[1]}" rowspan="3" headerText="Container No" />
+                        <p:column sortBy="#{item[2]}" rowspan="3" headerText="BL No" />
+                        <p:column sortBy="#{item[3]}" rowspan="3" headerText="Commodity" />
+                        <p:column sortBy="#{item[4]}" rowspan="3" headerText="Unit" />
+                        <p:column sortBy="#{item[5]}" rowspan="3" headerText="Weight"/>
+                        <p:column sortBy="#{item[6]}" rowspan="3" headerText="Volume" />
+                        <p:column sortBy="#{item[7]}" rowspan="3" headerText="Placement" />
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                        <p:column colspan="4" headerText="Charge&nbsp;(#{perhitunganGoodsDeliveryBean.symbol})"/>
+                        <p:column sortBy="#{item[10] + item[11] + item[12] + item[13]}" rowspan="3" headerText="Total&nbsp;(#{perhitunganGoodsDeliveryBean.symbol})" />
+                        <p:column rowspan="3" headerText="Action" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[8]}" rowspan="2" headerText="Masa 1" />
+                        <p:column sortBy="#{item[9]}" rowspan="2" headerText="Masa 2"/>
+                        <p:column sortBy="#{item[10]}" rowspan="2" headerText="Lift" />
+                        <p:column colspan="2" headerText="Penumpukan"/>
+                        <p:column sortBy="#{item[13]}" rowspan="2" headerText="Jasa Dermaga" />
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[11]}" headerText="Masa 1" />
+                        <p:column sortBy="#{item[12]}" headerText="Masa 2" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[7]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[10]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[11]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[12]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[13]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <div style="float: right">
+                        <h:outputText value="#{item[10] + item[11] + item[12] + item[13]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                    </div>
+                </p:column>
+                <p:column>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{perhitunganGoodsDeliveryBean.handleSelect}" disabled="#{not perhitunganGoodsDeliveryBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Delivery Service">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>
+                            <f:attribute name="noCont" value="#{item[1]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+                <p:columnGroup type="footer">
+                    <p:row>
+                        <p:column colspan="15" footerText="Jumlah Total " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganGoodsDeliveryBean.formattedTotal}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="15" footerText="PPn " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganGoodsDeliveryBean.formattedPpn}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="15" footerText="Materai " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganGoodsDeliveryBean.formattedMaterai}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                    <p:row>
+                        <p:column colspan="15" footerText="Total Tagihan " style="text-align: right"/>
+                        <p:column footerText="#{perhitunganGoodsDeliveryBean.formattedJmlTotal}" style="text-align: right"/>
+                        <p:column footerText="&nbsp;"/>
+                    </p:row>
+                </p:columnGroup>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" disabled="#{empty perhitunganGoodsDeliveryBean.deliveryBarangServices or not perhitunganGoodsDeliveryBean.registration.statusService.equals('registrasi')}" update="registrationForm:registrationDetail registrationForm:cek registrationForm:deliveryBarangServiceTable growl" actionListener="#{perhitunganGoodsDeliveryBean.handleSubmit}"/>
+                        <dycode:directPrint immediate="true" id="printPreview" onstart="freeze();" value="#{msg['application.operation.preview']}" disabled="#{empty perhitunganGoodsDeliveryBean.deliveryBarangServices}" actionListener="#{perhitunganGoodsDeliveryBean.handleDownloadTransactionRecap}" update="registrationForm:deliveryBarangServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printNota" onstart="freeze();" value="#{msg['application.operation.print_nota']}" disabled="#{empty perhitunganGoodsDeliveryBean.deliveryBarangServices or (perhitunganGoodsDeliveryBean.disPrint and not loginSessionBean.supervisor) or perhitunganGoodsDeliveryBean.disKredit}" actionListener="#{perhitunganGoodsDeliveryBean.handleDownloadNota}" update="registrationForm:deliveryBarangServiceTable"/>
+                        <dycode:directPrint immediate="true" id="printLampiranNota" onstart="freeze();" value="#{msg['application.operation.detail']}" disabled="#{empty perhitunganGoodsDeliveryBean.deliveryBarangServices or perhitunganGoodsDeliveryBean.disKredit or perhitunganGoodsDeliveryBean.disDetail}" actionListener="#{perhitunganGoodsDeliveryBean.handleDownloadDetail}" update="registrationForm:deliveryBarangServiceTable"/>
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="Entry Delivery Service"  widgetVar="dlg" modal="true" minWidth="400" id="dialog">
+            <h:form id="dsFormDialog">
+                <p:panel>
+                    <h:panelGrid columns="5" id="servContD">
+                        <h:outputLabel value="Container No *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="cont" onkeypress="dlgCont.show();" onmousedown="dlgCont.show();" value="#{perhitunganGoodsDeliveryBean.deliveryBarangService.contNo}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();"/>
+                        <p:message display="icon" for="cont"/>
+
+                        <h:outputLabel value="BL No" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="bl" onkeypress="dlgBL.show();" onmousedown="dlgBL.show();" value="#{perhitunganGoodsDeliveryBean.deliveryBarangService.blNo}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgBL.show();" disabled="#{empty perhitunganGoodsDeliveryBean.deliveryBarangService.contNo}"/>
+                        <p:message display="icon" for="bl"/>
+
+                        <h:outputLabel value="Count By" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneRadio value="#{perhitunganGoodsDeliveryBean.deliveryBarangService.countBy}">
+                            <f:selectItem itemLabel="Weight" itemValue="weight"/>
+                            <f:selectItem itemLabel="Volume" itemValue="volume"/>
+                        </h:selectOneRadio>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganGoodsDeliveryBean.handleConfirm}" update="registrationForm:deliveryBarangServiceTable serviceContDiscForm:serviceContDisc dsFormDialog:servContD growl" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{perhitunganGoodsDeliveryBean.registrations}"
+                             paginator="true" rows="10" rowIndexVar="No" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{No+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{perhitunganGoodsDeliveryBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail registrationForm:cek registrationForm:deliveryBarangServiceTable serviceContDiscForm:serviceContDisc" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="serviceContDiscForm">
+            <p:dialog header="Select Service CFS Stripping"  widgetVar="dlgCont" modal="true" width="500">
+                <p:dataTable id="serviceContDisc" rowIndexVar="No" var="item" value="#{perhitunganGoodsDeliveryBean.serviceCfsStrippings}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{No+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{perhitunganGoodsDeliveryBean.handleSelectContPick}" value="#{msg['application.operation.select']}" update="dsFormDialog:servContD blForm:bl" oncomplete="dlgCont.hide();">
+                            <f:attribute name="idCont" value="#{item[1]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="blForm">
+            <p:dialog header="Select BL No"  widgetVar="dlgBL" modal="true" width="700">
+                <p:dataTable id="bl" var="item" value="#{perhitunganGoodsDeliveryBean.serviceCfsStrippingsBL}"
+                             paginator="true" rowIndexVar="No" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{No+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[3]}" filterBy="#{item[3]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="BL No" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}" filterBy="#{item[4]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Commodity" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Unit" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Volume" />
+                        </f:facet>
+                        <h:outputText value="#{item[7]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{perhitunganGoodsDeliveryBean.handleSelectBL}" value="#{msg['application.operation.select']}" update="dsFormDialog:servContD" oncomplete="dlgBL.hide();">
+                            <f:attribute name="idBl" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="Yes" actionListener="#{perhitunganGoodsDeliveryBean.handleDelete}" update="registrationForm:registrationDetail registrationForm:cek registrationForm:deliveryBarangServiceTable growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="No" onclick="confirmation.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <p:dialog modal="true" header="#{msg['menu.billing.batal_nota']}"  widgetVar="dlgBatalNota" id="idBatalNota" width="500">
+            <h:form id="batalNota">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="No. Berita Acara" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="nob" value="#{perhitunganGoodsDeliveryBean.batalNota.noBeritaAcara}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="nob" display="icon"/>
+
+                        <h:outputLabel value="Alasan Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputTextarea id="asl" value="#{perhitunganGoodsDeliveryBean.batalNota.alasanPembatalan}" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message for="asl" display="icon"/>
+
+                        <h:outputLabel value="Tgl Pembatalan" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="tglp" styleClass="cal" value="#{perhitunganGoodsDeliveryBean.batalNota.tglPembatalan}" size="30" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <p:message for="tglp" display="icon"/>
+
+                    </h:panelGrid>
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{perhitunganGoodsDeliveryBean.handleCancelInvoice}"
+                                                 oncomplete="handleRequestValidation(xhr, status, args)" image="ui-icon-check" update="registrationForm:registrationDetail registrationForm:cek registrationForm:deliveryBarangServiceTable growl"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgBatalNota.hide()" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" visible="true" rendered="#{not perhitunganGoodsDeliveryBean.isSimpatReady}" closeOnEscape="false" width="400" resizable="false"  widgetVar="simpatStatusDialog" header="Error" draggable="false" closable="false">
+            <h:form>
+                <p:panel>
+                    <center>
+                        <br />
+                        <br />
+                        <div style="width:300px; height: 70px; font-size: 14px;">
+                            Proses perhitungan tidak bisa dilakukan karena ada masalah dengan koneksi ke server SIMPAT
+                        </div>
+                    </center>
+                    <f:facet name="footer">
+                        <div class="header-panel-left">
+                            <p:commandButton action="goToHome" ajax="false" value="Home"/>
+                        </div>
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-refresh" action="PerhitunganGoodsDelivery.xhtml" ajax="false" value="refresh"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

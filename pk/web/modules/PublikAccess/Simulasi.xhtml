@@ -1,0 +1,290 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.public_access.simulation']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.public_access.simulation']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" />
+        
+
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+
+        <h:form id="simulasi">           
+            <p:dataTable var="item" paginator="true"
+                         value="#{simulasiBean.listSImulasi}"
+                         paginatorPosition="bottom" id="tabelSimulasi"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rows="10" dynamic="true"
+                         >
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{simulasiBean.handleAdd}" oncomplete="dlg.show();" update="addForm"/>
+                    </div>
+                </f:facet>               
+                <p:column sortBy="#{item.contType}" filterMatchMode="contains" filterBy="#{item.contType}">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Type" />
+                    </f:facet>
+                    <h:outputText value="#{item.contType}" />
+                </p:column>
+
+                <p:column sortBy="#{item.conSize}" filterMatchMode="contains" filterBy="#{item.conSize}">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Size" />
+                    </f:facet>
+                    <h:outputText value="#{item.conSize}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contStatus}" filterMatchMode="contains" filterBy="#{item.contStatus}">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Status" />
+                    </f:facet>
+                    <h:outputText value="#{item.contStatus}" />
+                </p:column>
+
+                <p:column sortBy="#{item.overSize}">
+                    <f:facet name="header">
+                        <h:outputText value="OverSize" />
+                    </f:facet>
+                    <h:outputText value="#{item.overSize}" />
+                </p:column>
+
+                <p:column sortBy="#{item.dg}">
+                    <f:facet name="header">
+                        <h:outputText value="Dg" />
+                    </f:facet>
+                    <h:outputText value="#{item.dg}" />
+                </p:column>
+
+                <p:column sortBy="#{item.dgLabel}">
+                    <f:facet name="header">
+                        <h:outputText value="Dg Label" />
+                    </f:facet>
+                    <h:outputText value="#{item.dgLabel}" />
+                </p:column>
+
+                <p:column sortBy="#{item.charge}">
+                    <f:facet name="header">
+                        <h:outputText value="Charge" />
+                    </f:facet>
+                    <h:outputText value="#{item.charge}">
+
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;" />
+                    </f:facet>
+                    <p:commandButton actionListener="#{simulasiBean.editSimulasi}" image="ui-icon-pencil" title="Delete Simulasi" update="simulasi:tabelSimulasi editForm" onclick="dlgg.show();">
+                        <f:attribute name="itemDelete" value="#{item}"/>
+                    </p:commandButton>
+                    <p:commandButton actionListener="#{simulasiBean.removeSimulasi}" image="ui-icon-trash" title="Delete Simulasi" update="simulasi:tabelSimulasi addForm">
+                        <f:attribute name="itemDelete" value="#{item}"/>
+                    </p:commandButton>
+                </p:column>
+                <f:facet name="footer">
+                    <div class="header-panel-right">
+                        <h:outputText value="#{simulasiBean.terbilang}" />
+                        <p:commandButton disabled="true" value="Jumlah Total : #{simulasiBean.total}"/>                       
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <p:spacer height="30"/>
+
+
+        <p:dialog header="Entry Simulasi Booking"  widgetVar="dlg" modal="true" minWidth="400" >
+            <h:form id="addForm">
+                <p:panel>
+                    <h:panelGrid id="delServ">
+                        <h:panelGrid columns="4" id="servContD">
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.conSize}">
+                                <f:selectItems value="#{containerAttributesBean.containerSizes}"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.contType}">
+                                <f:selectItem itemValue="DRY" itemLabel="Dry" />
+                                <f:selectItem itemValue="REEFER" itemLabel="Reefer" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.contStatus}">
+                                <f:selectItem itemValue="FCL" itemLabel="Fcl" />
+                                <f:selectItem itemValue="LCL" itemLabel="Lcl" />
+                                <f:selectItem itemValue="MTY" itemLabel="Empty" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OverSize" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.overSize}">
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Dg" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.dg}">
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Dg Label" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.dgLabel}">
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Box" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{simulasiBean.box}" size="25"/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Crane" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneRadio layout="LINE_DIRECTION" value="#{simulasiBean.crane}">
+                                <f:selectItem itemValue="S" itemLabel="S"/>
+                                <f:selectItem itemValue="L" itemLabel="L" />
+                            </h:selectOneRadio>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Tipe Pelayaran" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneRadio layout="LINE_DIRECTION" value="#{simulasiBean.tipePelayaran}">
+                                <f:selectItem itemValue="d" itemLabel="Domestik"/>
+                                <f:selectItem itemValue="i" itemLabel="International" />
+                            </h:selectOneRadio>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.submit']}" action="#{simulasiBean.createNew}" update="simulasi:tabelSimulasi" oncomplete="dlg.hide();"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlg.hide();"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Entry Simulasi Booking"  widgetVar="dlgg" modal="true" minWidth="400" >
+            <h:form id="editForm">
+                <p:panel>
+                    <h:panelGrid id="delServ">
+                        <h:panelGrid columns="4" id="servContD">
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.simulasiBean.conSize}">
+                                <f:selectItems value="#{containerAttributesBean.containerSizes}"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.simulasiBean.contType}">
+                                <f:selectItem itemValue="DRY" itemLabel="Dry" />
+                                <f:selectItem itemValue="REEFER" itemLabel="Reefer" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.simulasiBean.contStatus}">
+                                <f:selectItem itemValue="FCL" itemLabel="Fcl" />
+                                <f:selectItem itemValue="LCL" itemLabel="Lcl" />
+                                <f:selectItem itemValue="MTY" itemLabel="Empty" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="OverSize" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.simulasiBean.overSize}">
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Dg" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.simulasiBean.dg}">
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Dg Label" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{simulasiBean.simulasiBean.dgLabel}">
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Box" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{simulasiBean.simulasiBean.box}" size="25"/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Crane" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneRadio layout="LINE_DIRECTION" value="#{simulasiBean.simulasiBean.crane}">
+                                <f:selectItem itemValue="S" itemLabel="S"/>
+                                <f:selectItem itemValue="L" itemLabel="L" />
+                            </h:selectOneRadio>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Tipe Pelayaran" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneRadio layout="LINE_DIRECTION" value="#{simulasiBean.simulasiBean.tipePelayaran}">
+                                <f:selectItem itemValue="d" itemLabel="Domestik"/>
+                                <f:selectItem itemValue="i" itemLabel="International" />
+                            </h:selectOneRadio>
+                            <h:outputLabel/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.submit']}" actionListener="#{simulasiBean.save}" update="simulasi:tabelSimulasi addForm" oncomplete="dlgg.hide();"/>
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlgg.hide();"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

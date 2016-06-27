@@ -1,0 +1,412 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.discharge_list']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.discharge_list']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <!--        <dycode:loadJZebraBundle/>-->
+        <h:form id="dischargeForm">
+            <h:panelGrid id="planningVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB"/>:
+                <h:inputText size="30" id="noPpkb" disabled="true" value="#{dischargeBean.planningVessel[0]}" title="No PPKB"/>
+                <p:column >
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="Plan" style="font-size: x-small" onclick="showPlanningVessels();"/>
+                <h:outputText value="&nbsp;"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="All Plan" style="font-size: x-small" onclick="showPlanningVessels2();"/>
+                </p:column>
+                <h:outputLabel value="Vessel Name" for="vesselName" />:
+                <h:inputText size="30" id="vesselName" disabled="true" value="#{dischargeBean.planningVessel[1]}" title="Vessel Name"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage In" for="voyageIn" />:
+                <h:inputText size="30" id="voyageIn" disabled="true" value="#{dischargeBean.planningVessel[2]}" title="Voyage In"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                <h:inputText size="30" id="voyageOut" disabled="true" value="#{dischargeBean.planningVessel[3]}" title="Voyage Out"/>
+                <h:outputText value="&nbsp;"/>
+            </h:panelGrid>
+            <br/>
+            <p:tabView style="width: 100%;">
+                <p:tab title="Discharge">
+                    <h:panelGrid id="planningContDischarge" width="100%">
+                        <p:dataTable paginatorPosition="bottom" var="item" value="#{dischargeBean.planningContDischarges}" paginator="true" rows="10"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                            <f:facet name="header">
+                                &nbsp;
+                            </f:facet>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column rowspan="2" headerText="No. " />
+                                    <p:column sortBy="#{item[0]}" rowspan="2" headerText="Container No" />
+                                    <p:column sortBy="#{item[1]}" rowspan="2" headerText="Size" />
+                                    <p:column sortBy="#{item[2]}" rowspan="2" headerText="Type" />
+                                    <p:column sortBy="#{item[3]}" rowspan="2" headerText="Status" />
+                                    <p:column sortBy="#{item[4]}" rowspan="2" headerText="Gross" />
+                                    <p:column sortBy="#{item[10]}" rowspan="2" headerText="Seal No"/>
+                                    <p:column colspan="3" headerText="Vessel Bay" />
+                                    <p:column colspan="4" headerText="Yard Planning" />
+                                </p:row>
+                                <p:row>
+                                    <p:column sortBy="#{item[11]}" headerText="Bay" />
+                                    <p:column sortBy="#{item[12]}" headerText="Row" />
+                                    <p:column sortBy="#{item[13]}" headerText="Tier" />
+                                    <p:column sortBy="#{item[5]}" headerText="Blok" />
+                                    <p:column sortBy="#{item[6]}" headerText="Slot" />
+                                    <p:column sortBy="#{item[7]}" headerText="Row" />
+                                    <p:column sortBy="#{item[8]}" headerText="Tier" />
+                                </p:row>
+                            </p:columnGroup>
+                             <p:column>
+                                <h:outputText value="#{number+1}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[2]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[10]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[11]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[12]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[13]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                            <f:facet name="footer">
+                                <div class="header-panel-single-left">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.download_as_pdf']}" disabled="#{empty dischargeBean.planningContDischarges}" actionListener="#{dischargeBean.handleDownloadTransactionRecap}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small">
+                                        <f:attribute name="mode" value="discharge"/>
+                                    </p:commandButton>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:panelGrid>
+                </p:tab>
+
+                <p:tab title="Transhipment">
+                    <h:panelGrid id="planningTransDischarge" width="100%">
+                        <p:dataTable paginatorPosition="bottom" var="item" value="#{dischargeBean.planningTransDischarges}" paginator="true" rows="10"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                            <f:facet name="header">
+                                &nbsp;
+                            </f:facet>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column rowspan="2" headerText="No. " />
+                                    <p:column sortBy="#{item[0]}" rowspan="2" headerText="Container No" />
+                                    <p:column sortBy="#{item[1]}" rowspan="2" headerText="Size" />
+                                    <p:column sortBy="#{item[2]}" rowspan="2" headerText="Type" />
+                                    <p:column sortBy="#{item[3]}" rowspan="2" headerText="Status" />
+                                    <p:column sortBy="#{item[4]}" rowspan="2" headerText="Gross" />
+                                    <p:column sortBy="#{item[10]}" rowspan="2" headerText="Seal No"/>
+                                    <p:column colspan="3" headerText="Vessel Bay" />
+                                    <p:column colspan="4" headerText="Yard Planning" />
+                                </p:row>
+                                <p:row>
+                                    <p:column sortBy="#{item[11]}" headerText="Bay" />
+                                    <p:column sortBy="#{item[12]}" headerText="Row" />
+                                    <p:column sortBy="#{item[13]}" headerText="Tier" />
+                                    <p:column sortBy="#{item[5]}" headerText="Blok" />
+                                    <p:column sortBy="#{item[6]}" headerText="Slot" />
+                                    <p:column sortBy="#{item[7]}" headerText="Row" />
+                                    <p:column sortBy="#{item[8]}" headerText="Tier" />
+                                </p:row>
+                            </p:columnGroup>
+                             <p:column>
+                                <h:outputText value="#{number+1}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[2]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[10]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[11]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[12]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[13]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[8]}"/>
+                            </p:column>
+                            <f:facet name="footer">
+                                <div class="header-panel-single-left">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.download_as_pdf']}" disabled="#{empty dischargeBean.planningTransDischarges}" actionListener="#{dischargeBean.handleDownloadTransactionRecap}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small">
+                                        <f:attribute name="mode" value="trans"/>
+                                    </p:commandButton>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:panelGrid>
+                </p:tab>
+
+                <p:tab title="Shifting">
+                    <h:panelGrid id="planningShiftDischarge" width="100%">
+                        <p:dataTable paginatorPosition="bottom" var="item" value="#{dischargeBean.planningShiftDischarges}" paginator="true" rows="10"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                            <f:facet name="header">
+                                &nbsp;
+                            </f:facet>
+                            <p:columnGroup type="header">
+                                <p:row>
+                                    <p:column rowspan="2" headerText="No. " />
+                                    <p:column sortBy="#{item[9]}" rowspan="2" headerText="Container No" />
+                                    <p:column sortBy="#{item[0]}" rowspan="2" headerText="Size" />
+                                    <p:column sortBy="#{item[1]}" rowspan="2" headerText="Type" />
+                                    <p:column sortBy="#{item[2]}" rowspan="2" headerText="Status" />
+                                    <p:column sortBy="#{item[3]}" rowspan="2" headerText="Gross" />
+                                    <p:column sortBy="#{item[4]}" rowspan="2" headerText="Seal No"/>
+                                    <p:column colspan="3" headerText="Vessel Bay" />
+                                </p:row>
+                                <p:row>
+                                    <p:column sortBy="#{item[5]}" headerText="Bay" />
+                                    <p:column sortBy="#{item[6]}" headerText="Row" />
+                                    <p:column sortBy="#{item[7]}" headerText="Tier" />
+                                </p:row>
+                            </p:columnGroup>
+                            <p:column>
+                                <h:outputText value="#{number+1}."/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[9]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[0]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[1]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[2]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[3]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[4]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[5]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[6]}"/>
+                            </p:column>
+                            <p:column>
+                                <h:outputText value="#{item[7]}"/>
+                            </p:column>
+                            <f:facet name="footer">
+                                <div class="header-panel-single-left">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.download_as_pdf']}" disabled="#{empty dischargeBean.planningShiftDischarges}" actionListener="#{dischargeBean.handleDownloadTransactionRecap}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small">
+                                        <f:attribute name="mode" value="shift"/>
+                                    </p:commandButton>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:panelGrid>
+                </p:tab>
+
+                <p:tab title="Uncontainerized">
+                    <h:panelGrid id="planningUncontainerized" width="100%">
+                        <p:dataTable paginatorPosition="bottom" var="item" value="#{dischargeBean.planningUncontainerizeds}" paginator="true" rows="10"
+                                     paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                            <f:facet name="header">
+                                &nbsp;
+                            </f:facet>
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputText value="No." />
+                                </f:facet>
+                                <h:outputText value="#{number+1}." />
+                            </p:column>
+
+                            <p:column sortBy="#{item[0]}"   filterMatchMode="Contains" filterBy="#{item[0]}">
+                                <f:facet name="header">
+                                    <h:outputText value="No BL" />
+                                </f:facet>
+                                <h:outputText value="#{item[0]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[1]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Commodity" />
+                                </f:facet>
+                                <h:outputText value="#{item[1]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[5]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Unit" />
+                                </f:facet>
+                                <h:outputText value="#{item[5]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[2]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Weight" />
+                                </f:facet>
+                                <h:outputText value="#{item[2]}" />
+                            </p:column>
+
+                            <p:column sortBy="#{item[3]}">
+                                <f:facet name="header">
+                                    <h:outputText value="Truck Lossing"/>
+                                </f:facet>
+                                <h:outputText value="#{item[3]}" />
+                            </p:column>
+                            <f:facet name="footer">
+                                <div class="header-panel-single-left">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.download_as_pdf']}" disabled="#{empty dischargeBean.planningUncontainerizeds}" actionListener="#{dischargeBean.handleDownloadTransactionRecap}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small">
+                                        <f:attribute name="mode" value="uc"/>
+                                    </p:commandButton>
+                                </div>
+                            </f:facet>
+                        </p:dataTable>
+                    </h:panelGrid>
+                </p:tab>
+            </p:tabView>
+        </h:form>
+
+        <p:dialog header="Planning Vessels"  widgetVar="planningVesselsDialog" modal="true" minWidth="750">
+            <h:form id="planningVesselsForm">
+                <p:dataTable var="item" value="#{dischargeBean.planningVessels}"
+                             id="planningVesselsTable"  widgetVar="planningVesselsTable"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column  filterMatchMode="Contains" filterBy="#{item[0]}" sortBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="Contains" filterBy="#{item[3]}" sortBy="#{item[3]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{dischargeBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="dischargeForm:planningVesselDetail dischargeForm:planningContDischarge dischargeForm:planningTransDischarge dischargeForm:planningShiftDischarge dischargeForm:planningUncontainerized" oncomplete="planningVesselsDialog.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <h:form>
+            <p:remoteCommand name="showPlanningVessels" onstart="freeze();" immediate="true" oncomplete="planningVesselsDialog.show();planningVesselsTable.clearFilters();" update="planningVesselsForm:planningVesselsTable" actionListener="#{dischargeBean.handleShowPlanningVessels}"/>
+            <p:remoteCommand name="showPlanningVessels2" onstart="freeze();" immediate="true" oncomplete="planningVesselsDialog.show();planningVesselsTable.clearFilters();" update="planningVesselsForm:planningVesselsTable" actionListener="#{dischargeBean.handleShowPlanningVessels2}"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

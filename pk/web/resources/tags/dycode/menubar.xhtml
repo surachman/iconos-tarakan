@@ -1,0 +1,323 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:cc="http://java.sun.com/jsf/composite"
+      xmlns:p="http://primefaces.prime.com.tr/ui"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <!-- INTERFACE -->
+    <cc:interface>
+    </cc:interface>
+
+    <!-- IMPLEMENTATION -->
+    <cc:implementation>
+        <style type="text/css">
+            /*Let submenu width be based on content*/
+            .wijmo-wijmenu .wijmo-wijmenu-parent .wijmo-wijmenu-child {
+                width: auto;
+                white-space: nowrap;
+            }
+            /*Prevent rightward facing icons from wrapping*/
+            .wijmo-wijmenu-parent > .wijmo-wijmenu-link > span.ui-icon-triangle-1-e {
+                position: absolute;
+                height:16px;
+                top:50%;
+                margin-top:-8px;
+                right: -8px;
+            }
+            /*Make room for righward facing icons*/
+            .wijmo-wijmenu ul.wijmo-wijmenu-child {
+                padding-right: 16px !important;
+            }
+            /*Set link width, which affects submenu overlap and is related to rightward facing icon padding*/
+            .wijmo-wijmenu-child .wijmo-wijmenu-link {
+                width: 100% !important;
+            }
+            /*Prevent menuitem icon from generating a line break. Also make room for left-side icon.  Note: we use relative parent absolute child strategy*/
+            .wijmo-wijmenu-child > .wijmo-wijmenu-item > .wijmo-wijmenu-link > .wijmo-wijmenu-text {
+                position: relative !important;
+                margin-left: 5px !important;
+            }
+            .wijmo-wijmenu-child > .wijmo-wijmenu-item > .wijmo-wijmenu-link > .wijmo-wijmenu-text > .wijmo-wijmenu-icon-left {
+                position: absolute;
+                height:16px;
+                top:50%;
+                margin-top:-8px;
+                left: -16px;
+            }
+            /*Set border (this is specific to black-tie theme)*/
+            .ui-widget-content, .wijmo-wijmenu .ui-widget-content {
+                border: 1px solid #CCCCCC;
+            }
+
+        </style>
+
+        <p:menubar autoSubmenuDisplay="true">
+            <p:menuitem value="#{msg['menu.home']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Home.xhtml"/>
+            <p:submenu label="#{msg['menu.planning']}">
+                <p:menuitem value="#{msg['menu.planning.ship_arrival_planning']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/BookingList.xhtml"/>
+                <p:menuitem value="#{msg['menu.planning.booking_online_list']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/BookingOnlineList.xhtml"/>
+                <p:menuitem value="#{msg['menu.planning.vessel_schedule']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/VesselList.xhtml"/>
+                <p:submenu label="#{msg['menu.planning.vessel_operation_planning']}">
+                    <p:menuitem value="#{msg['menu.planning.vessel_operation_planning.bay_plan_discharge']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/VesselOperationPlanning/BayPlanDischarge.xhtml"/>
+                    <p:menuitem value="#{msg['menu.planning.vessel_operation_planning.bay_plan_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/VesselOperationPlanning/BayPlanLoad.xhtml"/>                    
+                </p:submenu>
+                <p:submenu label="#{msg['menu.planning.yard_operation_planning']}">
+                    <p:submenu label="#{msg['menu.planning.yard_operation_planning.load']}">
+                        <p:menuitem value="#{msg['menu.planning.yard_operation_planning.load.receiving_loading_list']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/YardOperationPlanning/Load/PlanningContReceiving.xhtml"/>
+                        <p:menuitem value="#{msg['menu.planning.yard_operation_planning.load.receiving_yard_allocation']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/YardOperationPlanning/Load/ReceivingYardAllocation.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.planning.yard_operation_planning.discharge']}">
+                        <p:menuitem value="#{msg['menu.planning.yard_operation_planning.discharge.discharge_yard_allocation']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/YardOperationPlanning/Discharge/DischargeYardAllocation.xhtml"/>
+                        <p:menuitem value="#{msg['menu.planning.yard_operation_planning.discharge.change_discharge_yard_allocation']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/YardOperationPlanning/Discharge/ChangeDischargeYardAllocation.xhtml"/>
+                        <p:menuitem value="#{msg['menu.planning.yard_operation_planning.discharge.transhipment_yard_allocation']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/YardOperationPlanning/Discharge/TranshipmentYardAllocation.xhtml"/>
+                    </p:submenu>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.planning.baplie']}">
+                    <p:menuitem value="#{msg['menu.planning.baplie.generate_baplie']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/Baplie/GenerateBaplie.xhtml"/>
+                    <p:menuitem value="#{msg['menu.planning.baplie.download_baplie']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/Baplie/DownloadBaplie.xhtml"/>
+                </p:submenu>
+                <p:menuitem value="#{msg['menu.planning.transhipment_planning']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/TranshipmentPlanning.xhtml"/>
+                <p:menuitem value="#{msg['menu.planning.shifting_planning']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/ShiftingPlanning.xhtml"/>
+                <p:menuitem value="#{msg['menu.planning.uncontainerized_planning']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/UncontainerizedPlanning.xhtml"/>
+                <p:menuitem value="#{msg['menu.planning.discharge_list']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/DischargeList.xhtml"/>
+                <p:menuitem value="#{msg['menu.planning.loading_list']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/LoadingList.xhtml"/>
+                <p:menuitem value="#{msg['menu.planning.end_planning_discharge']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Planning/EndPlanningDischarge.xhtml"/>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.vessel_operation']}">
+                <p:menuitem value="#{msg['menu.vessel_operation.load_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/LoadConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.vessel_operation.discharge_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/DischargeConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.vessel_operation.transhipment_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/TranshipmentConfirm.xhtml"/>
+                <p:submenu label="#{msg['menu.vessel_operation.shifting_confirm']}">
+                    <p:menuitem value="#{msg['menu.vessel_operation.shifting_confirm.with_plan']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/ShiftingConfirm/WithPlan.xhtml"/>
+                    <p:menuitem value="#{msg['menu.vessel_operation.shifting_confirm.without_plan']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/ShiftingConfirm/WithoutPlan.xhtml"/>
+                </p:submenu>
+                <p:menuitem value="#{msg['menu.vessel_operation.hatch_moves_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/HatchMoveConfirm.xhtml"/>
+                <p:submenu label="#{msg['menu.vessel_operation.vessel_service']}">
+                    <p:menuitem value="#{msg['menu.vessel_operation.vessel_service.start_service_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/VesselService/StartService.xhtml"/>
+                    <p:menuitem value="#{msg['menu.vessel_operation.vessel_service.vessel_service_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/VesselService/VesselService.xhtml"/>
+                    <p:menuitem value="#{msg['menu.vessel_operation.vessel_service.end_service_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/VesselService/EndService.xhtml"/>
+                </p:submenu>
+                <p:menuitem value="#{msg['menu.vessel_operation.insert_idle_time']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/VesselOperation/InsertIdleTime.xhtml"/>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.yard_operation']}">
+                <p:menuitem value="#{msg['menu.yard_operation.placement_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/PlacementConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.yard_operation.unplacement_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/UnplacementConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.yard_operation.delivery_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/DeliveryConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.yard_operation.receiving_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ReceivingConfirm.xhtml"/>
+                <p:submenu label="#{msg['menu.yard_operation.plugging_confirm']}">
+                    <p:menuitem value="#{msg['menu.yard_operation.Delivery_plugging']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/PluggingConfirm/PluggingDelivery.xhtml"/>
+                    <p:menuitem value="#{msg['menu.yard_operation.Receiving_plugging']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/PluggingConfirm/PluggingReceiving.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.yard_operation.reefer_confirm']}">
+                    <p:menuitem value="#{msg['menu.yard_operation.reefer_confirm.reefer_discharge']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ReeferConfirm/ReeferDischarge.xhtml"/>
+                    <p:menuitem value="#{msg['menu.yard_operation.reefer_confirm.reefer_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ReeferConfirm/ReeferLoad.xhtml"/>
+                    <p:menuitem value="#{msg['menu.yard_operation.reefer_confirm.plugging_only']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ReeferConfirm/PluggingOnly.xhtml"/>
+                </p:submenu>               
+                <p:menuitem value="#{msg['menu.yard_operation.container_movement']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ContMovement.xhtml"/>               
+                <p:submenu label="#{msg['menu.yard_operation.change_status']}">
+                    <p:menuitem value="#{msg['menu.yard_operation.discharge_to_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ChangeStatus/DischargeToLoad.xhtml"/>
+                    <p:menuitem value="#{msg['menu.yard_operation.change_of_destination']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ChangeStatus/ChangeOfDestination.xhtml"/>
+                    <p:menuitem value="#{msg['menu.yard_operation.transhipment_delivery']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ChangeStatus/TranshipmentToDelivery.xhtml"/>
+                    <p:menuitem value="#{msg['menu.yard_operation.change_status.plugging_to_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/YardOperation/ChangeStatus/TranshipmentToDelivery.xhtml"/>
+                </p:submenu>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.gate_operation']}">
+                <p:menuitem value="#{msg['menu.gate_operation.gate_operation_in']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/GateOperation/GateIn.xhtml"/>
+                <p:menuitem value="#{msg['menu.gate_operation.gate_operation_out']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/GateOperation/GateOut.xhtml"/>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.cfs_operation']}">
+                <p:menuitem value="#{msg['menu.cfs_operation.stripping_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/CfsOperation/StrippingConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.cfs_operation.stuffing_confirm']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/CfsOperation/StuffingConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.cfs_operation.goods_receiving']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/CfsOperation/GoodsReceivingConfirm.xhtml"/>
+                <p:menuitem value="#{msg['menu.cfs_operation.goods_delivery']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/CfsOperation/GoodsDelivery.xhtml"/>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.billing']}">
+                <p:menuitem value="#{msg['menu.billing.service_registration']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceRegistration.xhtml"/>
+                <p:submenu label="#{msg['menu.billing.service_process']}">
+                    <p:submenu label="#{msg['menu.billing.service_process.entry_delivery']}">
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_delivery.entry_delivery_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryDelivery/EntryDeliveryService.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_delivery.entry_delivery_uc_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryDelivery/EntryDeliveryUcService.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_delivery.entry_goods_delivery']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryDelivery/EntryGoodsDelivery.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.billing.service_process.entry_receiving']}">
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_receiving.entry_receiving_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryReceiving/EntryReceivingService.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_receiving.entry_receiving_uc_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryReceiving/EntryReceivingUcService.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_receiving.entry_goods_receiving']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryReceiving/EntryGoodsReceiving.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.billing.service_process.entry_reefers']}">
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_reefers.entry_discharge_reefer']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryReefer/EntryDischargeReefer.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_reefers.entry_reefer_muat']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryReefer/EntryReeferMuat.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.service_process.entry_reefers.entry_plugging_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryReefer/EntryPluggingService.xhtml"/>
+                    </p:submenu>
+                    <p:menuitem value="#{msg['menu.billing.service_process.entry_penumpukan_susulan']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryPenumpukanSusulan.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.service_process.entry_penumpukan_susulan_uc']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryPenumpukanSusulanUc.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.service_process.entry_angsur_petikemas']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryAngsurPetikemas.xhtml"/>                   
+                    <p:menuitem value="#{msg['menu.billing.service_process.entry_behandle']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryBehandle.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.service_process.entry_stripping']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryStripping.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.service_process.entry_stuffing']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/EntryStuffing.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.service_process.entry_cancel_loading']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/ServiceProcess/CancelLoading.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.billing.perhitungan_service']}">
+                    <p:submenu label="#{msg['menu.billing.perhitungan_service.perhitungan_delivery']}">
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_delivery.perhitungan_delivery_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganDelivery/Delivery.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_delivery.perhitungan_delivery_uc_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganDelivery/DeliveryUc.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_delivery.perhitungan_goods_delivery']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganDelivery/PerhitunganGoodsDelivery.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.billing.perhitungan_service.perhitungan_receiving']}">
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_receiving.perhitungan_receiving_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganReceiving/Receiving.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_receiving.perhitungan_receiving_uc_service']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganReceiving/ReceivingUc.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_receiving.perhitungan_goods_receiving']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganReceiving/PerhitunganGoodsReceiving.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.billing.perhitungan_service.perhitungan_service']}">
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_service.perhitungan_penumpukan_susulan']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganJasa/PenumpukanSusulan.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_service.perhitungan_penumpukan_susulan_uc']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganJasa/PenumpukanSusulanUc.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_service.perhitungan_jasa_angsur']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganJasa/Angsur.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.billing.perhitungan_service.perhitungan_reefer']}">
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.perhitungan_discharge_reefer']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganReefer/DischargeReefer.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.perhitungan_load_reefer']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganReefer/LoadReefer.xhtml"/>                        
+                        <p:submenu label="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.perhitungan_plugging_reefer']}">
+                            <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.perhitungan_plugging_receiving']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganReefer/Plugging/PluggingReceiving.xhtml"/>
+                            <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_reefer.perhitungan_plugging_delivery']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganReefer/Plugging/PluggingDelivery.xhtml"/>
+                        </p:submenu>
+                    </p:submenu>
+                    <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_behandle']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/Behandle.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_stripping']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/Stripping.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_stuffing']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/Stuffing.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_cancel_loading']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganCancelLoading.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.perhitungan_service.perhitungan_change_status']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PerhitunganService/PerhitunganChangeStatus.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.billing.job_slip']}">
+                    <p:menuitem value="#{msg['menu.billing.job_slip.job_slip_delivery_receiving']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/DeliveryReceiving.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.job_slip.job_slip_reefer']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/Reefer.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.job_slip.job_slip_stripping_stuffing']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/StrippingStuffing.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.job_slip.job_slip_delivery_receiving_uc']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/DeliveryReceivingUC.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.job_slip.job_slip_behandle']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/JobslipBehandle.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.job_slip.job_slip_delivery_receiving_goods']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/JobslipDeliveryReceivingGoods.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.job_slip.job_slip_cancel_loading']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/JobslipCancelLoading.xhtml"/>
+                    <p:submenu label="#{msg['menu.billing.job_slip.plugging_only']}">
+                        <p:menuitem value="#{msg['menu.billing.job_slip.plugging.jobsip_receiving_plugging']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/Plugging/ReceivingPlugging.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.job_slip.plugging.jobsip_delivery_plugging']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/JobSlip/Plugging/DeliveryPlugging.xhtml"/>
+                    </p:submenu>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.billing.vessel_productivity_recap']}">
+                    <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.receiving_recap_container']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/ReceivingRecap.xhtml"/>
+                    <p:submenu label="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage']}">
+                        <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage.load_recap']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/Storage/LoadRecap.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage.discharge_recap']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/Storage/DischargeRecap.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage.transhipment_recap']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/Storage/TranshipmentRecap.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage_uc']}">
+                        <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage_uc.discharge_recap_uc']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/StorageUc/DischargeUcRecap.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.vessel_productivity_recap_storage_uc.load_recap_uc']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/StorageUc/LoadUcRecap.xhtml"/>
+                    </p:submenu>
+                    <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.hatch_moves']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/HatchMoves.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.shifting']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/Shifting.xhtml"/>
+                    <p:submenu label="#{msg['menu.billing.vessel_productivity_recap.transhipment']}">
+                        <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.transhipment.transhipment_discharge']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/transhipment/Transhipment.xhtml"/>
+                        <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.transhipment.transhipment_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/transhipment/TranshipmentLoad.xhtml"/>
+                    </p:submenu>
+                    <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.cfs']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/CfsRecap.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.handling_discharge_preview']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/HandlingDischargePreview.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.vessel_productivity_recap.handling_load_preview']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/VesselProductivityRecap/HandlingLoadPreview.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.billing.count']}">
+                    <p:menuitem value="#{msg['menu.billing.count.vessel_prod_count_load_handling']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/Count/VesselProdCountLoadHandling.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.count.vessel_prod_count_discharge_handling']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/Count/VesselProdCountDischargeHandling.xhtml"/>
+                </p:submenu>
+                <p:menuitem value="#{msg['menu.billing.cash_invoice']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/CashInvoice.xhtml"/>
+                <p:menuitem value="#{msg['menu.billing.print_credit_invoice']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/PrintCreditInvoice.xhtml"/>
+                <p:menuitem value="#{msg['menu.billing.batal_nota']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/BatalNota.xhtml"/>
+                <p:submenu label="#{msg['menu.billing.handling_invoice']}">
+                    <p:menuitem value="#{msg['menu.billing.handling_invoice.handling_invoice_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/HandlingInvoice/HandlingLoadInvoice.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.handling_invoice.handling_invoice_discharge']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/HandlingInvoice/HandlingDischargeInvoice.xhtml"/>
+                </p:submenu>
+                <p:menuitem value="#{msg['menu.billing.nota_manual']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/NotaManual.xhtml"/>
+                <p:menuitem value="#{msg['menu.billing.journal']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Billing/Journal.xhtml"/>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.invoice']}">
+                <p:submenu label="#{msg['menu.billing.handling_invoice']}">
+                    <p:menuitem value="#{msg['menu.billing.handling_invoice.handling_invoice_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/NewMenu/HandlingInvoice/HandlingLoadInvoice.xhtml"/>
+                    <p:menuitem value="#{msg['menu.billing.handling_invoice.handling_invoice_discharge']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/NewMenu/HandlingInvoice/HandlingDischargeInvoice.xhtml"/>
+                </p:submenu>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.monitoring']}">
+                <p:menuitem value="#{msg['menu.monitoring.discharge_monitoring']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/DischargeMonitoring.xhtml"/>
+                <p:menuitem value="#{msg['menu.monitoring.load_monitoring']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/LoadMonitoring.xhtml"/>
+                <p:submenu label="#{msg['menu.monitoring.yard_monitoring']}">
+                    <p:menuitem value="#{msg['menu.monitoring.yard_monitoring.side_view']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/YardMonitoring/SideView.xhtml"/>
+                    <p:menuitem value="#{msg['menu.monitoring.yard_monitoring.bird_view']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/YardMonitoring/BirdView.xhtml"/>
+                </p:submenu>
+                <p:menuitem value="#{msg['menu.monitoring.berth_monitoring']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/BerthMonitoring.xhtml"/>
+                <p:menuitem value="#{msg['menu.monitoring.monitoring']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/Monitoring.xhtml"/>
+                <p:menuitem value="#{msg['menu.monitoring.truck_monitoring']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/MonitoringTruck.xhtml"/>
+                <p:menuitem value="#{msg['menu.monitoring.vessel_monitoring']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/MonitoringVessel.xhtml"/>
+                <p:menuitem value="#{msg['menu.monitoring.yard_monitoring_planning']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/YardPlanningMonitoring.xhtml"/>
+                <p:menuitem value="#{msg['menu.monitoring.receiving_monitoring_plan_gate_cy']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/ReceivingPlanGateCyMonitoring.xhtml"/>
+                <p:submenu label="#{msg['menu.monitoring.container']}">
+                    <p:menuitem value="#{msg['menu.monitoring.container_discharge']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/MonitoringContainer/MonitoringContainerDischarge.xhtml"/>
+                    <p:menuitem value="#{msg['menu.monitoring.container_load']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/MonitoringContainer/MonitoringContainerLoad.xhtml"/>
+                    <p:menuitem value="#{msg['menu.monitoring.container_his']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/MonitoringContainer/MonitoringHistoryContainer.xhtml"/>
+                </p:submenu>
+                
+                <p:menuitem value="#{msg['menu.monitoring.bay_monitoring']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Monitoring/BayMonitoring.xhtml"/>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.data_master']}">
+                <p:submenu label="#{msg['menu.data_master.customer']}">
+                    <p:menuitem value="#{msg['menu.data_master.customer.type']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Customer/MasterCustType.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.customer']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Customer/MasterCustomer.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.data_master.finance']}">
+                    <p:menuitem value="#{msg['menu.data_master.finance.master_currency']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Finance/MasterCurrency.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.finance.master_tarif']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Finance/MasterTarif.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.finance.master_materai']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Finance/MasterMaterai.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.finance.master_discount']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Finance/MasterDiscount.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.data_master.port_utility']}">
+                    <p:submenu label="#{msg['menu.data_master.port_utility.vessel']}">
+                        <p:menuitem value="#{msg['menu.data_master.port_utility.vessel.master_vessel']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/Vessel/MasterVessel.xhtml"/>
+                        <p:menuitem value="#{msg['menu.data_master.port_utility.vessel.master_vessel_type']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/Vessel/MasterVesselType.xhtml"/>
+                        <p:menuitem value="#{msg['menu.data_master.port_utility.vessel.master_vessel_profile']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/Vessel/MasterVesselProfile.xhtml"/>
+                    </p:submenu>
+                    <p:submenu label="#{msg['menu.data_master.port_utility.commodity']}">
+                        <p:menuitem value="#{msg['menu.data_master.port_utility.commodity.master_commodity']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/Commodity/MasterCommodity.xhtml"/>
+                        <p:menuitem value="#{msg['menu.data_master.port_utility.commodity.master_commodity_type']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/Commodity/MasterCommodityType.xhtml"/>
+                    </p:submenu>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_port']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterPort.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_yard']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterYard.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_container_type']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterContainerType.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_dock']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterDock.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_vehicle']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterVehicle.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_equipment']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterEquipment.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_device']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterDevice.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_operator']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterOperator.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_owner']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterOwner.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_plugging']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterPlugging.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.port_utility.master_yard_type']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/PortUtility/MasterYardType.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.data_master.others']}">
+                    <p:menuitem value="#{msg['menu.data_master.others.anggaran.master_anggaran']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/Anggaran/MasterAnggaran.xhtml"/>
+                    <p:submenu label="#{msg['menu.data_master.others.idletime']}">
+                        <p:menuitem value="#{msg['menu.data_master.others.idletime.master_idletime']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/IdleTime/MasterIdleTime.xhtml"/>
+                        <p:menuitem value="#{msg['menu.data_master.others.idletime.master_idletime_type']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/IdleTime/MasterIdleTimeType.xhtml"/>
+                    </p:submenu>
+                    <p:menuitem value="#{msg['menu.data_master.others.master_activity']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/MasterActivity.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.others.master_country']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/MasterCountry.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.others.master_container']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/MasterContainer.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.others.closing_time']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/UpdateClosingTime.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.others.utilisasi_alat']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/UtilisasiAlat.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.others.searching_container']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Others/SearchingContainer.xhtml"/>
+                </p:submenu>
+                <p:submenu label="#{msg['menu.data_master.application']}">
+                    <p:menuitem value="#{msg['menu.data_master.application.master_view']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Application/MasterView.xhtml"/>
+                    <p:menuitem value="#{msg['menu.data_master.application.master_setting_app']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Master/Application/MasterSettingApp.xhtml"/>
+                </p:submenu>
+            </p:submenu>
+            <p:submenu label="#{msg['menu.report']}">
+                <p:menuitem value="#{msg['menu.report']}" url="#{facesContext.externalContext.requestContextPath}/../faces/modules/Report/RekapitulasiReport.xhtml"/>
+            </p:submenu>
+        </p:menubar>
+    </cc:implementation>
+</html>

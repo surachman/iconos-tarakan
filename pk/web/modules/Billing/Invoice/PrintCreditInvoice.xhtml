@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="bundles">
+
+    </ui:define>
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.invoice.print_credit_invoice']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+             function handleDownloadRequest(args) {
+                if(args.doPrint) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <!--        <h:form id="multipleSelect">
+                    <p:panel >
+                        <h:panelGrid columns="5" id="cari">
+                            <h:outputLabel value="Masukan Bl No *" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="{receivingBean.receivingService.blNo}" requiredMessage="{msg['application.validation.required']}" size="35"/>
+                            <p:commandButton onstart="freeze();" image="ui-icon-search" value="{msg['application.operation.search']}" style="font-size: x-small" actionListener="{receivingBean.cariBlNo}" update="multipleSelect growl listData">
+                                <f:attribute name="blNo" value="{receivingBean.receivingService.blNo}"/>
+                            </p:commandButton>
+                            <p:commandButton onstart="freeze();" image="ui-icon-search" value="{msg['application.operation.show_all']}" style="font-size: x-small" actionListener="{receivingBean.cariBlNo2}" update="multipleSelect growl listData">
+                                <f:attribute name="blNo" value="{receivingBean.receivingService.blNo}"/>
+                            </p:commandButton>
+                        </h:panelGrid>
+                        <br/>
+                    </p:panel>
+                </h:form>
+                <p:spacer height="20px"/>-->
+        <h:form id="fmmain">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{printCreditInvoiceBean.invoiceCredits}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="tableInvoices" rowIndexVar="number">
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;"/>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No. Registrasi" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No. Invoice" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[7]}" sortBy="#{item[7]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No. Faktur Pajak" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[5]}" sortBy="#{item[5]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Debitur" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>                
+
+                <p:column  filterMatchMode="contains" sortBy="#{item[2]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Total Tagihan" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                    <h:outputText value="#{item[2]}"><f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" /></h:outputText>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>                       
+                        <p:commandButton disabled="#{not empty item[1]}" value="#{msg['application.operation.print']}" actionListener="#{printCreditInvoiceBean.doFirstPrint}" oncomplete="handleDownloadRequest(args)" update="fmmain:tableInvoices" onstart="freeze()">
+                            <f:attribute name="noReg" value="#{item[0]}"/>
+                            <f:attribute name="to" value="#{item[2]}"/>
+                            <f:attribute name="curr" value="#{item[10]}"/>
+                            <f:attribute name="tipe" value="#{item[8]}"/>
+                            <f:attribute name="noPpkb" value="#{item[9]}"/>
+                            <f:attribute name="username" value="#{loginSessionBean.username}"/>
+                        </p:commandButton>
+                        <p:commandButton disabled="#{empty item[1]}" value="#{msg['application.operation.reprint']}" actionListener="#{printCreditInvoiceBean.doReprint}" oncomplete="handleDownloadRequest(args)" onstart="freeze()">
+                            <f:attribute name="noReg" value="#{item[0]}"/>
+                            <f:attribute name="to" value="#{item[2]}"/>
+                            <f:attribute name="curr" value="#{item[10]}"/>
+                            <f:attribute name="tipe" value="#{item[8]}"/>
+                            <f:attribute name="noPpkb" value="#{item[9]}"/>
+                            <f:attribute name="username" value="#{loginSessionBean.username}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

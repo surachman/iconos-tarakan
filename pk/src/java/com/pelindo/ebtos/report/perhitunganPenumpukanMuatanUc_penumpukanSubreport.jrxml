@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="perhitunganPenumpukanBongkaran_penumpukanSubreport" language="groovy" pageWidth="802" pageHeight="555" orientation="Landscape" columnWidth="802" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.2100000000000006"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="no_ppkb" class="java.lang.String"/>
+	<parameter name="language" class="java.lang.String"/>
+	<parameter name="country" class="java.lang.String"/>
+	<parameter name="fraction_digits" class="java.lang.Integer"/>
+	<parameter name="curr_code" class="java.lang.String"/>
+	<parameter name="ppn" class="java.math.BigDecimal"/>
+	<queryString>
+		<![CDATA[SELECT us.bl_no,
+  mc.name commodity,
+  us.weight,
+  us.cubication,
+  us.is_export_import,
+  us.unit,
+  CASE
+    WHEN rpu.activity IS NULL
+    OR rpu.activity    = 'SHIFTING'
+    THEN 'RESHIPPING'
+    ELSE rpu.activity
+  END activity,
+  ugs.date_in,
+  CASE
+    WHEN us.operation = 'LOAD'
+    THEN
+      CASE
+        WHEN us.truck_loosing = 'TRUE'
+        THEN e_load.start_time
+        ELSE e_lo.start_time
+      END
+    ELSE e_reship.start_time
+  END transaction_date,
+  NVLN(
+  CASE
+    WHEN us.operation = 'LOAD'
+    THEN rpu.total_hari
+    ELSE 0
+  END) total_hari,
+  NVLN(
+  CASE
+    WHEN us.operation = 'LOAD'
+    THEN rpu.masa_1
+    ELSE 0
+  END) masa_1,
+  NVLN(
+  CASE
+    WHEN us.operation = 'LOAD'
+    THEN rpu.charge_masa_1
+    ELSE 0
+  END) charge_masa_1,
+  NVLN(
+  CASE
+    WHEN us.operation = 'LOAD'
+    THEN rpu.masa_2
+    ELSE 0
+  END) masa_2,
+  NVLN(
+  CASE
+    WHEN us.operation = 'LOAD'
+    THEN rpu.charge_masa_2
+    ELSE 0
+  END) charge_masa_2,
+  NVLN(
+  CASE
+    WHEN us.operation = 'LOAD'
+    THEN rpu.total_charge
+    ELSE 0
+  END) total_charge
+FROM uncontainerized_service us
+JOIN m_commodity mc
+ON (us.commodity=mc.commodity_code)
+LEFT JOIN uc_receiving_service urs
+ON (us.id_uc=urs.id_uc)
+LEFT JOIN uc_gatereceiving_service ugs
+ON (urs.jobslip=ugs.jobslip)
+LEFT JOIN equipment e_lo
+ON (us.bl_no                =e_lo.bl_no
+AND us.no_ppkb              =e_lo.no_ppkb
+AND e_lo.operation          = 'LOADUC'
+AND e_lo.equipment_act_code = 'LIFTON')
+LEFT JOIN equipment e_load
+ON (us.bl_no                  =e_load.bl_no
+AND us.no_ppkb                =e_load.no_ppkb
+AND e_load.operation          = 'LOADUC'
+AND e_load.equipment_act_code = 'STEVEDORING')
+LEFT JOIN equipment e_reship
+ON (us.bl_no                    =e_reship.bl_no
+AND us.no_ppkb                  =e_reship.no_ppkb
+AND e_reship.operation          = 'SHIFTING-LANDED'
+AND e_reship.equipment_act_code = 'STEVEDORING')
+LEFT JOIN recap_penumpukan_uc rpu
+ON (rpu.bl_no     =us.bl_no
+AND rpu.no_ppkb   =us.no_ppkb
+AND us.operation  =rpu.operation
+AND rpu.curr_code = $P{curr_code}
+)
+WHERE us.no_ppkb  = $P{no_ppkb}
+AND (us.operation = 'LOAD'
+OR us.shift_to   IN ('LANDED', 'TOCY'))]]>
+	</queryString>
+	<field name="bl_no" class="java.lang.String"/>
+	<field name="commodity" class="java.lang.String"/>
+	<field name="weight" class="java.lang.Integer"/>
+	<field name="cubication" class="java.lang.Double"/>
+	<field name="is_export_import" class="java.lang.String"/>
+	<field name="unit" class="java.lang.Integer"/>
+	<field name="activity" class="java.lang.String"/>
+	<field name="date_in" class="java.sql.Timestamp"/>
+	<field name="transaction_date" class="java.sql.Timestamp"/>
+	<field name="total_hari" class="java.lang.Integer"/>
+	<field name="masa_1" class="java.lang.Integer"/>
+	<field name="charge_masa_1" class="java.math.BigDecimal"/>
+	<field name="masa_2" class="java.lang.Integer"/>
+	<field name="charge_masa_2" class="java.math.BigDecimal"/>
+	<field name="total_charge" class="java.math.BigDecimal"/>
+	<variable name="total" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{total_charge}]]></variableExpression>
+		<initialValueExpression><![CDATA[BigDecimal.ZERO]]></initialValueExpression>
+	</variable>
+	<variable name="total_masa1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{masa_1}]]></variableExpression>
+	</variable>
+	<variable name="total_biaya_masa1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{charge_masa_1}]]></variableExpression>
+	</variable>
+	<variable name="total_masa2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{masa_2}]]></variableExpression>
+	</variable>
+	<variable name="total_biaya_masa2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{charge_masa_2}]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="56" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="0" width="65" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[BL NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="85" y="0" width="64" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[COMMODITY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="149" y="0" width="43" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[WEIGHT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="192" y="0" width="30" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[VOL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="222" y="0" width="30" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[O/I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="252" y="0" width="32" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ACT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="284" y="0" width="24" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[UNIT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="371" y="0" width="63" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[START WORK DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="434" y="0" width="35" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[TOTAL HARI]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="469" y="38" width="34" height="18"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PROD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="503" y="38" width="79" height="18"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[BIAYA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="0" width="20" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[NO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="695" y="0" width="107" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[BIAYA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="469" y="0" width="226" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PENUMPUKAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="308" y="0" width="63" height="56"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[GATE IN DATE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="616" y="38" width="79" height="18"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[BIAYA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="582" y="38" width="34" height="18"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PROD]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="469" y="20" width="113" height="18"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[MASA I]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="582" y="20" width="113" height="18"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[MASA II]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement x="20" y="0" width="65" height="20"/>
+				<box leftPadding="2" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{bl_no}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="85" y="0" width="64" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{commodity}.toLowerCase()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="149" y="0" width="43" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{weight}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="192" y="0" width="30" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{cubication}.intValue()]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="222" y="0" width="30" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{is_export_import}.contentEquals("TRUE") ? "O" : "I"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="252" y="0" width="32" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{activity}.substring(0,4)]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="284" y="0" width="24" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{unit}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MM-yyyy" isBlankWhenNull="true">
+				<reportElement x="371" y="0" width="63" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{transaction_date}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="434" y="0" width="35" height="20"/>
+				<box leftPadding="0" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{total_hari}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="469" y="0" width="34" height="20"/>
+				<box leftPadding="0" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{masa_1}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="503" y="0" width="79" height="20"/>
+				<box leftPadding="0" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$F{charge_masa_1},false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="20" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="695" y="0" width="107" height="20"/>
+				<box leftPadding="0" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$F{total_charge},false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd-MM-yyyy" isBlankWhenNull="true">
+				<reportElement x="308" y="0" width="63" height="20"/>
+				<box leftPadding="0" rightPadding="0">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{date_in}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="616" y="0" width="79" height="20"/>
+				<box leftPadding="0" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$F{charge_masa_2},false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="582" y="0" width="34" height="20"/>
+				<box leftPadding="0" rightPadding="2">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{masa_2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<lastPageFooter>
+		<band height="62">
+			<rectangle>
+				<reportElement x="413" y="3" width="389" height="56"/>
+				<graphicElement>
+					<pen lineWidth="0.5"/>
+				</graphicElement>
+			</rectangle>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="695" y="4" width="107" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$V{total},false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="503" y="4" width="79" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$V{total_biaya_masa1},false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="469" y="4" width="34" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{total_masa1}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="413" y="23" width="282" height="18"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[TAX  :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="413" y="41" width="282" height="18"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[GENERAL TOTAL  :]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="695" y="23" width="107" height="18" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$V{total}.multiply($P{ppn}),false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="695" y="41" width="107" height="18" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$V{total}.add($V{total}.multiply($P{ppn})),false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="413" y="4" width="56" height="19"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<text><![CDATA[TOTAL  :]]></text>
+			</staticText>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="616" y="4" width="79" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[com.qtasnim.el.QTasnim.getFormattedCurrency($P{language},$P{country},$V{total_biaya_masa2},false,$P{fraction_digits})]]></textFieldExpression>
+			</textField>
+			<textField pattern="" isBlankWhenNull="false">
+				<reportElement mode="Transparent" x="582" y="4" width="34" height="19" forecolor="#000000" backcolor="#FFFFFF"/>
+				<box rightPadding="2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" rotation="None" lineSpacing="Single" markup="none">
+					<font fontName="SansSerif" size="10" isBold="false" isItalic="false" isUnderline="false" isStrikeThrough="false" pdfFontName="Helvetica" pdfEncoding="Cp1252" isPdfEmbedded="false"/>
+				</textElement>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{total_masa2}]]></textFieldExpression>
+			</textField>
+		</band>
+	</lastPageFooter>
+</jasperReport>

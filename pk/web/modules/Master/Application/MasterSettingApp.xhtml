@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.application.master_setting_app']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.application.master_setting_app']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                if(!(args.validationFailed || args.isValid == false)) {
+                    dialogAddEdit.hide();
+                }
+            }
+
+            function cekAlphabetFloat(param) {
+                var regexNum = /^[0-9.]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+
+            function cekAlphabetInt(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+        <h:form id="formTable">
+            <p:dataTable value="#{masterSettingAppBean.settingApps}" var="item" id="settingAppTable" rowIndexVar="number">
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+                <f:facet name="footer">
+                    &nbsp;
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item.id}" filterMatchMode="contains" filterBy="#{item.id}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item.id}"/>
+                </p:column>
+                <p:column sortBy="#{item.description}" filterMatchMode="contains" filterBy="#{item.description}">
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item.description}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Value"/>
+                    </f:facet>
+                    <h:outputText rendered="#{not empty item.valueString}" value="#{item.valueString}"/>
+                    <h:outputText rendered="#{not empty item.valueInteger}" value="#{item.valueInteger}"/>
+                    <h:outputText rendered="#{not empty item.valueFloat}" value="#{item.valueFloat}"/>
+                    <h:outputText rendered="#{not empty item.valueBoolean}" value="#{item.valueBoolean}"/>
+                    <h:outputText rendered="#{not empty item.valueDate}" value="#{item.valueDate}">
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:outputText>
+                </p:column>
+                <p:column  style="width: 60px;text-align: center;">
+                    <center>
+                        <p:commandLink onstart="freeze();" rendered="#{item.editable == 1}" actionListener="#{masterSettingAppBean.handleEdit}" update="formEdit:settingAppEdit" oncomplete="dialogAddEdit.show();" value="[edit]" title="Edit Setting Application">
+                            <f:attribute name="idSettingApp" value="#{item.id}"/>
+                        </p:commandLink>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="formEdit">
+            <p:dialog modal="true"  widgetVar="dialogAddEdit" minWidth="400" header="Master Setting Application">
+                <p:panel>
+                    <h:panelGrid columns="3" id="settingAppEdit">
+                        <h:outputLabel value="Id: " for="id" />
+                        <h:inputText size="25" id="id" value="#{masterSettingAppBean.settingApp.id}" readonly="true"/>
+                        <p:message display="icon" for="id"/>
+
+                       
+                        <h:outputLabel rendered="#{empty masterSettingAppBean.settingApp.valueNip}" value="Description: " for="description" />
+                        <h:inputTextarea rendered="#{empty masterSettingAppBean.settingApp.valueNip}" style="width: 200px;" id="description" readonly="true" value="#{masterSettingAppBean.settingApp.description}" title="Description" />
+                        <h:outputLabel rendered="#{empty masterSettingAppBean.settingApp.valueNip}"/>
+
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueNip}" value="Description: " for="description" />
+                        <h:inputTextarea rendered="#{not empty masterSettingAppBean.settingApp.valueNip}" style="width: 200px;" id="description2" value="#{masterSettingAppBean.settingApp.description}" title="Description" />
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueNip}"/>
+
+                        
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueString}" value="Value String: " for="valueString" />
+                        <h:inputText rendered="#{not empty masterSettingAppBean.settingApp.valueString}" size="25" id="valueString" value="#{masterSettingAppBean.settingApp.valueString}" title="ValueString" />
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueString}"/>
+
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueInteger}" value="Value Integer: " for="valueInteger" />
+                        <h:inputText rendered="#{not empty masterSettingAppBean.settingApp.valueInteger}" size="25" id="valueInteger" value="#{masterSettingAppBean.settingApp.valueInteger}" title="ValueInteger" onkeyup="javascript:cekAlphabetInt(this);"/>
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueInteger}" value="must be numeric" style="font: italic smaller; color:red;"/>
+
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueFloat}" value="Value Float: " for="valueFloat" />
+                        <h:inputText rendered="#{not empty masterSettingAppBean.settingApp.valueFloat}" size="25" id="valueFloat" value="#{masterSettingAppBean.settingApp.valueFloat}" title="ValueFloat" onkeyup="javascript:cekAlphabetFloat(this);"/>
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueFloat}" value="must be numeric" style="font: italic smaller; color:red;"/>
+
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueDate}" value="Value Date: " for="valueDate" />
+                        <p:inputMask rendered="#{not empty masterSettingAppBean.settingApp.valueDate}" mask="99/99/9999 99:99" id="valueDate" value="#{masterSettingAppBean.settingApp.valueDate}" title="ValueDate" >
+                            <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                        </p:inputMask>
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueDate}"/>
+
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueBoolean}" value="Value Boolean " for="valueBoolean" />
+                        <h:selectBooleanCheckbox value="#{masterSettingAppBean.settingApp.valueBoolean}" rendered="#{not empty masterSettingAppBean.settingApp.valueBoolean}" id="valueBoolean"/>
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueBoolean}"/>
+                        
+                        
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueNip}" value="Value Nip " for="valueNip" />
+                        <h:inputText value="#{masterSettingAppBean.settingApp.valueNip}" rendered="#{not empty masterSettingAppBean.settingApp.valueNip}" required="true" id="valueNip"/>
+                        <h:outputLabel rendered="#{not empty masterSettingAppBean.settingApp.valueNip}"/>
+                        
+                        
+                        
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{masterSettingAppBean.handleSave}" update="growl formEdit:settingAppEdit formTable:settingAppTable menuBar" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

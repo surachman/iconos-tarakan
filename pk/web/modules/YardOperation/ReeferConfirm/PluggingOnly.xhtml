@@ -1,0 +1,486 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.yard_operation.reefer_confirm.plugging_only']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.yard_operation.reefer_confirm.plugging_only']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery-ui-timepicker-addon.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript">
+        jQuery('.cal').livequery(function(){
+            jQuery(this).datetimepicker({dateFormat:'dd/mm/yy'});
+        });
+        </script>
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^-?[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="registrationForm">
+            <h:panelGrid columns="4" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{pluggingOnlyBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{pluggingOnlyBean.registration.masterCustomer.name}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+        </h:form>
+
+        <h:form id="serviceReeferForm">
+            <p:growl id="growl" showDetail="true" globalOnly="true"/>
+            <p:dataTable paginatorPosition="bottom" rowIndexVar="No" var="item" value="#{pluggingOnlyBean.serviceReefers}"
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="serviceReeferDetail"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" disabled="#{empty pluggingOnlyBean.registration.noReg}" value="#{msg['application.operation.plugon']}" actionListener="#{pluggingOnlyBean.handlePlugOn}" update="plugOn:serviceReefer" oncomplete="dlg.show();" onclick="genTitle('dlgRefeer','#{msg['application.operation.add']} Plug On');"/>
+                    </div>
+                </f:facet>
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No"/>
+                    </f:facet>
+                    <h:outputText value="#{No+1}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Plug On" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Date" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column sortBy="#{item[9]}">
+                    <f:facet name="header">
+                        <h:outputText value="Plug Off" />
+                    </f:facet>
+                    <h:outputText rendered="#{not empty item[8]}" value="#{item[9]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[8]}">
+                    <f:facet name="header">
+                        <h:outputText value="Date" />
+                    </f:facet>
+                    <h:outputText value="#{item[8]}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" disabled="#{not empty item[8]}" value="on" image="ui-icon-pencil" title="Edit Plug On" actionListener="#{pluggingOnlyBean.handleSelectServiceReefer}" update="plugOn:serviceReefer" oncomplete="dlg.show();" onclick="genTitle('dlgRefeer','#{msg['application.operation.edit']} Plug On');">
+                            <f:attribute name="idSerReef" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" disabled="#{empty item[8]}" value="off" image="ui-icon-pencil" title="Edit Plug Off" actionListener="#{pluggingOnlyBean.handlePlugOff}" update="plugOn:serviceReefer" oncomplete="dlg.show();" onclick="genTitle('dlgRefeer','#{msg['application.operation.edit']} Plug Off');">
+                            <f:attribute name="idSerReef" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" disabled="#{not empty item[8]}" image="ui-icon-power" title="Plug Off" actionListener="#{pluggingOnlyBean.handlePlugOff}" update="plugOn:serviceReefer" oncomplete="dlg.show();" onclick="genTitle('dlgRefeer','Plug Off');">
+                            <f:attribute name="idSerReef" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" disabled="#{not empty item[8]}" image="ui-icon-zoomin" title="Monitoring" actionListener="#{pluggingOnlyBean.handleSelectServiceReefer}" update="monitoringForm reefmonForm reeferMonForm" oncomplete="dlgmonitoring.show();">
+                            <f:attribute name="idSerReef" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" image="ui-icon-trash" title="Delete Service Reefer" actionListener="#{pluggingOnlyBean.handleSelectServiceReefer}" oncomplete="confirmation.show();">
+                            <f:attribute name="idSerReef" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <!--reefer plug on plug off-->
+        <h:form id="plugOn">
+            <p:dialog header="Container Reefer"  widgetVar="dlg" modal="true" minWidth="500" id="dlgRefeer">
+                <p:panel id="serviceReefer">
+                    <h:panelGrid id="serviceCont" columns="5">
+                        <h:outputLabel value="Container No" />
+                        <p:spacer width="3"/>
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="cn" onkeypress="dlgCont.show();" onmousedown="dlgCont.show();" disabled="#{pluggingOnlyBean.editCont}" value="#{pluggingOnlyBean.serviceReefer.contNo}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}" />
+                        <h:panelGrid columns="2">
+                            <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgCont.show();" disabled="#{pluggingOnlyBean.editCont}"/>
+                            <p:message display="icon" for="cn"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="MLO" />
+                        <p:spacer width="3"/>
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.mlo.name}"/>
+                        <h:outputLabel/>
+
+                        <h:outputLabel value="Size" />
+                        <p:spacer width="3"/>
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.contSize}" size="25"/>
+                        <h:outputLabel/>
+                        
+                        <h:outputLabel value="Type" />
+                        <p:spacer width="3"/>
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.masterContainerType.name}" size="25"/>
+                        <h:outputLabel/>
+                        <h:outputLabel value="Status" />
+                        <p:spacer width="3"/>
+                        <h:outputLabel value=" : " />
+                        <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.contStatus}" size="25"/>
+                        <h:outputLabel/>
+                    </h:panelGrid>
+                    <br/>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="Kode Plugging *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu disabled="#{pluggingOnlyBean.kodePlug}" value="#{pluggingOnlyBean.serviceReefer.masterPluggingReefer.pluggingCode}">
+                            <f:selectItems value="#{pluggingOnlyBean.pluggingReefers}" var="i" itemValue="#{i.pluggingCode}" itemLabel="#{i.name}"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel/>
+                        <h:outputLabel value="Date Time *" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText id="datet" styleClass="cal" value="#{pluggingOnlyBean.plugOnOff}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                        </h:inputText>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                            <p:message display="icon" for="datet"/>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.confirm']}" actionListener="#{pluggingOnlyBean.handleConfirm}" update="serviceReeferForm:serviceReeferDetail serviceReeferForm:growl dialogContForm:pluggingReeferServ serviceReefer" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="button"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <!--reefer Monitoring-->
+        <p:dialog header="Monitoring Reefer"  widgetVar="dlgmonitoring" modal="true" minWidth="750" >
+            <p:panel id="monitoringReefer">
+                <h:form id="monitoringForm">
+                    <p:panel>
+                        <h:panelGrid columns="4" >
+                            <h:outputLabel value="Container No" />
+                            <p:spacer width="3"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.contNo}" size="25"/>
+                            <h:outputLabel value="MLO" />
+                            <p:spacer width="3"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.mlo.name}" size="25"/>
+                            <h:outputLabel value="Size" />
+                            <p:spacer width="3"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.contSize}" size="25"/>
+                            <h:outputLabel value="Type" />
+                            <p:spacer width="3"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.masterContainerType.name}" size="25"/>
+                            <h:outputLabel value="Status" />
+                            <p:spacer width="3"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{pluggingOnlyBean.serviceReefer.contStatus}" size="25"/>
+                        </h:panelGrid>
+                        <h:panelGrid id="changePlug" columns="4">
+                            <h:outputLabel value="Kode Plugging" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu disabled="#{pluggingOnlyBean.changePlug}" value="#{pluggingOnlyBean.serviceReefer.masterPluggingReefer.pluggingCode}">
+                                <f:selectItems value="#{pluggingOnlyBean.pluggingReefers}" var="i" itemValue="#{i.pluggingCode}" itemLabel="#{i.name}"/>
+                            </h:selectOneMenu>
+                            <p:commandButton onstart="freeze();" value="change" action="#{pluggingOnlyBean.enableChangePlug}" update="changePlug"/>
+                        </h:panelGrid>
+                    </p:panel>
+                </h:form>
+                <br />
+                <h:form id="reefmonForm">
+                    <p:panel id="reefMon">
+                        <h:panelGrid columns="5" >
+                            <h:outputLabel value="Date - Time *" />
+                            <p:spacer width="10"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="datet" required="true" requiredMessage="#{msg['application.validation.required']}" styleClass="cal" value="#{pluggingOnlyBean.reeferMonitoring.dateMontoring}" size="25">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:inputText>
+                            <h:panelGrid columns="2">
+                                <h:outputLabel value="dd/MM/yyyy HH:mm" style="color:red;"/>
+                                <p:message display="icon" for="datet"/>
+                            </h:panelGrid>
+                            <h:outputLabel value="Temperatur *" />
+                            <p:spacer width="10"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="tem" required="true" requiredMessage="#{msg['application.validation.required']}" value="#{pluggingOnlyBean.reeferMonitoring.temperature}" maxlength="3" size="25" onkeyup="javascript:cekAlphabet(this);">
+                                <f:convertNumber />
+                            </h:inputText>
+                            <h:panelGrid columns="3">
+                                <h:outputLabel value="&deg;C"/>
+                                <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                <p:message display="icon" for="tem"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                        <f:facet name="footer">
+                            <h:panelGroup>
+                                <div style="text-align: center;">
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{pluggingOnlyBean.handleAddReeferMonitoring}" update="reefmonForm:reefMon reeferMonForm:reeferMonTable monitoringForm:changePlug serviceReeferForm:growl"/>
+                                    <p:commandButton onstart="freeze();" value="#{msg['application.operation.clear']}" actionListener="#{pluggingOnlyBean.handleClear}" update="reefmonForm:reefMon"/>
+                                </div>
+                            </h:panelGroup>
+                        </f:facet>
+                    </p:panel>
+                </h:form>
+                <br />
+                <h:form id="reeferMonForm">
+                    <p:dataTable paginatorPosition="bottom" var="item" value="#{pluggingOnlyBean.reeferMonitorings}"
+                                 paginator="true" rowIndexVar="No" rows="10" rowsPerPageTemplate="5,10,15" id="reeferMonTable"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+
+                        <p:column style="text-align: center">
+                            <f:facet name="header">
+                                <h:outputText value="No"/>
+                            </f:facet>
+                            <h:outputText value="#{No+1}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Date Monitoring" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}">
+                                <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Temperatur (&deg;C)" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action"/>
+                            </f:facet>
+                            <center>
+                                <p:commandButton onstart="freeze();" image="ui-icon-pencil" title="Edit Reefer Monitoring" actionListener="#{pluggingOnlyBean.handleSelectMonitoring}" update="reefmonForm:reefMon" >
+                                    <f:attribute name="idRM" value="#{item[0]}"/>
+                                </p:commandButton>
+                                <p:commandButton onstart="freeze();" image="ui-icon-trash" title="Delete Reefer Monitoring" actionListener="#{pluggingOnlyBean.handleSelectMonitoring}" oncomplete="confirmation.show();">
+                                    <f:attribute name="idRM" value="#{item[0]}"/>
+                                </p:commandButton>
+                            </center>
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <h:form>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.exit']}" actionListener="#{pluggingOnlyBean.handleExit}" update="serviceReeferForm:serviceReeferDetail" oncomplete="dlgmonitoring.hide();"/>
+                        </h:form>
+                    </div>
+                </f:facet>
+            </p:panel>
+        </p:dialog>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" rowIndexVar="No" value="#{pluggingOnlyBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{pluggingOnlyBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail serviceReeferForm:serviceReeferDetail dialogContForm:pluggingReeferServ" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="dialogContForm">
+            <p:dialog header="Select Plugging Reefer Service"  widgetVar="dlgCont" modal="true" minWidth="800">
+                <p:dataTable var="item" rowIndexVar="No" value="#{pluggingOnlyBean.pluggingReeferServices}" id="pluggingReeferServ"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No"/>
+                        </f:facet>
+                        <h:outputText value="#{No+1}"/>
+                    </p:column>
+                    <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Job Slip" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                        <f:facet name="header">
+                            <h:outputText value="Container No" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Gross" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="OH/OW/OL" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Shift" />
+                        </f:facet>
+                        <h:outputText value="#{item[7]}" />
+                    </p:column>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{pluggingOnlyBean.handleSelectCont}" value="#{msg['application.operation.select']}" update="plugOn:serviceCont" oncomplete="dlgCont.hide();">
+                            <f:attribute name="idCont" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{pluggingOnlyBean.handleDelete}" update="reeferMonForm:reeferMonTable serviceReeferForm:serviceReeferDetail serviceReeferForm:growl dialogContForm:pluggingReeferServ" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

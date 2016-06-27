@@ -1,0 +1,175 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns="http://www.w3.org/1999/xhtml">
+    
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.discharge_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.discharge_monitoring']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" />
+        
+
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+        <h:form id="dischargeMonitoring">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{dischargeMonitoringPublic.serviceVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{dischargeMonitoringPublic.handleSelectNoPPKB}" value="select" update="dischargeMonitoring:serviceVesselDetail dischargeMonitoring:dischargeMonitoringTable" oncomplete="dlgVessel.hide();statusDialog.hide();">
+                            <f:attribute name="noPPKB" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{dischargeMonitoringPublic.serviceVessel[0]}" disabled="true" />
+                <p:commandButton image="ui-icon-folder-open" value="..." type="button" onclick="dlgVessel.show();"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{dischargeMonitoringPublic.serviceVessel[1]}" disabled="true" />
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{dischargeMonitoringPublic.serviceVessel[2]}" disabled="true" />
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{dischargeMonitoringPublic.serviceVessel[3]}" disabled="true" />
+                <h:outputText />
+            </h:panelGrid>
+            <br/>
+            <!-- LIST DATA DISCHARGE MONITORING  -->
+            <p:dataTable id="dischargeMonitoringTable" paginatorPosition="bottom" var="item" value="#{dischargeMonitoringPublic.dischargeMonitorings}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                <f:facet name="header">
+                    <h:outputText value="&nbsp;" />
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>
+                        <p:column rowspan="2" headerText="Container No" sortBy=""/>
+                        <p:column rowspan="2" headerText="Size" sortBy=""/>
+                        <p:column rowspan="2" headerText="Type" sortBy=""/>
+                        <p:column rowspan="2" headerText="Status" sortBy=""/>
+                        <p:column rowspan="2" headerText="Gross" sortBy=""/>
+                        <p:column rowspan="2" headerText="OH/OW/OL" sortBy=""/>
+                        <p:column rowspan="2" headerText="Dg" sortBy=""/>
+                        <p:column rowspan="2" headerText="Dg Label" sortBy=""/>
+                        <p:column colspan="3" headerText="Stevedoring"/>
+                        <p:column colspan="3" headerText="Haulage Trucking"/>
+                        <p:column colspan="3" headerText="Lo/Lo"/>
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="" headerText="CC Code" />
+                        <p:column sortBy="" headerText="Start" />
+                        <p:column sortBy="" headerText="End" />
+                        <p:column sortBy="" headerText="HT Code" />
+                        <p:column sortBy="" headerText="Start" />
+                        <p:column sortBy="" headerText="End" />
+                        <p:column sortBy="" headerText="TT Code" />
+                        <p:column sortBy="" headerText="Start" />
+                        <p:column sortBy="" headerText="End" />
+                    </p:row>
+                </p:columnGroup>
+                <p:column>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[11]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[12]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[13]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[14]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[15]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[16]}"/>
+                </p:column>               
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

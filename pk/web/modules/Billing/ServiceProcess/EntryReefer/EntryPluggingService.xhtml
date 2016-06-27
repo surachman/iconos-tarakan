@@ -1,0 +1,277 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_reefers.entry_plugging_service']}" />
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function handleRequestValidation(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog').show();
+                } else {
+                        dlg.hide();
+                }
+        }
+
+        function cekAlphabet(param) {
+            var regexNum = /^[0-9]+$/;
+            var regexLetter = /[a-zA-z]/;
+            if(!regexNum.test(param.value))
+                param.value = "";
+            else if(regexLetter.test(param.value))
+                param.value = "";
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_reefers.entry_plugging_service']}" />
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="registrationForm">
+            <h:panelGrid columns="4" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryPluggingServiceBean.registration.noReg}" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryPluggingServiceBean.registration.masterCustomer.custCode}" />
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <h:outputLabel value=" : " />
+                <h:inputText size="30" disabled="true" value="#{entryPluggingServiceBean.registration.statusService}" />
+                <h:outputLabel/>
+            </h:panelGrid>
+            <br />
+        </h:form>
+
+        <h:form id="pluggingReeferForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{entryPluggingServiceBean.pluggingReeferServices}"
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="pluggingReeferDetail"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty entryPluggingServiceBean.registration.noReg}" update="pluggingReeferServiceForm:pluggingReeferGrid" actionListener="#{entryPluggingServiceBean.handleAdd}" oncomplete="dlg.show();"/>
+                    </div>
+                </f:facet>
+                <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Job Slip" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[5]}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross" />
+                    </f:facet>
+                    <h:outputText value="#{item[5]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="OH/OW/OL" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Shift" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryPluggingServiceBean.handleSelectPluggingReefer}" disabled="#{not entryPluggingServiceBean.registration.statusService.equals('registrasi')}" update="pluggingReeferServiceForm:pluggingReeferGrid" oncomplete="dlg.show();" image="ui-icon ui-icon-pencil" title="Edit Plugging Reefer Service">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>
+                            <f:attribute name="noCont" value="#{item[1]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryPluggingServiceBean.handleSelectPluggingReefer}" disabled="#{not entryPluggingServiceBean.registration.statusService.equals('registrasi')}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Plugging Reefer Service">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>
+                            <f:attribute name="noCont" value="#{item[1]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.message']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{entryPluggingServiceBean.handleDelete}" update="pluggingReeferForm:pluggingReeferDetail growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form id="pluggingReeferServiceForm">
+            <p:dialog header="Entry Data Plugging"  widgetVar="dlg" modal="true" width="400" >
+                <p:panel>
+                    <h:panelGrid columns="3"  id="pluggingReeferGrid">
+                        <h:outputLabel value="Container No *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup>
+                            <h:inputText maxlength="11" value="#{entryPluggingServiceBean.pluggingReeferService.contNo}" required="true" requiredMessage="#{msg['application.validation.required']}" id="co"/>
+                            <p:message display="icon" for="co"/>
+                        </h:panelGroup>
+
+                        <h:outputLabel value="Type *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{entryPluggingServiceBean.pluggingReeferService.masterContainerType.contType}">
+                            <f:selectItems value="#{entryPluggingServiceBean.masterContainerTypes}" var="i" itemValue="#{i[0]}" itemLabel="#{i[1]}" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Status *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{entryPluggingServiceBean.pluggingReeferService.contStatus}">
+                            <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                            <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                            <f:selectItem itemValue="MTY" itemLabel="EMPTY" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Gross *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup >
+                            <h:inputText maxlength="9" value="#{entryPluggingServiceBean.pluggingReeferService.contGross}" id="gr" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="numerik" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="gr"/>
+                        </h:panelGroup>
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{entryPluggingServiceBean.pluggingReeferService.masterCommodity.commodityCode}">
+                            <f:selectItems value="#{entryPluggingServiceBean.masterCommoditys}" var="item" itemValue="#{item.commodityCode}" itemLabel="#{item.name}" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="OH/OW/OL *" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{entryPluggingServiceBean.pluggingReeferService.overSize}">
+                            <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                            <f:selectItem itemValue="FALSE" itemLabel="No" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Dangerous *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup >
+                            <h:selectOneMenu value="#{entryPluggingServiceBean.pluggingReeferService.dg}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+
+                            <h:outputLabel value="Label *" />
+                            <h:selectOneMenu value="#{entryPluggingServiceBean.pluggingReeferService.dgLabel}">
+                                <f:selectItem itemValue="TRUE" itemLabel="Yes" />
+                                <f:selectItem itemValue="FALSE" itemLabel="No" />
+                            </h:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:outputLabel value="Shift Planning *" />
+                        <h:outputLabel value=" : " />
+                        <h:panelGroup>
+                            <h:inputText maxlength="3" value="#{entryPluggingServiceBean.pluggingReeferService.shiftPlanning}" id="sp" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                            <h:outputLabel value="numerik" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="sp"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryPluggingServiceBean.handleSubmit}" update="pluggingReeferForm:pluggingReeferDetail growl pluggingReeferServiceForm:pluggingReeferGrid" oncomplete="handleRequestValidation(xhr, status, args)" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+
+        <h:form>
+            <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{entryPluggingServiceBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{entryPluggingServiceBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail pluggingReeferForm:pluggingReeferDetail" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

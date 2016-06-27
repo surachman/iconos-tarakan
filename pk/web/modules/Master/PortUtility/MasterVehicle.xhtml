@@ -1,0 +1,155 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_vehicle']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.master_vehicle']}"/>
+    </ui:define>
+
+    <ui:define name="bundles">
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.livequery.min.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/jquery.qtasnim.weighing.js" />
+        <script type="text/javascript" src="./../../../resources/scripts/modules/MasterVehicle.js" />
+        <script type="text/javascript"  src="./../../../resources/scripts/deployJava.js"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function validateForm(xhr, status, args) {
+                if(!(args.validationFailed || !args.validated)) {
+                    dialogAddEdit.hide();
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl showDetail="true" life="3000" id="growl" globalOnly="true"/>
+        <div style="right: 50px; position: absolute;">
+            <script type="text/javascript">
+                var attributes = {
+                    code:       "com.qtasnim.weighing.Main",
+                    archive:    "ebtos-digital-weighing.jar, lib/jssc.jar",
+                    width:      280,
+                    height:     90
+                };
+                var parameters = {separate_jvm:"true", draggable:"true", jnlp_href:"./../../../../resources/applet/launch.jnlp"}; <!-- Applet Parameters -->
+                var version = "1.5"; <!-- Required Java Version -->
+                if (deployJava.getJREs().length > 0) {
+                    deployJava.runApplet(attributes, parameters, version);
+                } else {
+                    alert('Harap install Java Runtime (JRE) terbaru untuk mengaktifkan fitur Timbangan!');
+                }
+            </script>
+        </div>
+        <h:form id="vehicleForm">
+            <p:dataTable id="dataTbl" paginatorPosition="bottom" value="#{masterVehicleBean.masterVehicles}" var="item"
+                         paginator="true" rows="10"  widgetVar="vehiclesTable"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick"
+                                         oncomplete="dialogAddEdit.show();" update="formAddEdit" actionListener="#{masterVehicleBean.handleNewMasterVehicle}" onclick="genTitle('dialogAddEdit','#{msg['application.operation.add']} Master Vehicle');"/>
+                    </div>
+                </f:facet>
+                <p:column style="width:30px; text-align: center;">
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="License Plate"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Tonage"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton image="ui-icon-pencil" update="formAddEdit" actionListener="#{masterVehicleBean.handleSelectMasterVehicle}" oncomplete="dialogAddEdit.show();" title="Edit" onclick="genTitle('dialogAddEdit','#{msg['application.operation.edit']} Master Vehicle');">
+                            <f:attribute name="code" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton image="ui-icon-trash" oncomplete="confirmation.show();" title="Delete" actionListener="#{masterVehicleBean.handleSelectMasterVehicle}" update="deleteForm">
+                            <f:attribute name="code" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" id="dialogAddEdit"  widgetVar="dialogAddEdit" minWidth="500" header="Master Vehicle">
+            <h:form id="formAddEdit">
+                <p:panel rendered="#{not empty masterVehicleBean.masterVehicle}">
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="License Plate *" for="vCode" />:
+                        <h:inputText id="vCode" value="#{masterVehicleBean.masterVehicle.vehicleCode}" title="License Plate" required="true" requiredMessage="License Plate field #{msg['application.validation.required']}" disabled="#{masterVehicleBean.isEdit}" size="20">
+                            <f:validateLength maximum="10"/>
+                        </h:inputText>
+                        <p:message for="vCode" display="icon"/>
+
+                        <h:outputLabel value="Type" for="masterVehType" />:
+                        <h:selectOneMenu id="masterVehType" value="#{masterVehicleBean.masterVehicle.masterVehicleType.vehicleTypeCode}" title="Vehicle Name" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItems value="#{masterVehicleBean.masterVehicleTypeList}" var="i" itemValue="#{i.vehicleTypeCode}" itemLabel="#{i.name}"/>
+                        </h:selectOneMenu>
+                        <p:message for="masterVehType" display="icon"/>
+
+                        <h:outputLabel value="Tonage (kg) *" for="tonage" />:
+                        <h:inputText id="tonage" required="true" value="#{masterVehicleBean.masterVehicle.tonage}" title="Tonage" size="10" requiredMessage="Tonage field #{msg['application.validation.required']}" />
+                        <p:message for="tonage" display="icon"/>
+
+                        <h:outputLabel value="Maximum Weight (kg) *" for="maxWeight" />:
+                        <h:inputText id="maxWeight" required="true" value="#{masterVehicleBean.masterVehicle.weightMax}" title="Tonage" size="10" requiredMessage="Maximum Weight field #{msg['application.validation.required']}" />
+                        <p:message for="maxWeight" display="icon"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" id="saveButton"  widgetVar="saveButton_var" image="ui-icon-check" actionListener="#{masterVehicleBean.handleSaveEdit}" update="formAddEdit vehicleForm growl" oncomplete="vehiclesTable.clearFilters(); validateForm(xhr, status, args);"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" oncomplete="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation" width="450" modal="true">
+            <h:form id="deleteForm">
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{masterVehicleBean.handleOnDelete}" update="vehicleForm growl" oncomplete="vehiclesTable.clearFilters(); confirmation.hide();" />
+                            <p:commandButton value="#{msg['application.operation.no']}" oncomplete="confirmation.hide()" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+</ui:composition>

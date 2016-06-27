@@ -1,0 +1,188 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:dycode="http://java.sun.com/jsf/composite/tags/dycode">
+
+    <ui:define name="bundles">
+        bundles
+    </ui:define>
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.perhitungan_service.angkut_petikemas']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#angkutPetikemasDialog').show();
+                    } else {
+                            addEditDialog.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="angkutPetikemasList">
+            <p:dataTable value="#{angkutPetikemasBean.angkutPetikemasList}" var="item"
+                         paginator="true" rows="10" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="angkutPetikemas" rowIndexVar="No">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" onclick="genTitle('angkutPetikemasDialog','#{msg['application.operation.add']} Angkut Petikemas');" value="#{msg['application.operation.add']}" immediate="true" actionListener="#{angkutPetikemasBean.handleAdd}" oncomplete="addEditDialog.show();" update="formAddEdit" title="Add Angkut Petikemas"/>
+                    </div>
+                </f:facet>
+                <p:column style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No" />
+                    </f:facet>
+                    <h:outputText value="#{No+1}" />
+                </p:column>
+                <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}" >
+                    <f:facet name="header">
+                        <h:outputText value="No SPK"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Customer"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[3]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Size"/>
+                    </f:facet>
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[4]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Status"/>
+                    </f:facet>
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[5]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Jumlah"/>
+                    </f:facet>
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[6]}" style="text-align: right">
+                    <f:facet name="header">
+                        <h:outputText value="Tarif"/>
+                    </f:facet>
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+
+                <p:column sortBy="#{item[7]}" style="text-align: right">
+                    <f:facet name="header">
+                        <h:outputText value="Total Charge"/>
+                    </f:facet>
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+
+                <p:column style="width: 90px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{angkutPetikemasBean.handleEditDeleteButton}" update="formAddEdit" oncomplete="addEditDialog.show();" image="ui-icon ui-icon-pencil" title="Edit Angkut Petikemas" onclick="genTitle('angkutPetikemasDialog','#{msg['application.operation.edit']} Angkut Petikemas');">
+                            <f:attribute name="id_angkut" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{angkutPetikemasBean.handleEditDeleteButton}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Angkut Petikemas">
+                            <f:attribute name="id_angkut" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true" header="Booking" width="450"  widgetVar="addEditDialog" id="angkutPetikemasDialog">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:panelGrid columns="4">
+                        <h:outputLabel value="NoSpk" for="noSpk" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="noSpk" value="#{angkutPetikemasBean.angkutPetikemas.noSpk}" title="No Spk" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                        <p:message display="icon" for="noSpk"/>
+
+                        <h:outputLabel value="Container Size" for="contSize" />
+                        <h:outputLabel value=":" />
+                        <h:selectOneMenu id="contSize" value="#{angkutPetikemasBean.angkutPetikemas.contSize}" title="Container Size" >
+                            <f:selectItems value="#{containerAttributesBean.containerSizes}"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel />
+
+                        <h:outputLabel value="Container Status" for="contStatus" />
+                        <h:outputLabel value=":" />
+                        <h:selectOneMenu id="contStatus" value="#{angkutPetikemasBean.angkutPetikemas.contStatus}" title="Container Status" >
+                            <f:selectItem itemValue="FCL" itemLabel="FULL"/>
+                            <f:selectItem itemValue="MTY" itemLabel="EMPTY"/>
+                        </h:selectOneMenu>
+                        <h:outputLabel />
+
+                        <h:outputLabel value="JmlCont" for="jmlCont" />
+                        <h:outputLabel value=":" />
+                        <h:inputText id="jmlCont" value="#{angkutPetikemasBean.angkutPetikemas.jmlCont}" title="JmlCont" maxlength="3" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                            <p:message display="icon" for="jmlCont"/>
+                        </h:panelGrid>
+
+                        <h:outputLabel value="Customer" for="masterCustomer" />
+                        <h:outputLabel value=":" />
+                        <h:selectOneMenu id="masterCustomer" value="#{angkutPetikemasBean.angkutPetikemas.masterCustomer.custCode}" title="MasterCustomer" required="true" requiredMessage="#{msg['application.validation.required']}">
+                            <f:selectItems value="#{angkutPetikemasBean.masterCustomers}" var="i" itemValue="#{i[0]}" itemLabel="#{i[1]}"/>
+                        </h:selectOneMenu>
+                        <p:message display="icon" for="masterCustomer"/>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton image="ui-icon-check" value="#{msg['application.operation.save']}" onstart="freeze();" update="angkutPetikemasList:angkutPetikemas growl formAddEdit" actionListener="#{angkutPetikemasBean.handleSave}" oncomplete="handleRequestValidation(xhr, status, args)" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="addEditDialog.hide();" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}" id="confirmation"  widgetVar="confirmation" minWidth="400">
+            <h:form id="confirmationForm">
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.delete.confirmation']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{angkutPetikemasBean.handleDelete}" update="angkutPetikemasList:angkutPetikemas growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

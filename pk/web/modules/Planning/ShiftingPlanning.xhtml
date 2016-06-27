@@ -1,0 +1,1160 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-shiftitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.shifting_planning']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.shifting_planning']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+              function handleRequestValidation(xhr, status, args) {
+                      if(args.validationFailed || !args.loggedIn) {
+                              jQuery('#dialog').show();
+                              jQuery('#dialogUc').show();
+                      } else {
+                              dlgEdit.hide();
+                              dlgAddEditUC.hide();
+                      }
+              }
+
+              function cekAlphabet(param) {
+                  var regexNum = /^[0-9]+$/;
+                  var regexLetter = /[a-zA-z]/;
+                  if(!regexNum.test(param.value))
+                      param.value = "";
+                  else if(regexLetter.test(param.value))
+                      param.value = "";
+              }
+
+            function validateTranshipmentConstraint(xhr, status, args) {
+                if(args.isConstraintNotEnough) {
+                    allocationNotEnoughWarningDialog.show();
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+        <h:form id="formPlanningVessel">
+            <!--view untuk  planning vessel-->
+            <h:panelGrid id="planningVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{shiftingPlanningBean.noPPKB}" readonly="true" size="30" />
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="showPlanningVessels();"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{shiftingPlanningBean.vessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{shiftingPlanningBean.vessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{shiftingPlanningBean.vessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+        </h:form>
+        <p:spacer height="30px" width="0px" />
+        <p:tabView>
+            <p:tab title="Container" >
+                <p:accordionPanel autoHeight="false">
+                    <p:tab title="Add Shifting">
+                        <h:form id="formAddShifting">
+                            <p:dataTable id="tableAddShifting" var="item" value="#{shiftingPlanningBean.baplieDischarges}"
+                                         paginator="true" rows="10" paginatorPosition="bottom"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15" rowIndexVar="number" selection="#{shiftingPlanningBean.containers}">
+
+                                <f:facet name="header">
+                                    <div class="header-panel-single-left">
+                                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty shiftingPlanningBean.vessel[0]}" actionListener="#{shiftingPlanningBean.handleButtonAdd}" update="formAddEdit" oncomplete="dlg.show();" onclick="genTitle('dlgContainer','#{msg['application.operation.add']} Container to Baplie');"/>
+                                    </div>
+                                </f:facet>
+                                
+                                <p:column selectionMode="multiple" />
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+
+                                <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Bl No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[0]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Container No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[3]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[2]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Size" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[5]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Gross" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[5]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[6]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Commodity" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[6]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[7]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Seal No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[7]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[8]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Bay" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[8]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[9]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Row" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[9]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[10]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Tier" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[10]}" />
+                                </p:column>
+
+                                <p:column headerText="Shift To" style="width:100px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{item[13]}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <h:selectOneMenu value="#{item[13]}" >
+                                                <f:selectItem itemLabel="NOLANDED" itemValue="NOLANDED" />
+                                                <f:selectItem itemLabel="LANDED" itemValue="LANDED" />
+                                                <f:selectItem itemLabel="TO CY" itemValue="TOCY" />
+                                            </h:selectOneMenu>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+
+                                <p:column style="width: 90px;text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Action" />
+                                    </f:facet>
+                                    <p:rowEditor />
+                                    <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleEditDeleteBaplieButton}" disabled="#{item[15] == false}" image="ui-icon ui-icon-pencil" title="Edit Shifting Container to Baplie" update="formAddEdit" oncomplete="dlg.show();" onclick="genTitle('dlg','#{msg['application.operation.edit']} Shift To');">
+                                        <f:attribute name="idBaplie" value="#{item[14]}"/>
+                                    </p:commandButton>
+                                    <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleEditDeleteBaplieButton}" disabled="#{item[15] == false}" image="ui-icon ui-icon-trash" title="Delete Shifting Container to Baplie" oncomplete="deleteConfirmationDialogBaplie.show();">
+                                        <f:attribute name="idBaplie" value="#{item[14]}"/>
+                                    </p:commandButton>
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <div class="header-panel-single-right">
+                                        <p:commandButton onstart="freeze();" image="ui-icon-check" value="#{msg['application.operation.submit']}" disabled="#{empty shiftingPlanningBean.vessel[0]}" action="#{shiftingPlanningBean.submit}" update="formAddShifting:tableAddShifting formListShifting:shiftDischargesTable allocationNotEnoughForm growl" oncomplete="validateTranshipmentConstraint(xhr, status, args)"/>
+                                    </div>
+                                </f:facet>
+                            </p:dataTable>
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="Shifting List">
+                        <h:form id="formListShifting">
+                            <p:dataTable id="shiftDischargesTable" var="item" value="#{shiftingPlanningBean.planningShiftDischarges}"
+                                         paginator="true" rows="10" paginatorPosition="bottom"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15" rowIndexVar="number" selection="#{shiftingPlanningBean.containerRemoves}">
+
+                                <f:facet name="header">
+                                    <div class="header-panel-single-left">
+                                        <p:commandButton onstart="freeze();" image="ui-icon ui-icon-trash" value="#{msg['application.operation.delete_selected']}" disabled="#{empty shiftingPlanningBean.planningShiftDischarges}" action="#{shiftingPlanningBean.handleDeleteAll}" oncomplete="deleteConfirmationDialog.show();" />
+                                    </div>
+                                </f:facet>
+
+                                <p:column selectionMode="multiple" />
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+
+                                <p:column sortBy="#{item[0]}" filterBy="#{item[0]}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Bl No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[0]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[1]}" filterBy="#{item[1]}" filterMatchMode="contains">
+                                    <f:facet name="header">
+                                        <h:outputText value="Container No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[3]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Type" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[2]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Size" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[5]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Gross" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[5]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[6]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Commodity" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[6]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[7]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Seal No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[7]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[8]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Bay" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[8]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[9]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Row" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[9]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[10]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Tier" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[10]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[13]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Shift To" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[13]}" />
+                                </p:column>
+
+                                <p:column style="width: 60px;text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Action" />
+                                    </f:facet>
+                                    <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleEditDeleteButton}" image="ui-icon ui-icon-pencil" title="Edit PlanningShiftDischarge" update="formEdit" oncomplete="dlgEdit.show();" onclick="genTitle('dlg','#{msg['application.operation.edit']} Shift To');">
+                                        <f:attribute name="idCont" value="#{item[14]}"/>
+                                    </p:commandButton>
+                                    <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleEditDeleteButton}" image="ui-icon ui-icon-trash" title="Delete PlanningShiftDischarge" oncomplete="deleteConfirmationDialog.show();">
+                                        <f:attribute name="idCont" value="#{item[14]}"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </p:tab>
+                </p:accordionPanel>
+            </p:tab>
+
+            <p:tab title="Uncontainerized">
+                <p:accordionPanel autoHeight="false">
+                    <p:tab title="Add Shifting Uncontainerized">
+                        <h:form id="formSelectUC">
+                            <p:dataTable id="tableContainerSelect" var="item" value="#{shiftingPlanningBean.uncontaineraizedList}"
+                                         paginator="true" rows="10"
+                                         paginatorPosition="bottom" rowIndexVar="number"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15" selection="#{shiftingPlanningBean.uncontainerizedArray}">
+                                <f:facet name="header">
+                                    <h:outputText value="&nbsp;"/>
+                                </f:facet>
+
+                                <p:column selectionMode="multiple" />
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+
+                                <p:column  filterMatchMode="Contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Bl No" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[0]}" />
+                                </p:column>
+
+                                <p:column  filterMatchMode="Contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Commodity" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[2]}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Weight" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[7]}" filterMatchMode="Contains" filterBy="#{item[7]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Load Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[7]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[6]}" filterMatchMode="Contains" filterBy="#{item[6]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Disch Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[6]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[3]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Truck Loosing" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[5]}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Unit" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[5]}" />
+                                </p:column>
+
+                                <p:column headerText="Shift To" style="width:100px">
+                                    <p:cellEditor>
+                                        <f:facet name="output">
+                                            <h:outputText value="#{item[8]}" />
+                                        </f:facet>
+                                        <f:facet name="input">
+                                            <h:selectOneMenu value="#{item[8]}" >
+                                                <f:selectItem itemLabel="NOLANDED" itemValue="NOLANDED" />
+                                                <f:selectItem itemLabel="LANDED" itemValue="LANDED" />
+                                                <f:selectItem itemLabel="TOCY" itemValue="TOCY" />
+                                            </h:selectOneMenu>
+                                        </f:facet>
+                                    </p:cellEditor>
+                                </p:column>
+
+                                <p:column headerText="Options">
+                                    <p:rowEditor />
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <div class="header-panel-single-right">
+                                        <p:commandButton onstart="freeze();" image="ui-icon-check" value="#{msg['application.operation.submit']}" disabled="#{empty shiftingPlanningBean.vessel[0] or empty shiftingPlanningBean.uncontaineraizedList}" actionListener="#{shiftingPlanningBean.careateEntryGenerate}" update="formListShiftingUC formSelectUC growl" />
+                                    </div>
+                                </f:facet>
+
+                            </p:dataTable>
+                        </h:form>
+                    </p:tab>
+                    <p:tab title="Shifting List Uncontainerized">
+                        <h:form id="formListShiftingUC">
+                            <p:dataTable id="shiftDischargesTableUC" var="item" value="#{shiftingPlanningBean.ucList}"
+                                         paginator="true" rows="10" paginatorPosition="bottom"
+                                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                         rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                                <f:facet name="header">
+                                    &nbsp;
+                                </f:facet>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+                                <p:column sortBy="#{item[0]}"  filterMatchMode="Contains" filterBy="#{item[0]}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="No BL" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[0]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[1]}"  filterMatchMode="Contains" filterBy="#{item[1]}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Commodity" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[1]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[2]}"  filterMatchMode="Contains" filterBy="#{item[2]}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Weight" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                 <p:column sortBy="#{item[4]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Load Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[4]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[3]}"  filterMatchMode="Contains" filterBy="#{item[3]}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Disch Port" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[5]}">
+                                    <f:facet name="header">
+                                        <h:outputText value="Truck Lossing" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[5]}" />
+                                </p:column>
+
+                                <p:column sortBy="#{item[6]}"  filterMatchMode="Contains" filterBy="#{item[6]}" >
+                                    <f:facet name="header">
+                                        <h:outputText value="Shift To" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[6]}" />
+                                </p:column>
+
+                                <p:column style="width: 60px;text-align: center">
+                                    <f:facet name="header">
+                                        <h:outputText value="Action" />
+                                    </f:facet>
+                                    <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleEditDeleteUC}" disabled="#{not item[8].equals('PLANNING')}" image="ui-icon ui-icon-pencil" title="Edit PlanningShifting UC" update="formAddEditUC" oncomplete="dlgAddEditUC.show();" onclick="genTitle('dialogUc','#{msg['application.operation.edit']} Uncontainerized to be Moved'); ">
+                                        <f:attribute name="idUC" value="#{item[7]}"/>
+                                    </p:commandButton>
+                                    <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleEditDeleteUC}" disabled="#{not item[8].equals('PLANNING')}" image="ui-icon ui-icon-trash" title="Delete PlanningShifting UC" oncomplete="confirmationUC.show();">
+                                        <f:attribute name="idUC" value="#{item[7]}"/>
+                                    </p:commandButton>
+                                </p:column>
+                            </p:dataTable>
+                        </h:form>
+                    </p:tab>
+                </p:accordionPanel>
+            </p:tab>
+        </p:tabView>
+
+
+        <!--dialog untuk menambah data container-->
+
+
+        <p:dialog header="Container to Bay Plan"  widgetVar="dlg" modal="true" minWidth="750" id="dlgContainer">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:panelGrid columns="3" rowClasses="first-tr">
+                        <h:panelGrid columns="4">
+                            <h:outputLabel value="Containers Details" style="font-weight: bold"/>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Container No*" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="contnofield" value="#{shiftingPlanningBean.baplieDischarge.contNo}" disabled="#{shiftingPlanningBean.opsi.equals('delete')}" onkeyup="javascript:this.value=this.value.toUpperCase();" maxlength="11" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:message display="icon" for="contnofield"/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{shiftingPlanningBean.baplieDischarge.masterContainerType.contType}"
+                                             valueChangeListener="#{shiftingPlanningBean.onChangeConstraintType}" immediate="true">
+                                <f:selectItem itemLabel="20 BLK" itemValue="20" />
+                                <f:selectItem itemLabel="20 DRY" itemValue="1" />
+                                <f:selectItem itemLabel="20 FLT" itemValue="14" />
+                                <f:selectItem itemLabel="20 HC" itemValue="21" />
+                                <f:selectItem itemLabel="20 OPS" itemValue="65" />
+                                <f:selectItem itemLabel="20 OPT" itemValue="12" />
+                                <f:selectItem itemLabel="20 RFR" itemValue="2" />
+                                <f:selectItem itemLabel="20 TNK" itemValue="19" />
+                                <f:selectItem itemLabel="40 BLK" itemValue="36" />
+                                <f:selectItem itemLabel="40 DRY" itemValue="26" />
+                                <f:selectItem itemLabel="40 FLT" itemValue="32" />
+                                <f:selectItem itemLabel="40 HC" itemValue="37" />
+                                <f:selectItem itemLabel="40 OPS" itemValue="98" />
+                                <f:selectItem itemLabel="40 OPT" itemValue="30" />
+                                <f:selectItem itemLabel="40 RFR" itemValue="29" />
+                                <f:selectItem itemLabel="40 TNK" itemValue="83" />
+                                <f:selectItem itemLabel="45 DRY" itemValue="1752" />
+                                <f:selectItem itemLabel="45 HC" itemValue="99" />
+                                <f:ajax execute="@this" event="change" render="containerSize"/>
+                            </h:selectOneMenu>
+                            <h:outputText />
+                            <h:outputLabel value="Size"/>
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="containerSize" value="#{shiftingPlanningBean.baplieDischarge.contSize}" disabled="true" size="5" readonly="false"/>
+                            <h:outputText />
+                            <h:outputLabel value="Import/Export *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="1">
+                                <h:selectOneMenu value="#{shiftingPlanningBean.baplieDischarge.isExportImport}">
+                                    <f:selectItem itemValue="true" itemLabel="Yes" />
+                                    <f:selectItem itemValue="false" itemLabel="No" />
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <h:outputLabel/>
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{shiftingPlanningBean.baplieDischarge.contStatus}">
+                                <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                                <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                                <f:selectItem itemValue="MTY" itemLabel="EMPTY" />
+                                <p:ajax  event="change" onstart="freeze();" update="formAddEdit:contCommodity"/>
+                            </h:selectOneMenu>
+                            <h:outputText />
+                            <h:outputLabel value="Gross*" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3">
+                                <h:inputText id="grossfield" value="#{shiftingPlanningBean.baplieDischarge.contGross}" maxlength="9" onkeyup="javascript:cekAlphabet(this);" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                                <h:outputLabel value="numeric" style="font: italic smaller; color:red;"/>
+                                <p:message display="icon" for="grossfield"/>
+                            </h:panelGrid>
+                            <h:outputText/>
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{shiftingPlanningBean.baplieDischarge.sealNo}" maxlength="10"/>
+                            <h:outputText />
+                            <h:outputLabel value="Comodity *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="contCommodity">
+                                <h:inputText id="commodity" value="#{shiftingPlanningBean.baplieDischarge.masterCommodity}" required="true" requiredMessage="#{msg['application.validation.required']}" onkeypress="showCommodities()" onmousedown="showCommodities();" disabled="#{empty shiftingPlanningBean.baplieDischarge.contStatus}"/>
+                                <p:commandButton  disabled="#{empty shiftingPlanningBean.baplieDischarge.contStatus}" image="ui-icon-folder-open" value="..." onclick="showCommodities();" immediate="true" style="font-size: x-small"/>
+                                <p:message display="icon" for="commodity"/>
+                            </h:panelGrid>
+                            <h:outputText />
+                            <h:outputLabel value="Dangerous " />
+                            <h:outputLabel value=" : " />
+                            <h:inputText id="dangerous" value="#{shiftingPlanningBean.baplieDischarge.dg ? shiftingPlanningBean.baplieDischarge.masterCommodity.masterDangerousClass : 'No'}" readonly="true"/>
+                            <h:outputText />
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{shiftingPlanningBean.baplieDischarge.overSize}">
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputText />
+                            <h:outputLabel value="21 feet" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{shiftingPlanningBean.baplieDischarge.twentyOneFeet}">
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputText />
+                            <h:outputLabel value="Label " />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{shiftingPlanningBean.baplieDischarge.dgLabel}">
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                            </h:selectOneMenu>
+                            <h:outputText />
+                        </h:panelGrid>
+
+                        <p:spacer height="0" width="20" />
+
+                        <h:panelGrid columns="3">
+                            <h:outputLabel value="Vessel Position"   style="font-weight: bold"/>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputText value="Bay"/>
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="bay" value="#{shiftingPlanningBean.baplieDischarge.VBay}" valueChangeListener="#{shiftingPlanningBean.onchangeBay}">
+                                <f:selectItems value="#{shiftingPlanningBean.bayChoices}" />
+                                <f:ajax execute="@this" event="change" render="rowChoices tierChoices"/>
+                            </h:selectOneMenu>
+                            <h:outputText value="Row"/>
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="rowChoices" value="#{shiftingPlanningBean.baplieDischarge.VRow}" valueChangeListener="#{shiftingPlanningBean.onChangeRow}">
+                                <f:selectItems value="#{shiftingPlanningBean.rowChoices}" />
+                                <f:ajax execute="@this" event="change" render="tierChoices"/>
+                            </h:selectOneMenu>
+                            <h:outputText value="Tier"/>
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu id="tierChoices" value="#{shiftingPlanningBean.baplieDischarge.VTier}">
+                                <f:selectItems value="#{shiftingPlanningBean.tierChoices}" />
+                            </h:selectOneMenu>
+                            <p:spacer height="20" width="0" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Port Details"  style="font-weight: bold" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Load Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{shiftingPlanningBean.baplieDischarge.masterPort.name}" disabled="true"/>
+                            <h:outputLabel value="Discharge Port" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{shiftingPlanningBean.baplieDischarge.masterPort1.name}" disabled="true"/>
+                            <h:outputLabel value="Port of Delivery" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{shiftingPlanningBean.baplieDischarge.portOfDelivery.name}" disabled="true"/>
+                            <p:spacer height="20" width="0" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Bill of Lading"  style="font-weight: bold" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Bl No." />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{shiftingPlanningBean.baplieDischarge.blNo}" maxlength="20" size="25"/>
+                            <p:spacer height="20" width="0" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Main Line Operator"  style="font-weight: bold" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Customer" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="2" id="mloName">
+                                <h:inputText readonly="true" onmousedown="showMasterCustomers();" onkeypress="showMasterCustomers();" value="#{empty shiftingPlanningBean.baplieDischarge.mlo ? null : shiftingPlanningBean.baplieDischarge.mlo.custCode}" maxlength="20" size="15"/>
+                                <p:commandButton image="ui-icon-folder-open" value="..." onclick="showMasterCustomers();" immediate="true" style="font-size: x-small"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{shiftingPlanningBean.saveEditBaplie}" update="formAddShifting:tableAddShifting formAddEdit growl" oncomplete="handleRequestValidation(xhr, status, args)" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="button" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <!--dialog untuk melakukan edit container yang akan di shifting-->
+        <p:dialog header="Edit Container to Be Moved"  widgetVar="dlgEdit" modal="true" width="750" id="dlg">
+            <h:form id="formEdit">
+                <p:panel>
+                    <h:panelGrid columns="3" rowClasses="first-tr">
+                        <h:panelGrid columns="3">
+                            <h:outputLabel value="Containers Details" style="font-weight: bold"/>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="BL No." />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[0]}" />
+                            <h:outputLabel value="Container No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[1]}" />
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[2]}"/>
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[3]}"/>
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[5]}"/>
+                            <h:outputLabel value="Commodity" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[6]}" />
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[7]}"/>
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[8]}"/>
+                            <h:outputLabel value="Dangerous" />
+                            <h:outputLabel value=" : " />                            
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[9]}"/>
+                            <h:outputLabel value="Label" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[10]}"/>
+                            <p:spacer height="17" width="0" />
+                            <h:outputText />
+                        </h:panelGrid>
+
+                        <p:spacer width="100px" />
+
+                        <h:panelGrid columns="3">
+                            <h:outputLabel value="Vessel Bay" style="font-weight: bold"/>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Bay" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" size="4" value="#{shiftingPlanningBean.shiftDischarge[11]}"/>
+                            <h:outputLabel value="Row" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" size="4" value="#{shiftingPlanningBean.shiftDischarge[12]}"/>
+                            <h:outputLabel value="Tier" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" size="4" value="#{shiftingPlanningBean.shiftDischarge[13]}"/>
+                            <p:spacer height="40px" width="0" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Port Details"  style="font-weight: bold" />
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Load Port " />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[14]}"/>
+                            <h:outputLabel value="Discharge Port " />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{shiftingPlanningBean.shiftDischarge[15]}"/>
+                            <p:spacer height="40px" width="0" />
+                            <h:outputText />
+                            <h:outputText />                            
+                            <h:outputLabel value="Shifting" style="font-weight: bold"/>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputLabel value="Shifting To *" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneRadio value="#{shiftingPlanningBean.planningShiftDischarge.shiftTo}">
+                                <f:selectItem itemValue="LANDED" itemLabel="Landed" />
+                                <f:selectItem itemValue="NOLANDED" itemLabel="No Landed" />
+                                <f:selectItem itemLabel="TO CY" itemValue="TOCY" />
+                            </h:selectOneRadio>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" action="#{shiftingPlanningBean.saveEdit}" update="formEdit formAddShifting:tableAddShifting formListShifting:shiftDischargesTable growl" oncomplete="handleRequestValidation(xhr, status, args);" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgEdit.hide();" type="button" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--uncontainerized-->
+        <p:dialog header="Uncontainerized Shifting"  widgetVar="dlgAddEditUC" modal="true" minWidth="550" id="dialogUc">
+            <h:form id="formAddEditUC">
+                <p:panel>
+                    <h:panelGrid columns="5">
+                        <h:outputLabel value="No BL *"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="50" id="bl" onkeypress="dlgShiftingUc.show()" onmousedown="dlgShiftingUc.show()" value="#{shiftingPlanningBean.uncontainerizedService.blNo}" title="No BL" requiredMessage="#{msg['application.validation.required']}" disabled="true"/>
+                        <p:message for="bl" display="icon"/>
+                        <h:outputText />
+
+                        <h:outputLabel value="Commodity *" />
+                        <h:outputLabel value=":"/>
+                        <h:inputText value="#{shiftingPlanningBean.commodityName}" readonly="true" size="50" />
+                        <h:outputText />
+                        <h:outputText />
+                        <h:outputText />
+
+                        <h:outputLabel value="Weight *" />
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="50" id="weight" disabled="true" value="#{shiftingPlanningBean.uncontainerizedService.weight}" title="Weight" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                        <p:message for="weight" display="icon"/>
+
+                        <h:outputLabel value="Truck Lossing *" />
+                        <h:outputLabel value=":"/>
+                        <h:selectOneMenu disabled="true" value="#{shiftingPlanningBean.uncontainerizedService.truckLoosing}">
+                            <f:selectItem itemValue="TRUE" itemLabel="YES"/>
+                            <f:selectItem itemValue="FALSE" itemLabel="NO"/>
+                        </h:selectOneMenu>
+                        <h:outputText />
+                        <h:outputText />
+
+                        <h:outputLabel value="Load Port *" />
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="50" value="#{shiftingPlanningBean.port1}" disabled="true"/>
+                        <h:outputText />
+                        <h:outputText />
+
+                        <h:outputLabel value="Disch.Port *"/>
+                        <h:outputLabel value=":"/>
+                        <h:inputText size="50" value="#{shiftingPlanningBean.port2}" disabled="true"/>
+                        <h:outputText />
+                        <h:outputText />
+
+                        <h:outputLabel value="Shift To *"/>
+                        <h:outputLabel value=":"/>
+                        <h:selectOneRadio id="shiftTo" value="#{shiftingPlanningBean.uncontainerizedService.shiftTo}">
+                            <f:selectItem itemValue="LANDED" itemLabel="Landed" />
+                            <f:selectItem itemValue="NOLANDED" itemLabel="No Landed" />
+                            <f:selectItem itemValue="TOCY" itemLabel="To CY" />
+                        </h:selectOneRadio>
+                        <p:message for="shiftTo" display="icon"/>
+                        <h:outputText />
+
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{shiftingPlanningBean.saveEditUC}" update="formshifting:shiftDischargesTableUC formSelectUC formAddEditUC growl formListShiftingUC" oncomplete="handleRequestValidation(xhr, status, args)"  />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlgAddEditUC.hide();" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmationUC">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.delete.confirmation']} uncontainerized?" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  action="#{shiftingPlanningBean.deleteUC}"  update="formshifting:shiftDischargesTableUC formSelectUC growl formListShiftingUC" onclick="confirmationUC.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmationUC.hide()" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--buat milih planning vessel-->
+        <p:dialog header="Planning Vessels"  widgetVar="planningVesselsDialog" modal="true" minWidth="750">
+            <h:form id="planningVesselsForm">
+                <p:dataTable var="item" value="#{shiftingPlanningBean.planningVessels}"
+                             paginator="true" rows="10" id="planningVesselsTable"  widgetVar="planningVesselsTable"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleSelectNoPpkb}" value="select" update="formPlanningVessel:planningVesselDetail formAddShifting:tableAddShifting formListShifting:shiftDischargesTable formSelectUC formListShiftingUC" oncomplete="planningVesselsDialog.hide()">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk confirmasi menghapus            -->
+        <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="deleteConfirmationDialog">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="Are you sure you want to delete this file?" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{shiftingPlanningBean.delete}"  update="formAddShifting:tableAddShifting formListShifting:shiftDischargesTable growl" onclick="deleteConfirmationDialog.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="deleteConfirmationDialog.hide()" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <!--dialog untuk confirmasi menghapus            -->
+        <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="deleteConfirmationDialogBaplie">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="Are you sure you want to delete this file?" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{shiftingPlanningBean.deleteBaplie}"  update="formAddShifting:tableAddShifting formListShifting:shiftDischargesTable growl" onclick="deleteConfirmationDialogBaplie.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="deleteConfirmationDialogBaplie.hide()" type="reset" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Warning"  widgetVar="allocationNotEnoughWarningDialog" modal="true" width="900" resizable="false">
+            <h:form id="allocationNotEnoughForm">
+                <h:outputLabel escape="false" style="font-size: 12px;" value="#{fn:replace(msg['application.validation.not_enough_transhipment_allocation'],':noPpkb',shiftingPlanningBean.planningVessel.noPpkb)}"/>
+                <p:dataTable var="item" value="#{shiftingPlanningBean.loadPlanningAllocationsInfo}"
+                         id="loadPlanningAllocationsInfoTable"  widgetVar="loadPlanningAllocationsInfoTable"
+                          rowStyleClass="#{item[11] lt item[10] ? 'false-row' : null}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Discharge Port" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Cont Type" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Gross Class" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Cont Size" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Cont Status" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column style="text-align:center;">
+                        <f:facet name="header">
+                            <h:outputText value="Over Size" />
+                        </f:facet>
+                        <h:outputText value="#{item[7] ? 'yes' : 'no'}" />
+                    </p:column>
+
+                    <p:column style="text-align:center;">
+                        <f:facet name="header">
+                            <h:outputText value="Dangerous" />
+                        </f:facet>
+                        <h:outputText value="#{item[8] ? 'yes' : 'no'}" />
+                    </p:column>
+
+                    <p:column style="text-align:center;">
+                        <f:facet name="header">
+                            <h:outputText value="Is Export" />
+                        </f:facet>
+                        <h:outputText value="#{item[9] ? 'yes' : 'no'}" />
+                    </p:column>
+
+                    <p:column style="text-align:center;">
+                        <f:facet name="header">
+                            <h:outputText value="Required" />
+                        </f:facet>
+                        <h:outputText value="#{item[10]}" />
+                    </p:column>
+
+                    <p:column style="text-align:center;">
+                        <f:facet name="header">
+                            <h:outputText value="Allocated" />
+                        </f:facet>
+                        <h:outputText style="#{item[11] lt item[10] ? 'color: red;' : null}" value="#{item[11]}" />
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Master Commodities"  widgetVar="commoditiesDialog" modal="true" minWidth="600">
+            <h:form id="commoditiesForm">
+                <p:dataTable var="item" value="#{masterCommoditySelector.masterCommodities}"
+                             id="commoditiesTable"  widgetVar="commoditiesTable"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" lazy="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item.commodityCode}" filterMatchMode="contains" filterBy="#{item.commodityCode}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.commodityCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.masterCommodityType.name}" filterMatchMode="contains" filterBy="#{item.masterCommodityType.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Type" />
+                        </f:facet>
+                        <h:outputText value="#{item.masterCommodityType.name}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" action="#{shiftingPlanningBean.handleSelectCommodity}" value="select" update="formAddEdit:contCommodity formAddEdit:dangerous formAddEditUC" oncomplete="commoditiesDialog.hide();">
+                            <f:setPropertyActionListener target="#{shiftingPlanningBean.baplieDischarge.masterCommodity}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="Booking Agent"  widgetVar="masterCustomersDialog" width="700">
+            <h:form id="masterCustomersForm">
+                <p:dataTable value="#{shiftingPlanningBean.masterCustomers}" id="masterCustomersTable"  widgetVar="masterCustomersTable" var="item"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Customer Code"/>
+                        </f:facet>
+                        <h:outputText value="#{item[0]}"/>
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Agent Name"/>
+                        </f:facet>
+                        <h:outputText value="#{item[1]}"/>
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Phone"/>
+                        </f:facet>
+                        <h:outputText value="#{item[2]}"/>
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[3]}" sortBy="#{item[3]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Address"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}"/>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{shiftingPlanningBean.handleSelectMasterCustomers}" value="#{msg['application.operation.select']}" update="formAddEdit:mloName" oncomplete="masterCustomersDialog.hide();">
+                                <f:attribute name="custCode" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+        
+        <h:form>
+            <p:remoteCommand onstart="freeze();" name="showCommodities" immediate="true" oncomplete="commoditiesDialog.show();commoditiesTable.filter();"/>
+            <p:remoteCommand onstart="freeze();" name="showMasterCustomers" immediate="true" oncomplete="masterCustomersDialog.show();masterCustomersTable.clearFilters();" update="masterCustomersForm:masterCustomersTable" actionListener="#{shiftingPlanningBean.handleShowMasterCustomers}"/>
+            <p:remoteCommand onstart="freeze();" name="showPlanningVessels" immediate="true" oncomplete="planningVesselsDialog.show();planningVesselsTable.clearFilters();" update="planningVesselsForm:planningVesselsTable" actionListener="#{shiftingPlanningBean.handleShowPlanningVessels}"/>
+        </h:form>
+    </ui:define>
+</ui:composition>

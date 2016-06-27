@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns="http://www.w3.org/1999/xhtml"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                >
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.monitoring.yard_monitoring.overall_view']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.monitoring.yard_monitoring.overall_view']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="overallViewForm">
+            <p:growl id="growl" showDetail="true" sticky="true" />
+            <p:panel>
+                <h:panelGrid columns="2">
+                    <h:panelGrid columns="2" style="background-color: lightsteelblue;width: 950px">
+                        <p:outputPanel id="yard">
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockI}" style="margin: 3px;"/>
+                                <f:param name="block" value="I" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockH}" style="margin: 3px; margin-left: 35px"/>
+                                <f:param name="block" value="H" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockJ}" style="margin: 3px;"/>
+                                <f:param name="block" value="J" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockG}" style="margin: 3px; margin-left: 35px"/>
+                                <f:param name="block" value="G" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockK}" style="margin: 3px;"/>
+                                <f:param name="block" value="K" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockF}" style="margin: 3px; margin-left: 35px"/>
+                                <f:param name="block" value="F" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockL}" style="margin: 3px;"/>
+                                <f:param name="block" value="L" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockE}" style="margin: 3px; margin-left: 35px"/>
+                                <f:param name="block" value="E" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockM}" style="margin: 3px;margin-top: 35px "/>
+                                <f:param name="block" value="M" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockD}" style="margin: 3px; margin-left: 35px; margin-top: 35px"/>
+                                <f:param name="block" value="D" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockN}" style="margin: 3px;"/>
+                                <f:param name="block" value="N" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockC}" style="margin: 3px; margin-left: 35px"/>
+                                <f:param name="block" value="C" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockO}" style="margin: 3px;"/>
+                                <f:param name="block" value="O" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockB}" style="margin: 3px; margin-left: 35px"/>
+                                <f:param name="block" value="B" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockP}" style="margin: 3px;"/>
+                                <f:param name="block" value="P" />
+                            </h:outputLink>
+                            <h:outputLink value="SideView.xhtml" target="_blank">
+                                <p:graphicImage value="#{containerOverallView.blockA}" style="margin: 3px; margin-left: 35px"/>
+                                <f:param name="block" value="A" />
+                            </h:outputLink>
+                        </p:outputPanel>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="4" style="background-color: lightsteelblue;">
+                        <p:outputPanel id="legend" style="width: 100%">
+                            <center>
+                                <p:graphicImage value="#{containerOverallViewLegend.legend}" style="margin: 3px"/>
+                                <p:graphicImage value="#{containerOverallViewLegend.notes}" style="margin: 3px"/>
+                                <p:graphicImage value="#{containerOverallViewLegend.statistic}" style="margin: 3px"/>
+                                <p:graphicImage value="#{containerOverallViewLegend.chart}" style="margin: 3px"/>
+                            </center>
+                        </p:outputPanel>
+                    </h:panelGrid>
+
+                </h:panelGrid>
+            </p:panel>
+        </h:form>
+
+    </ui:define>
+</ui:composition>

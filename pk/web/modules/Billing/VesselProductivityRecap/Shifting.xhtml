@@ -1,0 +1,216 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="bundles">
+        bundles
+    </ui:define>
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.vessel_productivity_recap.shifting']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleDownloadRequest(args) {
+                if(!(args.validationFailed || !args.doPrint)) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.vessel_productivity_recap.shifting']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <h:form id="serviceVesselForm">
+            <h:panelGrid id="serviceVesselDetail" columns="4">
+                <h:outputLabel value="Operation" for="operation" />:
+                <h:selectOneRadio id="operation" value="#{shiftingBean.operation}" title="Operation">
+                    <f:selectItem itemValue="DISCHARGE" itemLabel="Discharge"/>
+                    <f:selectItem itemValue="LOAD" itemLabel="Load"/>
+                </h:selectOneRadio>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="No PPKB"/>:
+                <h:inputText id="noPpkb" disabled="true" value="#{shiftingBean.serviceVessel[0]}" title="No PPKB" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgVessel.show();"/>
+                <h:outputLabel value="Vessel Name" for="vesselName" />:
+                <h:inputText id="vesselName" disabled="true" value="#{shiftingBean.serviceVessel[1]}" title="Vessel Name" size="30"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage In" for="voyageIn" />:
+                <h:inputText id="voyageIn" disabled="true" value="#{shiftingBean.serviceVessel[2]}" title="Voyage In" size="30"/>
+                <h:outputText value="&nbsp;"/>
+                <h:outputLabel value="Voyage Out" for="voyageOut" />:
+                <h:inputText id="voyageOut" disabled="true" value="#{shiftingBean.serviceVessel[3]}" title="Voyage Out" size="30"/>
+                <h:outputText value="&nbsp;"/>
+            </h:panelGrid>
+            <br/>
+        </h:form>
+
+        <h:form id="serviceShiftingForm">
+            <p:dataTable paginatorPosition="bottom" var="item" rowIndexVar="No" value="#{shiftingBean.serviceShiftings}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="serviceShiftingTable">
+                <f:facet name="header">
+                    &nbsp;
+                </f:facet>
+                <p:columnGroup type="header">
+                    <p:row>                        
+                        <p:column sortBy="#{item[0]}" rowspan="3" headerText="No" />
+                        <p:column sortBy="#{item[1]}" rowspan="3" headerText="Container No" />
+                        <p:column sortBy="#{item[2]}" rowspan="3" headerText="Size" />
+                        <p:column sortBy="#{item[3]}" rowspan="3" headerText="Type" />
+                        <p:column sortBy="#{item[4]}" rowspan="3" headerText="Status" />
+                        <p:column sortBy="#{item[5]}" rowspan="3" headerText="Over Size"/>
+                        <p:column colspan="2" headerText="Dangerous" />
+                        <p:column sortBy="#{item[8]}" rowspan="3" headerText="Crane" />
+                        <p:column sortBy="#{item[9]}" rowspan="3" headerText="Landed" />
+                        <p:column colspan="6" headerText="Equipment"/>
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[6]}" rowspan="2" headerText="Dg" />
+                        <p:column sortBy="#{item[7]}" rowspan="2" headerText="Label"/>
+                        <p:column colspan="3" headerText="Shifting"/>
+                        <p:column colspan="3" headerText="Reshipping"/>
+                    </p:row>
+                    <p:row>
+                        <p:column sortBy="#{item[10]}" headerText="CC Code" />
+                        <p:column sortBy="#{item[11]}" headerText="Start" />
+                        <p:column sortBy="#{item[12]}" headerText="End" />
+                        <p:column sortBy="#{item[13]}" headerText="CC Code" />
+                        <p:column sortBy="#{item[14]}" headerText="Start" />
+                        <p:column sortBy="#{item[15]}" headerText="End" />
+                    </p:row>
+                </p:columnGroup>               
+                <p:column>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[3]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[4]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[5]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[6]}"/>
+                </p:column>
+                <p:column style="text-align: center">
+                    <h:outputText value="#{item[7]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[8]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[9]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[10]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[11]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[12]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[13]}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[14]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{item[15]}">
+                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                    </h:outputText>
+                </p:column>
+
+                <f:facet name="footer">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" disabled="#{empty shiftingBean.serviceShiftings}" id="buttonPreview" value="#{msg['application.operation.preview']}" actionListener="#{shiftingBean.handleDownload}" oncomplete="handleDownloadRequest(args)" style="font-size: x-small" update="serviceShiftingForm:buttonPreview"/>
+                        <!--                        <a href="{shiftingBean.url}" class="ui-button-text">
+                                                    <p:button disabled="{empty shiftingBean.serviceShiftings}" value="{msg['application.operation.download_as_pdf']}"/>
+                                                </a>-->
+                    </div>
+                </f:facet>
+            </p:dataTable>
+        </h:form>
+
+        <h:form id="dialogVesselForm">
+            <p:dialog header="Select Service Vessel"  widgetVar="dlgVessel" modal="true" minWidth="750">
+                <p:dataTable var="item" rowIndexVar="No" value="#{shiftingBean.serviceVessels}" paginatorPosition="bottom"
+                             paginator="true" rows="10" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column style="text-align: center">
+                        <f:facet name="header">
+                            <h:outputText value="No" />
+                        </f:facet>
+                        <h:outputText value="#{No+1}" />
+                    </p:column>
+                    <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{shiftingBean.handleSelectNoPpkb}" value="#{msg['application.operation.select']}" update="serviceVesselForm:serviceVesselDetail serviceShiftingForm:serviceShiftingTable" oncomplete="dlgVessel.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

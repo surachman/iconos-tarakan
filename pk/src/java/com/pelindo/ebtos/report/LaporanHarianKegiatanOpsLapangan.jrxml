@@ -1,0 +1,2063 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LaporanHarianKegiatanOpsLapangan" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<property name="ireport.zoom" value="1.6500000000000008"/>
+	<property name="ireport.x" value="40"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="tanggal1" class="java.util.Date"/>
+	<parameter name="tanggal2" class="java.util.Date"/>
+	<parameter name="koordinator" class="java.lang.String"/>
+	<parameter name="owner" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[--DELIVERY
+SELECT
+  (SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS delcont20full,
+  --cont20mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS delcont20mty,
+  --cont20rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) delcont20rffull,
+  --cont20rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) delcont20rfmty,
+  --cont40full
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS delcont40full,
+  --cont40mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS delcont40mty,
+  --cont40rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) delcont40rffull,
+  --cont40rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='DELIVERY'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) delcont40rfmty,
+  --RECEIVING
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_receiving d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS reccont20full,
+  --cont20mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS reccont20mty,
+  --cont20rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) reccont20rffull,
+  --cont20rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) reccont20rfmty,
+  --cont40full
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS reccont40full,
+  --cont40mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS reccont40mty,
+  --cont40rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) reccont40rffull,
+  --cont40rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM delivery_service d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb_recv
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='RECEIVING'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) reccont40rfmty,
+  --bongkaran
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS bongcont20full,
+  --cont20mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS bongcont20mty,
+  --cont20rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) bongcont20rffull,
+  --cont20rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) bongcont20rfmty,
+  --cont40full
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS bongcont40full,
+  --cont40mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS bongcont40mty,
+  --cont40rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) bongcont40rffull,
+  --cont40rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_discharge d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTOFF'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) bongcont40rfmty,
+  --muatan
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS muatcont20full,
+  --cont20mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS muatcont20mty,
+  --cont20rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) muatcont20rffull,
+  --cont20rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =20
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) muatcont20rfmty,
+  --cont40full
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS muatcont40full,
+  --cont40mty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general !='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) AS muatcont40mty,
+  --cont40rffull
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='FCL'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) muatcont40rffull,
+  --cont40rfmty
+  (
+  SELECT COUNT(d.cont_no)
+  FROM service_cont_load d,
+    equipment e,
+    m_container_type mt,
+    m_equipment me
+  WHERE d.cont_no         =e.cont_no
+  AND d.no_ppkb           =e.no_ppkb
+  AND d.cont_type         =mt.cont_type
+  AND mt.type_in_general  ='RF'
+  AND d.cont_size         =40
+  AND d.cont_status       ='MTY'
+  AND e.equipment_act_code='LIFTON'
+  AND me.equip_code       =e.equip_code
+  AND me.owner_code       =$P{owner}
+  AND e.end_time BETWEEN $P{tanggal1} AND $P{tanggal2}
+  ) muatcont40rfmty,
+  (SELECT description FROM m_setting_app WHERE id='tpb_pn_jawab_opr'
+  ) nama,
+  (SELECT value_string FROM m_setting_app WHERE id='tpb_pn_jawab_opr'
+  ) nipp,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.cabang.kota'
+  ) kota,
+  (SELECT description FROM m_setting_app WHERE id='ebtos.nama.cabang'
+  ) AS cabang,
+  (SELECT description FROM m_setting_app WHERE id='spv_bongkar_muat'
+  ) namaSpv,
+  (SELECT value_string FROM m_setting_app WHERE id='spv_bongkar_muat'
+  ) nippSpv,
+  ' PERIODE : '
+  || to_date($P{tanggal1},'dd/MM/yyyy')
+  || ' S/D '
+  || to_Date($P{tanggal2},'dd/MM/yyyy') AS periode
+from dual]]>
+	</queryString>
+	<field name="kota" class="java.lang.String"/>
+	<field name="cabang" class="java.lang.String"/>
+	<field name="delcont20full" class="java.lang.Long"/>
+	<field name="delcont20mty" class="java.lang.Long"/>
+	<field name="delcont20rffull" class="java.lang.Long"/>
+	<field name="delcont20rfmty" class="java.lang.Long"/>
+	<field name="delcont40full" class="java.lang.Long"/>
+	<field name="delcont40mty" class="java.lang.Long"/>
+	<field name="delcont40rffull" class="java.lang.Long"/>
+	<field name="delcont40rfmty" class="java.lang.Long"/>
+	<field name="reccont20full" class="java.lang.Long"/>
+	<field name="reccont20mty" class="java.lang.Long"/>
+	<field name="reccont20rffull" class="java.lang.Long"/>
+	<field name="reccont20rfmty" class="java.lang.Long"/>
+	<field name="reccont40full" class="java.lang.Long"/>
+	<field name="reccont40mty" class="java.lang.Long"/>
+	<field name="reccont40rffull" class="java.lang.Long"/>
+	<field name="reccont40rfmty" class="java.lang.Long"/>
+	<field name="bongcont20full" class="java.lang.Long"/>
+	<field name="bongcont20mty" class="java.lang.Long"/>
+	<field name="bongcont20rffull" class="java.lang.Long"/>
+	<field name="bongcont20rfmty" class="java.lang.Long"/>
+	<field name="bongcont40full" class="java.lang.Long"/>
+	<field name="bongcont40mty" class="java.lang.Long"/>
+	<field name="bongcont40rffull" class="java.lang.Long"/>
+	<field name="bongcont40rfmty" class="java.lang.Long"/>
+	<field name="muatcont20full" class="java.lang.Long"/>
+	<field name="muatcont20mty" class="java.lang.Long"/>
+	<field name="muatcont20rffull" class="java.lang.Long"/>
+	<field name="muatcont20rfmty" class="java.lang.Long"/>
+	<field name="muatcont40full" class="java.lang.Long"/>
+	<field name="muatcont40mty" class="java.lang.Long"/>
+	<field name="muatcont40rffull" class="java.lang.Long"/>
+	<field name="muatcont40rfmty" class="java.lang.Long"/>
+	<field name="nama" class="java.lang.String"/>
+	<field name="nipp" class="java.lang.String"/>
+	<field name="namaspv" class="java.lang.String"/>
+	<field name="nippspv" class="java.lang.String"/>
+	<field name="periode" class="java.lang.String"/>
+	<variable name="delivery" class="java.lang.Long"/>
+	<variable name="receiving" class="java.lang.Long"/>
+	<variable name="bongkar" class="java.lang.Long"/>
+	<variable name="muat" class="java.lang.Long"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="38" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="194" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[PT. Pelabuhan Indonesia IV (Persero)]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="15" width="194" height="15"/>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{cabang}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="32" splitType="Stretch">
+			<textField>
+				<reportElement x="1" y="0" width="801" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{periode}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="802" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[LAPORAN HARIAN KEGIATAN OPS. LAPANGAN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="15" width="200" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[DELIVERY]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="15" width="198" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[RECEIVING]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="15" width="200" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[BONGKAR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="15" width="204" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="9"/>
+				</textElement>
+				<text><![CDATA[MUAT]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="113" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="14" width="89" height="15"/>
+				<box leftPadding="5">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="28" width="89" height="15"/>
+				<box leftPadding="5">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="56" width="89" height="15"/>
+				<box leftPadding="5">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="70" width="89" height="15"/>
+				<box leftPadding="5">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="84" width="89" height="15"/>
+				<box leftPadding="5">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="98" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="42" width="89" height="15"/>
+				<box leftPadding="5">
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.0"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="84" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="56" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="28" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="42" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="70" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="14" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="88" y="98" width="16" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="70" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="84" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="56" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="42" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="28" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="14" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="98" width="44" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="156" y="0" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="70" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="84" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="84" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="0" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="56" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="28" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="98" width="44" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="28" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="42" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="42" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="14" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="0" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="14" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="70" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="56" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="28" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="42" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="14" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="70" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="98" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="287" y="98" width="16" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="56" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="354" y="84" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="28" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="14" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="42" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="28" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="14" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="14" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="56" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="0" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="70" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="84" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="28" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="70" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="84" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="0" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="42" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="398" y="98" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="98" width="16" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="486" y="56" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="70" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="98" width="44" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="42" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="56" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="554" y="84" width="44" height="15"/>
+				<box>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="98" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="56" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="84" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="28" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="42" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 RF MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="0" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY FL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="70" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[40 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="598" y="14" width="89" height="15"/>
+				<box leftPadding="5">
+					<leftPen lineWidth="0.25"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[20 DRY MT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="70" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="42" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="56" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="0" width="16" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="14" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="84" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="98" width="20" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="28" width="16" height="15"/>
+				<box leftPadding="0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[=]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="14" width="44" height="15"/>
+				<box leftPadding="0">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="42" width="44" height="15"/>
+				<box leftPadding="0">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="98" width="44" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="28" width="44" height="15"/>
+				<box leftPadding="0">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="0" width="44" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="56" width="44" height="15"/>
+				<box leftPadding="0">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="70" width="44" height="15"/>
+				<box leftPadding="0">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="758" y="84" width="44" height="15"/>
+				<box leftPadding="0">
+					<topPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<text><![CDATA[BOX]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="104" y="0" width="53" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont20full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="104" y="14" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont20mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="104" y="28" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont20rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="104" y="42" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont20rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="104" y="56" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont40full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="104" y="70" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont40mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="104" y="84" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont40rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="104" y="98" width="53" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont40rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="14" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont20mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="42" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont20rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="98" width="53" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont40rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="56" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont40full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="28" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont20rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="70" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont40mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="84" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont40rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="42" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont20rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="0" width="53" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont20full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="28" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont20rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="56" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont40full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="14" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont20mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="98" width="53" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont40rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="84" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont40rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="70" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont40mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="98" width="53" height="15"/>
+				<box>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont40rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="70" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont40mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="56" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont40full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="42" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont20rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="0" width="53" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont20full}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="84" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont40rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="28" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont20rffull}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="14" width="53" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont20mty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="302" y="0" width="53" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont20full}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="89" splitType="Stretch">
+			<staticText>
+				<reportElement x="631" y="19" width="148" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[KOORDINATOR SHIFT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="317" y="19" width="148" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[PENANGGUNG JAWAB OPERASIONAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="62" y="19" width="94" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<text><![CDATA[OPERASIONAL
+SPV. BONGKAR / MUAT PK]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="62" y="58" width="100" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{namaspv}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="62" y="74" width="100" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nippspv}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="61" y="73" width="100" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="338" y="74" width="100" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nipp}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="337" y="73" width="100" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="338" y="58" width="100" height="15"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{nama}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="658" y="72" width="100" height="1"/>
+			</line>
+			<textField>
+				<reportElement x="631" y="54" width="148" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{koordinator}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="21" splitType="Stretch">
+			<textField>
+				<reportElement x="104" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{delcont20full} + $F{delcont20mty} + $F{delcont20rffull} +
+$F{delcont20rfmty} + $F{delcont40full} + $F{delcont40mty} +
+$F{delcont40rffull} + $F{delcont40rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="303" y="0" width="52" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{reccont20full} + $F{reccont20mty}+ $F{reccont20rffull} +
+$F{reccont20rfmty} + $F{reccont40full} + $F{reccont40mty}
++ $F{reccont40rffull} + $F{reccont40rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="501" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{bongcont20full} + $F{bongcont20mty} + $F{bongcont20rffull} + $F{bongcont20rfmty}
++ $F{bongcont40full} + $F{bongcont40mty} + $F{bongcont40rffull} + $F{bongcont40rfmty}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="705" y="0" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="8"/>
+				</textElement>
+				<textFieldExpression class="java.lang.Long"><![CDATA[$F{muatcont20full} + $F{muatcont20mty} + $F{muatcont20rffull} + $F{muatcont20rfmty} +
+$F{muatcont40full} + $F{muatcont40mty} + $F{muatcont40rffull} + $F{muatcont40rfmty}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="0" width="1" height="19"/>
+			</line>
+			<line>
+				<reportElement x="0" y="20" width="802" height="1"/>
+			</line>
+			<line>
+				<reportElement x="802" y="0" width="1" height="21"/>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

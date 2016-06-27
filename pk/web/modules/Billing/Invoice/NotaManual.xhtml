@@ -1,0 +1,500 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.invoice.nota_manual']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.invoice.nota_manual']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            jQuery("[id=fmAddNota:isTax]").live('change', function(){
+                var tax = Math.floor(10 * parseFloat(jQuery("[id=fmAddNota:csTot]").val())/100);
+                if(jQuery(this).is(':checked')){
+                    jQuery("[id=fmAddNota:taxInput]").val(tax);
+                    jQuery("[id=fmAddNota:grandTotal]").val(parseFloat(jQuery("[id=fmAddNota:csTot]").val()) + parseFloat(tax) + parseFloat(jQuery("[id=fmAddNota:materaiInput]").val()));
+                } else {
+                    jQuery("[id=fmAddNota:taxInput]").val(0);
+                    jQuery("[id=fmAddNota:grandTotal]").val(parseFloat(jQuery("[id=fmAddNota:csTot]").val()) + parseFloat(jQuery("[id=fmAddNota:materaiInput]").val()));
+                }                
+            });                  
+
+            jQuery(".countable").live('keyup change',function(){
+                if (jQuery(this).val() != "")
+                    jQuery(this).val(parseFloat(jQuery(this).val()));
+                    var cs1 = jQuery("[id=fmAddNota:cs1]").val();
+                    var cs2 = jQuery("[id=fmAddNota:cs2]").val();
+                    var cs3 = jQuery("[id=fmAddNota:cs3]").val();
+                    var cs4 = jQuery("[id=fmAddNota:cs4]").val();
+                    var cs5 = jQuery("[id=fmAddNota:cs5]").val();
+                    var cs6 = jQuery("[id=fmAddNota:cs6]").val();
+                    var cs7 = jQuery("[id=fmAddNota:cs7]").val();
+                    var cs8 = jQuery("[id=fmAddNota:cs8]").val();
+                    var csTot = jQuery("[id=fmAddNota:csTot]").val();
+                    var tax = jQuery("[id=fmAddNota:taxInput]").val();
+                    var mat = jQuery("[id=fmAddNota:materaiInput]").val();
+                if (!((cs1 == "") || (cs2 == "") || (cs3 == "") || (cs4 == "") || (cs5 == "") || (cs6 == "") || (cs7 == "") || (cs8 == ""))){
+                   jQuery("[id=fmAddNota:csTot]").val(parseFloat(cs1) + parseFloat(cs2) + parseFloat(cs3) + parseFloat(cs4) + parseFloat(cs5) + parseFloat(cs6) + parseFloat(cs7) + parseFloat(cs8));
+                   jQuery("[id=fmAddNota:grandTotal]").val(parseFloat(cs1) + parseFloat(cs2) + parseFloat(cs3) + parseFloat(cs4) + parseFloat(cs5) + parseFloat(cs6) + parseFloat(cs7) + parseFloat(cs8) + parseFloat(tax) + parseFloat(mat));
+                }
+            });
+            jQuery(".countable").live('keyup',function(){
+            if (jQuery(this).val() != "")
+                    jQuery(this).val(parseFloat(jQuery(this).val()));
+                    var cs1 = jQuery("[id=fmEditNota:cs1]").val();
+                    var cs2 = jQuery("[id=fmEditNota:cs2]").val();
+                    var cs3 = jQuery("[id=fmEditNota:cs3]").val();
+                    var cs4 = jQuery("[id=fmEditNota:cs4]").val();
+                    var cs5 = jQuery("[id=fmEditNota:cs5]").val();
+                    var cs6 = jQuery("[id=fmEditNota:cs6]").val();
+                    var cs7 = jQuery("[id=fmEditNota:cs7]").val();
+                    var cs8 = jQuery("[id=fmEditNota:cs8]").val();
+                    var csTot = jQuery("[id=fmEditNota:csTot]").val();
+                    var tax = jQuery("[id=fmEditNota:taxInput]").val();
+                    var mat = jQuery("[id=fmEditNota:materaiInput]").val();
+                if (!((cs1 == "") || (cs2 == "") || (cs3 == "") || (cs4 == "") || (cs5 == "") || (cs6 == "") || (cs7 == "") || (cs8 == ""))){
+                    jQuery("[id=fmEditNota:csTot]").val(parseFloat(cs1) + parseFloat(cs2) + parseFloat(cs3) + parseFloat(cs4) + parseFloat(cs5) + parseFloat(cs6) + parseFloat(cs7) + parseFloat(cs8));
+                    var tax = Math.floor(10 * ((parseFloat(cs1) + parseFloat(cs2) + parseFloat(cs3) + parseFloat(cs4) + parseFloat(cs5) + parseFloat(cs6) + parseFloat(cs7) + parseFloat(cs8)))/100);
+                    if(jQuery("[id=fmEditNota:isTax]").is(':checked')){
+                        jQuery("[id=fmEditNota:taxInput]").val(tax);
+                        jQuery("[id=fmEditNota:grandTotal]").val(parseFloat(jQuery("[id=fmEditNota:csTot]").val()) + parseFloat(tax) + parseFloat(jQuery("[id=fmEditNota:materaiInput]").val()));
+                    } else {
+                        jQuery("[id=fmEditNota:taxInput]").val(0);
+                        jQuery("[id=fmEditNota:grandTotal]").val(parseFloat(jQuery("[id=fmEditNota:csTot]").val()) + parseFloat(jQuery("[id=fmEditNota:materaiInput]").val()));
+                    }
+                    //jQuery("[id=fmEditNota:grandTotal]").val(parseFloat(cs1) + parseFloat(cs2) + parseFloat(cs3) + parseFloat(cs4) + parseFloat(cs5) + parseFloat(cs6) + parseFloat(cs7) + parseFloat(cs8) + parseFloat(tax) + parseFloat(mat));
+                }
+            });
+
+            jQuery(".countable").focus(function() { jQuery(this).select(); })
+
+            function handleDownloadRequest(args) {
+                if(args.doPrint) {
+                    window.open(unescape(args.url), '_blank', 'fullscreen=yes, scrollbars=auto');
+                }
+            }
+        </script>
+
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true" life="3000"/>
+        <!-- List Nota Manual -->
+
+        <h:form id="fmmain">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{notaManualBean.notaManuals}" paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15" id="dtNotaManual" rowIndexVar="number">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" actionListener="#{notaManualBean.handleOnAdd}" update="fmAddNota" value="#{msg['application.operation.add']}" immediate="true" oncomplete="dlg.show();" onclick="genTitle('dialog','#{msg['application.operation.add']} Nota Manual');"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+  <!--          <p:column  filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="No. PPKB" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column> -->
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="No. Registrasi" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[2]}" sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="No. Invoice" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[3]}" sortBy="#{item[3]}">
+                    <f:facet name="header">
+                        <h:outputText value="No. Faktur Pajak" />
+                    </f:facet>
+                    <h:outputText value="#{item[3]}" />
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[4]}" sortBy="#{item[4]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Nama Perusahaan/Debitur" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column  filterMatchMode="contains" filterBy="#{item[5]}" sortBy="#{item[5]}" style="text-align: right" >
+                    <f:facet name="header">
+                        <h:outputText value="Total Tagihan" />
+                    </f:facet>
+                    <h:outputText value="Rp" style="text-align: left;"/>
+                    <h:outputText value="#{item[5]}" >
+                        <f:convertNumber type="currency" currencySymbol=" "  maxFractionDigits="2" />
+                    </h:outputText>
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton actionListener="#{notaManualBean.handleOnPrint}" value="#{msg['application.operation.print']}" oncomplete="handleDownloadRequest(args)" update="fmmain:tableInvoices" onstart="freeze()">
+                            <f:attribute name="noReg" value="#{item[1]}"/>
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{notaManualBean.handleOnEdit}" value="#{msg['application.operation.edit']}" update="fmEditNota" onsuccess="dlgEdit.show();" onstart="freeze()">
+                            <f:attribute name="noReg" value="#{item[1]}"/>
+                            <f:attribute name="nmId" value="#{item[8]}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+
+
+            </p:dataTable>
+        </h:form>
+
+        <!-- Dialog buat nota manual baru tanpa PPN -->
+        <p:dialog header="Registration Form"  widgetVar="dlg" modal="true" width="800" id="dialog" resizable="false">
+            <h:form id="fmAddNota">
+                <h:panelGrid>
+                    <p:fieldset legend="Data Header Nota">
+                        <h:panelGrid columns="4" columnClasses="first-td" rowClasses="first-tr">
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="Kegiatan :" />
+                                <h:selectOneMenu value="#{notaManualBean.notaManualDetail.activityType}" valueChangeListener="#{notaManualBean.onChangeActivityType}">
+                                    <f:selectItem itemLabel="--- PILIH KEGIATAN ---" noSelectionOption="true" itemValue="0"/>
+                                    <f:selectItems value="#{notaManualBean.manualActivityTypes}" var="item" itemValue="#{item[0]}" itemLabel="#{item[1]}" />
+                                    <f:ajax execute="@this" event="change" render="detailNota" />
+                                </h:selectOneMenu>
+                            </h:panelGrid>                           
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="4" rowClasses="first-tr">                         
+   <!--                     <h:panelGrid columns="1">
+                                <h:outputLabel value="No. PPKB :" />
+                                <h:inputText value="#{notaManualBean.perhitunganNotaManual.noPpkb}" size="20"/>
+                            </h:panelGrid> -->
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Registrasi :" />
+                                <h:inputText value="#{notaManualBean.perhitunganNotaManual.noReg}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="Nama Perusahaan/Debitur : " />
+                                <h:selectOneMenu value="#{notaManualBean.perhitunganNotaManual.custCode}">
+                                    <f:selectItems value="#{notaManualBean.customers}" var="item" itemValue="#{item[0]}" itemLabel="#{item[1]}" />
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="4" rowClasses="first-tr">
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Invoice :" />
+                                <h:inputText value="#{notaManualBean.invoice.noInvoice}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="Tanggal Invoice :" />
+                                <h:inputText value="#{notaManualBean.invoice.createdDate}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Faktur Pajak :" />
+                                <h:inputText value="#{notaManualBean.invoice.noFakturPajak}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Bentuk 3 :" />
+                                <h:inputText value="#{notaManualBean.perhitunganNotaManual.noBentukTiga}" size="20"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </p:fieldset>
+                    <p:spacer height="5"/>
+                    <p:fieldset legend="Data Detail Nota" id="detailNota" toggleable="true" toggleSpeed="500">
+                        <h:outputText value="A. Perhitungan Jasa" style="font-weight: bold"/>
+                        <h:panelGrid columns="5" rowClasses="first-tr">
+                            <h:outputText value="1." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[0].name}" />
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs1" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[0].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[0].id}" />
+
+                            <h:outputText value="2." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[1].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs2" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[1].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[1].id}" />
+
+                            <h:outputText value="3." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[2].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText  id="cs3" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[2].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[2].id}" />
+
+                            <h:outputText value="4." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[3].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs4" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[3].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[3].id}" />
+
+                            <h:outputText value="5." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[4].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs5" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[4].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[4].id}" />
+
+                            <h:outputText value="6." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[5].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs6" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[5].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[5].id}" />
+
+                            <h:outputText value="7." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[6].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs7" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[6].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[6].id}" />
+
+                            <h:outputText value="8." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[7].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs8" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[7].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[7].id}" />
+
+                            <h:outputText />
+                            <h:outputText value="SUB TOTAL PERHITUNGAN JASA " style="font-style: italic; font-weight: bold;" />
+                            <h:outputText value="Rp." />
+                            <h:inputText id="csTot" size="20" dir="RTL" value="#{notaManualBean.jumTagihan}">                               
+                            </h:inputText>
+                            <h:outputText />
+
+                            <h:outputText />                           
+                            <h:panelGroup>
+                                <h:selectBooleanCheckbox value="#{notaManualBean.isIncludeTax}" title="Hitung dengan pajak?" id="isTax" />
+                                <h:outputText value="Hitung Dengan Pajak?"/>
+                            </h:panelGroup>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputText />
+
+                            <h:outputText value="9." />
+                            <h:panelGroup>
+                                <h:outputText value="Pajak Pertambahan Nilai (PPN) 10%" />
+                                <h:outputText />
+                                <h:outputText />
+                                <h:outputText />
+                                <h:outputText />
+                            </h:panelGroup>
+                            <h:outputText value="Rp." />
+                            <h:inputText size="20" dir="RTL" value="#{notaManualBean.tax}" id="taxInput" />
+                            <h:outputText />
+
+                            <h:outputText value="10." />
+                            <h:outputText value="Biaya Materai" />
+                            <h:outputText value="Rp." />
+                            <h:inputText size="20" dir="RTL" value="#{notaManualBean.materai}" id="materaiInput" styleClass="countable"/>
+                            <h:outputText />
+
+                            <h:outputText />
+                            <h:outputText value="TOTAL BAYAR"  style="font-style: italic; font-weight: bold;"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText size="20" dir="RTL" value="#{notaManualBean.grandTot}" disabled="true" id="grandTotal"/>
+                            <h:outputText />
+                        </h:panelGrid>                                             
+                    </p:fieldset>
+
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.submit']}" actionListener="#{notaManualBean.handleOnSubmit}" oncomplete="handleDownloadRequest(args)" onsuccess="dlg.hide()" update="fmmain:dtNotaManual" onstart="freeze();"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                        </div>
+                    </f:facet>
+                </h:panelGrid>               
+            </h:form>
+        </p:dialog>
+        <!-- Dialog buat nota manual baru dengan PPN -->
+
+        <!-- Dialog Edit -->
+        <p:dialog header="Registration Form"  widgetVar="dlgEdit" modal="true" width="800" id="dialogEdit" resizable="false">
+            <h:form id="fmEditNota">
+                <h:panelGrid>
+                    <p:fieldset legend="Data Header Nota">
+                        <h:panelGrid columns="4" columnClasses="first-td" rowClasses="first-tr">
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="Kegiatan :" />
+                                <h:selectOneMenu value="#{notaManualBean.notaManualDetail.activityType}" valueChangeListener="#{notaManualBean.onChangeActivityType}">
+                                    <f:selectItem itemLabel="--- PILIH KEGIATAN ---" noSelectionOption="true" itemValue="0"/>
+                                    <f:selectItems value="#{notaManualBean.manualActivityTypes}" var="item" itemValue="#{item[0]}" itemLabel="#{item[1]}" />
+                                    <f:ajax execute="@this" event="change" render="detailNota" />
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="4" rowClasses="first-tr">
+    <!--                   <h:panelGrid columns="1">
+                                <h:outputLabel value="No. PPKB :" />
+                                <h:inputText value="#{notaManualBean.perhitunganNotaManual.noPpkb}" size="20"/>
+                            </h:panelGrid> -->
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Registrasi :" />
+                                <h:inputText value="#{notaManualBean.perhitunganNotaManual.noReg}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="Nama Perusahaan/Debitur : " />
+                                <h:selectOneMenu value="#{notaManualBean.perhitunganNotaManual.custCode}">
+                                    <f:selectItems value="#{notaManualBean.customers}" var="item" itemValue="#{item[0]}" itemLabel="#{item[1]}" />
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                        </h:panelGrid>
+
+                        <h:panelGrid columns="4" rowClasses="first-tr">
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Invoice :" />
+                                <h:inputText value="#{notaManualBean.invoice.noInvoice}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="Tanggal Invoice :" />
+                                <h:inputText value="#{notaManualBean.invoice.createdDate}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Faktur Pajak :" />
+                                <h:inputText value="#{notaManualBean.invoice.noFakturPajak}" size="20" disabled="true"/>
+                            </h:panelGrid>
+
+                            <h:panelGrid columns="1">
+                                <h:outputLabel value="No. Bentuk 3 :" />
+                                <h:inputText value="#{notaManualBean.perhitunganNotaManual.noBentukTiga}" size="20"/>
+                            </h:panelGrid>
+                        </h:panelGrid>
+                    </p:fieldset>
+                    <p:spacer height="5"/>
+                    <p:fieldset legend="Data Detail Nota" id="detailNota" toggleable="true" toggleSpeed="500">
+                        <h:outputText value="A. Perhitungan Jasa" style="font-weight: bold"/>
+                        <h:panelGrid columns="5" rowClasses="first-tr">
+                            <h:outputText value="1." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[0].name}" />
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs1" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[0].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[0].id}" />
+
+                            <h:outputText value="2." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[1].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs2" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[1].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[1].id}" />
+
+                            <h:outputText value="3." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[2].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText  id="cs3" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[2].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[2].id}" />
+
+                            <h:outputText value="4." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[3].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs4" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[3].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[3].id}" />
+
+                            <h:outputText value="5." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[4].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs5" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[4].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[4].id}" />
+
+                            <h:outputText value="6." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[5].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs6" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[5].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[5].id}" />
+
+                            <h:outputText value="7." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[6].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs7" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[6].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[6].id}" />
+
+                            <h:outputText value="8." />
+                            <h:inputText size="60" maxlength="50" value="#{notaManualBean.customDatas[7].name}"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText id="cs8" styleClass="countable" size="20" dir="RTL" value="#{notaManualBean.customDatas[7].amount}" />
+                            <h:inputHidden value="#{notaManualBean.customDatas[7].id}" />
+
+                            <h:outputText />
+                            <h:outputText value="SUB TOTAL PERHITUNGAN JASA " style="font-style: italic; font-weight: bold;" />
+                            <h:outputText value="Rp." />
+                            <h:inputText id="csTot" size="20" dir="RTL" value="#{notaManualBean.jumTagihan}">
+                            </h:inputText>
+                            <h:outputText />
+
+                            <h:outputText />
+                            <h:panelGroup>
+                                <h:selectBooleanCheckbox value="#{notaManualBean.isIncludeTax}" title="Hitung dengan pajak?" id="isTax" disabled="true"/>
+                                <h:outputText value="Hitung Dengan Pajak?"/>
+                            </h:panelGroup>
+                            <h:outputText />
+                            <h:outputText />
+                            <h:outputText />
+
+                            <h:outputText value="9." />
+                            <h:panelGroup>
+                                <h:outputText value="Pajak Pertambahan Nilai (PPN) 10%" />
+                                <h:outputText />
+                                <h:outputText />
+                                <h:outputText />
+                                <h:outputText />
+                            </h:panelGroup>
+                            <h:outputText value="Rp." />
+                            <h:inputText size="20" dir="RTL" value="#{notaManualBean.tax}" id="taxInput" />
+                            <h:outputText />
+
+                            <h:outputText value="10." />
+                            <h:outputText value="Biaya Materai" />
+                            <h:outputText value="Rp." />
+                            <h:inputText size="20" dir="RTL" value="#{notaManualBean.materai}" id="materaiInput" styleClass="countable"/>
+                            <h:outputText />
+
+                            <h:outputText />
+                            <h:outputText value="TOTAL BAYAR"  style="font-style: italic; font-weight: bold;"/>
+                            <h:outputText value="Rp." />
+                            <h:inputText size="20" dir="RTL" value="#{notaManualBean.grandTot}" disabled="true" id="grandTotal"/>
+                            <h:outputText />
+                        </h:panelGrid>
+                    </p:fieldset>
+
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.submit']}" actionListener="#{notaManualBean.handleOnSubmitEdit}" onsuccess="dlgEdit.hide()" update="fmmain:dtNotaManual" onstart="freeze();" >
+                                <f:attribute name="noReg" value="#{notaManualBean.perhitunganNotaManual.noReg}"/>
+                                <f:attribute name="nmId" value="#{notaManualBean.perhitunganNotaManual.id}"/>
+                            </p:commandButton>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlgEdit.hide();" type="reset"/>
+                        </div>
+                    </f:facet>
+                </h:panelGrid>
+            </h:form>
+        </p:dialog>
+        <!-- end -->
+    </ui:define>
+</ui:composition>

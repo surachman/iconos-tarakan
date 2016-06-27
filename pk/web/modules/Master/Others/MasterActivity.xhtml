@@ -1,0 +1,118 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.others.master_activity']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.others.master_activity']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+        function validateForm(xhr, status, args) {
+            if(args.validationFailed || !args.validated) {
+                jQuery('#dialogAddEdit').show();
+            } else {
+                dialogAddEdit.hide();
+            }
+        }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">        
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+        <h:form id="main-list">
+            <p:dataTable paginatorPosition="bottom" value="#{masterActivityBean.activityConts}" var="item"
+                         paginator="true" rows="10" rowIndexVar="number"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">               
+                <f:facet name="header">
+                    <!--                    <div class="header-panel-single-left">
+                                            <p:commandButton image="ui-icon-plusthick" value="{msg['application.operation.add']}" immediate="true" onclick="dialogAddEdit.show()" actionListener="{masterActivityBean.handleAdd}" update="formAddEdit"/>
+                                        </div>-->
+                    <div class="header-panel-single-left">
+                        <h:outputText value="&nbsp;"/>
+                    </div>
+                </f:facet>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" style="width: 100px;text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Activity Code"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Description"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column style="width: 70px">
+                    <f:facet name="header">
+                        <h:outputText value="Action"/>
+                    </f:facet>
+                    <center>
+                        <p:commandButton image="ui-icon-pencil" oncomplete="dialogAddEdit.show()" title="Edit" actionListener="#{masterActivityBean.handleSelectTable}" update="formAddEdit">
+                            <f:attribute name="act_code" value="#{item[0]}"/>
+                        </p:commandButton>
+                        <!--                        <p:commandButton image="ui-icon-trash" onclick="dialogDel.show()" title="Delete" actionListener="{masterActivityBean.handleSelectTable}">
+                                                    <f:attribute name="act_code" value="{item.activityCode}"/>
+                                                </p:commandButton>-->
+                        <h:outputText value="&nbsp;"/>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog modal="true"  widgetVar="dialogAddEdit" minWidth="500" header="Edit Master Activity">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:panelGrid columns="4" columnClasses="first-td">
+                        <h:outputLabel value="Activity Code*" for="activityCode" />:
+                        <h:inputText id="activityCode" value="#{masterActivityBean.activityCont.activityCode}" title="ActivityCode" required="true" requiredMessage="The ActivityCode field is required." disabled="#{masterActivityBean.vis}"/>
+                        <p:message for="name" display="icon"/>
+
+                        <h:outputLabel value="Description*" for="name" />:
+                        <h:inputText id="name" value="#{masterActivityBean.activityCont.description}" title="Name" required="true" requiredMessage="The Description field is required." size="40" />
+                        <p:message for="name" display="icon"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" actionListener="#{masterActivityBean.handleSaveEdit}" update="main-list growl formAddEdit" oncomplete="validateForm(xhr, status, args);" image="ui-icon-check"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" image="ui-icon-cancel" onclick="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog modal="true" header="#{msg['application.header.confirm.delete']}"  widgetVar="dialogDel">
+            <h:form id="formDelete">               
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterActivityBean.handleDelete}" update="main-list growl" oncomplete="dialogDel.hide()"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+</ui:composition>

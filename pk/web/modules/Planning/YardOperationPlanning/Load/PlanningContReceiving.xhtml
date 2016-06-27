@@ -1,0 +1,434 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.yard_operation_planning.load.receiving_loading_list']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.yard_operation_planning.load.receiving_loading_list']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+
+
+        <h:form id="formdischarge">
+            <p:dialog header="Select Planning Vessel"  widgetVar="dlgvessel" modal="true" minWidth="750">
+                <p:dataTable var="item" value="#{planningContReceivingBean.planningVessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" id="vesselDetail" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton actionListener="#{planningContReceivingBean.handleSelectNoPpkb}" value="select" update="formdischarge:baplieDischargesTable formdischarge:planningVesselDetail" oncomplete="dlgvessel.hide();statusDialog.hide();">
+                                <f:attribute name="noPpkb" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </p:dialog>
+            <h:panelGrid id="planningVesselDetail" columns="4">
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{planningContReceivingBean.planningVessel[0]}" disabled="true" size="30"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." onclick="dlgvessel.show()" update="formdischarge:vesselDetail" actionListener="#{planningContReceivingBean.handleNewPpkb}" style="font-size: x-small"/>
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{planningContReceivingBean.planningVessel[1]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{planningContReceivingBean.planningVessel[2]}" disabled="true" size="30"/>
+                <h:outputText />
+                <h:outputLabel value="Voyage Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{planningContReceivingBean.planningVessel[3]}" disabled="true" size="30"/>
+                <h:outputText />
+            </h:panelGrid>
+            <br />
+            <br />
+            <p:dataTable id="baplieDischargesTable" var="item" value="#{planningContReceivingBean.planningContReceivings}"
+                         paginator="true" rows="20" paginatorPosition="bottom"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="20,35,50" rowStyleClass="#{item.isCompleted ? null : 'false-row'}" rowIndexVar="number">
+
+                <f:facet name="header">
+                    <div class="header-panel-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon ui-icon-trash" value="#{msg['application.operation.delete_all']}" disabled="#{empty planningContReceivingBean.planningContReceivings or planningContReceivingBean.disableFinish}" actionListener="#{planningContReceivingBean.handleDeleteAll}" oncomplete="confirmation.show();" />
+                    </div>
+                    <div class="header-panel-right">
+                        <p:commandButton onstart="freeze();" image="ui-icon-locked" value="#{msg['application.operation.finish']}" disabled="#{planningContReceivingBean.disableFinish or empty planningContReceivingBean.planningContReceivings}" onclick="confirmationFinish.show();" />
+                    </div>
+                </f:facet>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="No." />
+                    </f:facet>
+                    <h:outputText value="#{number+1}." />
+                </p:column>
+
+                <p:column sortBy="#{item.blNo}" style="text-align: center" filterMatchMode="contains" filterBy="#{item.blNo}">
+                    <f:facet name="header">
+                        <h:outputText value="Bl No" />
+                    </f:facet>
+                    <h:outputText value="#{item.blNo}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contNo}" style="text-align: center" filterMatchMode="contains" filterBy="#{item.contNo}">
+                    <f:facet name="header">
+                        <h:outputText value="Cont No" />
+                    </f:facet>
+                    <h:outputText style="#{not item.containerNumberValid ? 'font-weight: bold; color: red;' : null}" value="#{item.contNo}" />
+                </p:column>
+
+                <p:column sortBy="#{item.masterCommodity.name}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Commodity" />
+                    </f:facet>
+                    <h:outputText value="#{item.masterCommodity.name}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contSize}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item.contSize}" />
+                </p:column>
+
+                <p:column sortBy="#{item.masterContainerType.masterContainerTypeInGeneral.id}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Cont Type" />
+                    </f:facet>
+                    <h:outputText value="#{item.masterContainerType.masterContainerTypeInGeneral.id}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contStatus}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item.contStatus}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contGross}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Gross" />
+                    </f:facet>
+                    <h:outputText value="#{item.contGross}" />
+                </p:column>
+
+                <p:column sortBy="#{item.sealNo}" style="text-align: center">
+                    <f:facet name="header">
+                        <h:outputText value="Seal No" />
+                    </f:facet>
+                    <h:outputText value="#{item.sealNo}" />
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{planningContReceivingBean.handleEditDeleteButton}" disabled="#{planningContReceivingBean.disableFinish}" image="ui-icon ui-icon-pencil" title="Edit Container By Plan" update="formAddEdit" oncomplete="dlg.show();" onclick="genTitle('dialog','#{msg['application.operation.edit']} Container By Plan');">
+                            <f:attribute name="idCont" value="#{item.id}"/>
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{planningContReceivingBean.handleEditDeleteButton}" disabled="#{planningContReceivingBean.disableFinish}" image="ui-icon ui-icon-trash" title="Delete Container By Plan" oncomplete="confirmation.show();">
+                            <f:attribute name="idCont" value="#{item.id}"/>
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:dialog header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  actionListener="#{planningContReceivingBean.delete}"  update="formdischarge:baplieDischargesTable growl" onclick="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  header="#{msg['application.header.confirm.finish']}"  widgetVar="confirmationFinish">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="#{msg['application.operation.finish_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}"  action="#{planningContReceivingBean.handleButtonFinish}"  update="formdischarge:baplieDischargesTable growl" onclick="confirmationFinish.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmationFinish.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Container to Bay Plan"  widgetVar="dlg" modal="true" minWidth="500" id="dialog">
+            <h:form id="formAddEdit">
+                <p:panel>
+                    <h:panelGrid columns="1">
+                        <h:panelGrid columns="4">
+
+                            <h:outputLabel value="Bl No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{planningContReceivingBean.planningContReceiving.blNo}" />
+                            <h:outputLabel />
+
+                            <h:outputLabel value="Container No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{planningContReceivingBean.planningContReceiving.contNo}" />
+                            <h:outputLabel />
+
+                            <h:outputLabel value="MLO" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText disabled="true" value="#{planningContReceivingBean.planningContReceiving.mlo.name}"/>
+                            <h:outputLabel/>
+
+                            <h:outputLabel value="Type" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{planningContReceivingBean.planningContReceiving.masterContainerType.contType}"
+                                             valueChangeListener="#{planningContReceivingBean.onChangeConstraintType}" immediate="true">
+                                <f:selectItem itemLabel="20 BLK" itemValue="20" />
+                                <f:selectItem itemLabel="20 DRY" itemValue="1" />
+                                <f:selectItem itemLabel="20 FLT" itemValue="14" />
+                                <f:selectItem itemLabel="20 HC" itemValue="21" />
+                                <f:selectItem itemLabel="20 OPS" itemValue="65" />
+                                <f:selectItem itemLabel="20 OPT" itemValue="12" />
+                                <f:selectItem itemLabel="20 RFR" itemValue="2" />
+                                <f:selectItem itemLabel="20 TNK" itemValue="19" />
+                                <f:selectItem itemLabel="40 BLK" itemValue="36" />
+                                <f:selectItem itemLabel="40 DRY" itemValue="26" />
+                                <f:selectItem itemLabel="40 FLT" itemValue="32" />
+                                <f:selectItem itemLabel="40 HC" itemValue="37" />
+                                <f:selectItem itemLabel="40 OPS" itemValue="98" />
+                                <f:selectItem itemLabel="40 OPT" itemValue="30" />
+                                <f:selectItem itemLabel="40 RFR" itemValue="29" />
+                                <f:selectItem itemLabel="40 TNK" itemValue="83" />
+                                <f:selectItem itemLabel="45 DRY" itemValue="1752" />
+                                <f:selectItem itemLabel="45 HC" itemValue="99" />
+                                <f:ajax execute="@this" event="change" render="formAddEdit:contId"/>
+                            </h:selectOneMenu>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="Size" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="1" id="contId">
+                                <h:selectOneMenu disabled="true" value="#{planningContReceivingBean.planningContReceiving.contSize}">
+                                    <f:selectItems value="#{containerAttributesBean.containerSizes}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{planningContReceivingBean.planningContReceiving.contStatus}">
+                                <f:selectItem itemValue="FCL" itemLabel="FCL" />
+                                <f:selectItem itemValue="LCL" itemLabel="LCL" />
+                                <f:selectItem itemValue="MTY" itemLabel="EMPTY" />
+                            </h:selectOneMenu>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="Gross" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3">
+                                <h:inputText id="gross" required="true" value="#{planningContReceivingBean.planningContReceiving.contGross}" onkeyup="javascript:cekAlphabet(this);" requiredMessage="#{msg['application.validation.required']}"/>
+                                <h:outputLabel value="numerik" style="font: italic smaller; color:red;"/>
+                                <p:message for="gross" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="Seal No" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText required="true" id="seal" value="#{planningContReceivingBean.planningContReceiving.sealNo}" requiredMessage="#{msg['application.validation.required']}"/>
+                            <p:message for="seal" display="icon"/>
+
+                            <h:outputLabel value="Comodity" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" id="opt">
+                                <h:inputText readonly="true" id="com" value="#{planningContReceivingBean.planningContReceiving.masterCommodity}" />
+                                <p:commandButton image="ui-icon-folder-open" value="..." onclick="showCommodities();" style="font-size: x-small" immediate="true"/>
+                                <p:message for="com" display="icon"/>
+                            </h:panelGrid>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="Dangerous " />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3" >
+                                <h:inputText id="dangerous" value="#{planningContReceivingBean.planningContReceiving.dg ? planningContReceivingBean.planningContReceiving.masterCommodity.masterDangerousClass : 'No'}" readonly="true"/>
+                                <h:outputLabel />
+                            </h:panelGrid>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="OH/OW/OL" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{planningContReceivingBean.planningContReceiving.overSize}">
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                            </h:selectOneMenu>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="21 feet" />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{planningContReceivingBean.planningContReceiving.twentyOneFeet}">
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                            </h:selectOneMenu>
+                            <h:outputLabel />
+
+                            <h:outputLabel value="Label " />
+                            <h:outputLabel value=" : " />
+                            <h:selectOneMenu value="#{planningContReceivingBean.planningContReceiving.dgLabel}">
+                                <f:selectItem itemValue="true" itemLabel="Yes" />
+                                <f:selectItem itemValue="false" itemLabel="No" />
+                            </h:selectOneMenu>
+                            <h:outputLabel />
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.save']}" actionListener="#{planningContReceivingBean.saveEdit}" update="formdischarge:baplieDischargesTable formAddEdit growl " oncomplete="handleRequestValidation(xhr, status, args)" />
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset" />
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog header="Master Commodities"  widgetVar="commoditiesDialog" modal="true" minWidth="600">
+            <h:form id="commoditiesForm">
+                <p:dataTable var="item" value="#{masterCommoditySelector.masterCommodities}"
+                             id="commoditiesTable"  widgetVar="commoditiesTable"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom" lazy="true"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+
+                    <p:column sortBy="#{item.commodityCode}" filterMatchMode="contains" filterBy="#{item.commodityCode}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Code" />
+                        </f:facet>
+                        <h:outputText value="#{item.commodityCode}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.name}" filterMatchMode="contains" filterBy="#{item.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Name" />
+                        </f:facet>
+                        <h:outputText value="#{item.name}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item.masterCommodityType.name}" filterMatchMode="contains" filterBy="#{item.masterCommodityType.name}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity Type" />
+                        </f:facet>
+                        <h:outputText value="#{item.masterCommodityType.name}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" action="#{planningContReceivingBean.handleSelectCommodity}" value="select" update="formAddEdit:opt formAddEdit:dangerous" oncomplete="commoditiesDialog.hide();">
+                            <f:setPropertyActionListener target="#{planningContReceivingBean.planningContReceiving.masterCommodity}" value="#{item}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlg.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^-?[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+
+        <h:form>
+            <p:remoteCommand onstart="freeze();" name="showCommodities" immediate="true" oncomplete="commoditiesDialog.show();commoditiesTable.filter();"/>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
+

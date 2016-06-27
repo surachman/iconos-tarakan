@@ -1,0 +1,365 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_receiving.entry_receiving_uc_service']}" />
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_receiving.entry_receiving_uc_service']}" />
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+           function handleRequestValidation(xhr, status, args) {
+                   if(args.validationFailed || !args.loggedIn) {
+                           jQuery('#dialog').show();
+                   } else {
+                           dlg.hide();
+                   }
+           }
+            function cekAlphabet(param) {
+               var regexNum = /^[0-9]+$/;
+               var regexLetter = /[a-zA-z]/;
+               if(!regexNum.test(param.value))
+                   param.value = "";
+               else if(regexLetter.test(param.value))
+                   param.value = "";
+           }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <p:growl id="growl" showDetail="true" globalOnly="true"/>
+        <h:form id="registrationForm">
+            <h:panelGrid columns="4" id="registrationDetail">
+                <h:outputLabel value="No Registrasi" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryReceivingUcServiceBean.registration.noReg}" size="30" onkeypress="dlgReg.show();"/>
+                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgReg.show();"/>
+
+                <h:outputLabel value="Customer" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryReceivingUcServiceBean.registration.masterCustomer.custCode}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryReceivingUcServiceBean.registration.planningVessel.noPpkb}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryReceivingUcServiceBean.registration.planningVessel.preserviceVessel.masterVessel.name}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy In" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryReceivingUcServiceBean.registration.planningVessel.preserviceVessel.voyIn}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Voy Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryReceivingUcServiceBean.registration.planningVessel.preserviceVessel.voyOut}" size="30"/>
+                <h:outputLabel/>
+
+                <h:outputLabel value="Status" />
+                <h:outputLabel value=" : " />
+                <h:inputText disabled="true" value="#{entryReceivingUcServiceBean.registration.statusService}" size="30"/>
+                <h:outputLabel/>
+
+            </h:panelGrid>
+            <br />
+        </h:form>
+
+        <h:form id="receivingUcsForm">
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{entryReceivingUcServiceBean.receivingUcs}"
+                         paginator="true" rows="10" rowsPerPageTemplate="5,10,15" id="receivingUcsTable"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton onstart="freeze();" image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty entryReceivingUcServiceBean.registration.noReg or not entryReceivingUcServiceBean.registration.statusService.equals('registrasi') or entryReceivingUcServiceBean.registration.planningVessel.status.equals('Served')}" actionListener="#{entryReceivingUcServiceBean.handleAdd}" update="ucDialogForm" oncomplete="dlg.show();" onclick="genTitle('dialog','#{msg['application.operation.add']} Receiving Uncontainerized Service');"/>
+                    </div>
+                </f:facet>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Job Slip" />
+                    </f:facet>
+                    <h:outputText value="#{item[0]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}" >
+                    <f:facet name="header">
+                        <h:outputText value="BL No" />
+                    </f:facet>
+                    <h:outputText value="#{item[1]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[2]}" filterMatchMode="contains" filterBy="#{item[2]}" >
+                    <f:facet name="header">
+                        <h:outputText value="Commodity" />
+                    </f:facet>
+                    <h:outputText value="#{item[2]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[6]}">
+                    <f:facet name="header">
+                        <h:outputText value="Unit" />
+                    </f:facet>
+                    <h:outputText value="#{item[6]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[7]}">
+                    <f:facet name="header">
+                        <h:outputText value="Weight" />
+                    </f:facet>
+                    <h:outputText value="#{item[7]}" />
+                </p:column>
+
+                <p:column sortBy="#{item[4]}">
+                    <f:facet name="header">
+                        <h:outputText value="Truck Lossing" />
+                    </f:facet>
+                    <h:outputText value="#{item[4]}" />
+                </p:column>
+
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <center>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryReceivingUcServiceBean.handleSelectRecUC}" update="ucDialogForm:recUC" oncomplete="dlg.show();" image="ui-icon ui-icon-pencil" title="Edit Receiving Uncontainerized" disabled="#{not entryReceivingUcServiceBean.registration.statusService.equals('registrasi')  or entryReceivingUcServiceBean.registration.planningVessel.status.equals('Servicing') or entryReceivingUcServiceBean.registration.planningVessel.status.equals('Served')}" onclick="genTitle('dialog','#{msg['application.operation.edit']} Receiving Uncontainerized Service');">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>                            
+                        </p:commandButton>
+                        <p:commandButton onstart="freeze();" actionListener="#{entryReceivingUcServiceBean.handleSelectRecUC}" oncomplete="confirmation.show();" image="ui-icon-trash" title="Delete Receiving Uncontainerized" disabled="#{not entryReceivingUcServiceBean.registration.statusService.equals('registrasi') or item[8].equals('CY') or item[8].equals('STV')}">
+                            <f:attribute name="jobSlip" value="#{item[0]}"/>                            
+                        </p:commandButton>
+                    </center>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+
+        <p:dialog header="Entry Data Receiving Uncontainerized"  widgetVar="dlg" modal="true" width="600" id="dialog">
+            <h:form id="ucDialogForm">
+                <p:panel>
+                    <h:panelGrid id="recUC">
+                        <h:panelGrid columns="3" columnClasses="first-td">
+                            <h:outputLabel value="Job Slip" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="1">
+                                <h:inputText disabled="true" value="#{entryReceivingUcServiceBean.receivingUc.jobslip}" size="25"/>
+                            </h:panelGrid>
+
+                            <h:outputLabel value="BL No" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3">
+                                <h:inputText id="bl" value="#{entryReceivingUcServiceBean.uncontainerizedService.blNo}" size="25" required="true" requiredMessage="#{msg['application.validation.required']}"/>
+                                <p:commandButton onstart="freeze();" image="ui-icon-folder-open" value="..." style="font-size: x-small" onclick="dlgPUC.show();" disabled="#{entryReceivingUcServiceBean.isEdit}"/>
+                                <p:message for="bl" display="icon"/>
+                            </h:panelGrid>
+
+                            <h:outputLabel value="Commodity" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="1">
+                                <h:selectOneMenu value="#{entryReceivingUcServiceBean.uncontainerizedService.commodity}">
+                                    <f:selectItems value="#{entryReceivingUcServiceBean.masterCommoditys}" var="it" itemValue="#{it[0]}" itemLabel="#{it[0]} || #{it[1]}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>                            
+
+                            <h:outputLabel value="Part *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="3">
+                                <h:inputText id="unit" value="#{entryReceivingUcServiceBean.uncontainerizedService.unit}" title="Unit" required="true" requiredMessage="#{msg['application.validation.required']}" onkeyup="javascript:cekAlphabet(this);"/>
+                                <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                <p:message for="unit" display="icon"/>
+                            </h:panelGrid>
+
+                            <h:outputLabel value="Weight *" />
+                            <h:outputLabel value=" : " />
+                            <h:panelGrid columns="4">
+                                <h:inputText id="weight" value="#{entryReceivingUcServiceBean.uncontainerizedService.weight}" requiredMessage="#{msg['application.validation.required']}" title="Weight" required="true" onkeyup="javascript:cekAlphabet(this);"/>
+                                <h:outputLabel value="kg"/>
+                                <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                                <p:message for="weight" display="icon"/>
+                            </h:panelGrid>                            
+
+                            <h:outputLabel value="Truck Lossing *" />
+                            <h:outputLabel value=":"/>
+                            <h:panelGrid columns="1">
+                                <h:selectOneMenu value="#{entryReceivingUcServiceBean.uncontainerizedService.truckLoosing}">
+                                    <f:selectItem itemValue="true" itemLabel="YES"/>
+                                    <f:selectItem itemValue="false" itemLabel="NO"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+
+                            <h:outputLabel value="Block Alocation *"/>
+                            <h:outputLabel value=":"/>
+                            <h:panelGrid columns="1">
+                                <h:selectOneMenu value="#{entryReceivingUcServiceBean.uncontainerizedService.block}" >
+                                    <f:selectItems value="#{entryReceivingUcServiceBean.masterYards}" var="i" itemValue="#{i.block}" itemLabel="#{i.block} - #{i.description}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+
+                            <h:outputLabel value="Load Port *" />
+                            <h:outputLabel value=":"/>
+                            <h:panelGrid columns="1">
+                                <h:selectOneMenu disabled="#{entryReceivingUcServiceBean.uncontainerizedService.operation.equals('LOAD')}" value="#{entryReceivingUcServiceBean.uncontainerizedService.loadPort}">
+                                    <f:selectItems value="#{entryReceivingUcServiceBean.masterPorts}" var="it" itemValue="#{it.portCode}" itemLabel="#{it.name}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+
+                            <h:outputLabel value="Disch.Port *"/>
+                            <h:outputLabel value=":"/>
+                            <h:panelGrid columns="1">
+                                <h:selectOneMenu value="#{entryReceivingUcServiceBean.uncontainerizedService.dischPort}">
+                                    <f:selectItems value="#{entryReceivingUcServiceBean.masterPorts}" var="it" itemValue="#{it.portCode}" itemLabel="#{it.name}"/>
+                                </h:selectOneMenu>
+                            </h:panelGrid>
+
+
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.submit']}" actionListener="#{entryReceivingUcServiceBean.handleConfirm}" update="receivingUcsForm:receivingUcsTable growl planningUcForm:planningUc ucDialogForm" oncomplete="handleRequestValidation(xhr, status, args)"/>
+                                <p:commandButton onstart="freeze();" value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="reset"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="Select Registration"  widgetVar="dlgReg" modal="true" minWidth="750">
+            <h:form>
+                <p:dataTable var="item" value="#{entryReceivingUcServiceBean.registrations}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}"  sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No Registration" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}"  sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Customer" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[2]}"  sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" actionListener="#{entryReceivingUcServiceBean.handleSelectRegistration}" value="#{msg['application.operation.select']}" update="registrationForm:registrationDetail receivingUcsForm:receivingUcsTable planningUcForm:planningUc" oncomplete="dlgReg.hide();">
+                                <f:attribute name="noReg" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+
+        <p:dialog header="Select Planning Uncontainerized"  widgetVar="dlgPUC" modal="true" minWidth="750">
+            <h:form id="planningUcForm">
+                <p:dataTable id="planningUc" var="item" value="#{entryReceivingUcServiceBean.uncontainerizedList}"
+                             paginator="true" rows="10" paginatorPosition="bottom" rowsPerPageTemplate="5,10,15"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}">
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}" >
+                        <f:facet name="header">
+                            <h:outputText value="No BL" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}" >
+                        <f:facet name="header">
+                            <h:outputText value="Commodity" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[5]}">
+                        <f:facet name="header">
+                            <h:outputText value="Unit" />
+                        </f:facet>
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Weight" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Truck Lossing"/>
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <center>
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.select']}" actionListener="#{entryReceivingUcServiceBean.handleSelectPlanningUC}" update="ucDialogForm " oncomplete="dlgPUC.hide();">
+                                <f:attribute name="idd" value="#{item[4]}"/>
+                            </p:commandButton>
+                        </center>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  widgetVar="confirmation" header="#{msg['application.header.confirm.delete']}">
+            <h:form>
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.yes']}" actionListener="#{entryReceivingUcServiceBean.handleDelete}" update="receivingUcsForm:receivingUcsTable planningUcForm:planningUc growl" oncomplete="confirmation.hide();" />
+                            <p:commandButton onstart="freeze();" value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="reset"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+
+    </ui:define>
+
+</ui:composition>

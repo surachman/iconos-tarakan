@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Report23kkt_subreport1" language="groovy" pageWidth="135" pageHeight="802" columnWidth="135" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="tahun" class="java.lang.Integer"/>
+	<parameter name="bulan" class="java.lang.Integer"/>
+	<queryString>
+		<![CDATA[
+select 
+
+(SELECT TIMESTAMP 'epoch' + sum(
+coalesce((SELECT EXTRACT(epoch FROM (((sv.departure_time - sv.berhting_time) - ((sv.start_work_time-sv.berhting_time)+(sv.departure_time-sv.end_work_time)) - 
+(select sum(end_time-start_time)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type 
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)-(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type where itt.name='IT Internal' and no_ppkb=sv.no_ppkb)-(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type 
+where itt.name='NOT Internal' and no_ppkb=sv.no_ppkb)))) ),0)
+)* INTERVAL '1 second')
+jml_bwt_et_num,
+
+(SELECT TIMESTAMP 'epoch' + sum(
+coalesce((SELECT EXTRACT(epoch FROM (((sv.start_work_time-sv.berhting_time)+(sv.departure_time-sv.end_work_time) + 
+(select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type 
+where itt.name='IT Internal' and no_ppkb=sv.no_ppkb)))
+)
+),0)
+)* INTERVAL '1 second')
+jml_bwt_it_num,
+ 
+(SELECT TIMESTAMP 'epoch' + sum( 
+coalesce((SELECT EXTRACT(EPOCH FROM  
+(((select sum(end_time-start_time)idle_time from service_idle_time sit left join m_idletimetype itt on itt.id_type=sit.id_type 
+where itt.name='NOT External' and no_ppkb=sv.no_ppkb)+ (select sum(end_time-start_time)idle_time from service_idle_time sit
+left join m_idletimetype itt on itt.id_type=sit.id_type where itt.name='NOT Internal' and no_ppkb=sv.no_ppkb)))
+)
+),0)
+)* INTERVAL '1 second')
+jml_bwt_not_num
+
+
+from service_vessel sv 
+where date_part('MONTH', sv.departure_time)=$P{bulan}
+AND date_part('YEAR', sv.departure_time)=$P{tahun};]]>
+	</queryString>
+	<field name="jml_bwt_et_num" class="java.sql.Timestamp"/>
+	<field name="jml_bwt_it_num" class="java.sql.Timestamp"/>
+	<field name="jml_bwt_not_num" class="java.sql.Timestamp"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="15" splitType="Stretch">
+			<textField pattern="HH.mm.ss">
+				<reportElement x="45" y="0" width="45" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{jml_bwt_it_num}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH.mm.ss">
+				<reportElement x="0" y="0" width="45" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{jml_bwt_et_num}]]></textFieldExpression>
+			</textField>
+			<textField pattern="HH.mm.ss">
+				<reportElement x="90" y="0" width="45" height="15"/>
+				<box>
+					<topPen lineWidth="0.25"/>
+					<leftPen lineWidth="0.25"/>
+					<bottomPen lineWidth="0.25"/>
+					<rightPen lineWidth="0.25"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="Arial" size="7"/>
+				</textElement>
+				<textFieldExpression class="java.sql.Timestamp"><![CDATA[$F{jml_bwt_not_num}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

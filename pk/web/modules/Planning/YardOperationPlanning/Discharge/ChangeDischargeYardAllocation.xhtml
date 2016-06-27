@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+    
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.planning.yard_operation_planning.discharge.change_discharge_yard_allocation']}"/>
+    </ui:define>
+    
+<!--    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlgEditGenerate.hide();
+                    }
+            }
+        </script>
+    </ui:define>-->
+    
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.planning.yard_operation_planning.discharge.change_discharge_yard_allocation']}"/>
+    </ui:define>
+        
+    <ui:define name="content">
+        <p:growl id="growl" globalOnly="true" showDetail="true"/>
+            
+        <h:form id="constraintForm">
+            <p:fieldset legend="PPKB" style="width: 350px;">
+                <h:panelGrid id="planningVesselDetail" columns="4">
+                    <h:outputLabel value="No PPKB" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{changeDischargeYardAllocationBean.vessel[0]}" readonly="true" size="30" />
+                    <p:commandButton image="ui-icon-folder-open" value="..." onclick="selectableVesselsDialog.show();" 
+                                     onstart="freeze();" update="selectableVesselsForm " 
+                                     actionListener="#{changeDischargeYardAllocationBean.handleNewPpkb}"/>
+                    <h:outputLabel value="Vessel Name" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{changeDischargeYardAllocationBean.vessel[1]}" disabled="true" size="30"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage In" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{changeDischargeYardAllocationBean.vessel[2]}" disabled="true" size="30"/>
+                    <h:outputText />
+                    <h:outputLabel value="Voyage Out" />
+                    <h:outputLabel value=" : " />
+                    <h:inputText value="#{changeDischargeYardAllocationBean.vessel[3]}" disabled="true" size="30"/>
+                    <h:outputText />
+                </h:panelGrid>
+            </p:fieldset>
+            <br/>
+            <p:fieldset legend="Change Block" style="width: 350px;">
+                <h:panelGrid id="changeBlockPanel" columns="5">
+                    <h:outputLabel value="Block : " />
+                    <h:selectOneMenu value="#{changeDischargeYardAllocationBean.selectedFromYard}" 
+                                     disabled="#{changeDischargeYardAllocationBean.disable}" 
+                                     valueChangeListener="#{changeDischargeYardAllocationBean.handleChangeBlock}">
+                        <f:selectItems value="#{changeDischargeYardAllocationBean.fromYards}" var="fyard" itemLabel="#{fyard}" itemValue="#{fyard}"/>
+                        <p:ajax process="@this" event="change" onstart="freeze();" update=":constraintForm:constraintTable"/>
+                    </h:selectOneMenu>
+                    <h:outputLabel value="Replace By : " />
+                    <h:selectOneMenu value="#{changeDischargeYardAllocationBean.selectedToYard}" disabled="#{changeDischargeYardAllocationBean.disable}">
+                        <f:selectItems value="#{changeDischargeYardAllocationBean.toYards}" var="tyard" itemLabel="#{tyard}" itemValue="#{tyard}"/>
+                    </h:selectOneMenu>
+                    <p:commandButton image="ui-icon-transferthick-e-w"
+                                     onstart="freeze();" value="Replace" 
+                                     title="Replace" action="#{changeDischargeYardAllocationBean.handleReplace}" 
+                                     update=":constraintForm:constraintTable :constraintForm:changeBlockPanel growl"
+                                     disabled="#{changeDischargeYardAllocationBean.disable}">
+                        
+                    </p:commandButton>
+                        
+                </h:panelGrid>
+                </p:fieldset>
+            <br/>
+                    
+            <p:fieldset legend="Rincian Data">
+                <p:dataTable id="constraintTable" var="item" value="#{changeDischargeYardAllocationBean.services}"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+                                 
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            &nbsp;
+                        </div>
+                    </f:facet>
+                    <p:column headerText="No.">
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column headerText="Cont. No.">
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+                    <p:column headerText="Size">
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+                    <p:column headerText="Type">
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+                    <p:column headerText="Status">
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+                    <p:column headerText="Gross">
+                        <h:outputText value="#{item[5]}" />
+                    </p:column>
+                    <p:column headerText="Dangerous">
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+                    <p:column headerText="Oversize">
+                        <h:outputText value="#{item[7]}" />
+                    </p:column>
+                    <p:column headerText="Is Import">
+                        <h:outputText value="#{item[8]}" />
+                    </p:column>
+                    <p:column headerText="Block">
+                        <h:outputText value="#{item[9]}" />
+                    </p:column>
+                    <p:column headerText="Slot">
+                        <h:outputText value="#{item[10]}" />
+                    </p:column>
+                    <p:column headerText="Row">
+                        <h:outputText value="#{item[11]}" />
+                    </p:column>
+                    <p:column headerText="Tier">
+                        <h:outputText value="#{item[12]}" />
+                    </p:column>
+                    
+                </p:dataTable>
+            </p:fieldset>
+        
+            </h:form>
+        
+        <p:dialog header="Select Planning Vessel"  widgetVar="selectableVesselsDialog" modal="true" minWidth="750">
+            <h:form id="selectableVesselsForm">
+                <p:dataTable var="item" value="#{changeDischargeYardAllocationBean.vessels}"
+                             paginator="true" rows="10"
+                             paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" id="vesselDetail" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <h:outputText value="&nbsp;"/>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                        <f:facet name="header">
+                            <h:outputText value="No PPKB" />
+                        </f:facet>
+                        <h:outputText value="#{item[0]}" />
+                    </p:column>
+
+                    <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Vessel Name" />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage In" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Voyage Out" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton onstart="freeze();" actionListener="#{changeDischargeYardAllocationBean.handleSelectNoPpkb}" value="select" update="constraintForm:planningVesselDetail :constraintForm:constraintTable constraintForm:changeBlockPanel" oncomplete="selectableVesselsDialog.hide();statusDialog.hide();">
+                            <f:attribute name="noPpkb" value="#{item[0]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </p:dialog>
+        
+    </ui:define>
+    
+</ui:composition>

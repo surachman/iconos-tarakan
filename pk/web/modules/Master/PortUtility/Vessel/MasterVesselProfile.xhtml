@@ -1,0 +1,632 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.vessel.master_vessel_profile']}"/>
+    </ui:define>
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.vessel.master_vessel_profile']}"/>
+    </ui:define>
+
+    <ui:define name="script">
+        <script type="text/javascript">
+            function handleRequestValidation(xhr, status, args) {
+                    if(args.validationFailed || !args.loggedIn) {
+                            jQuery('#dialog').show();
+                    } else {
+                            dlgAddEdit.hide();
+                    }
+            }
+
+            function cekAlphabet(param) {
+                var regexNum = /^-?[0-9]+$/;
+                var regexLetter = /[a-zA-z]/;
+                if(!regexNum.test(param.value))
+                    param.value = "";
+                else if(regexLetter.test(param.value))
+                    param.value = "";
+            }
+        </script>
+    </ui:define>
+
+    <ui:define name="content">
+        <p:growl id="growl" />
+
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+        <p:panel id="panelEverything" visible="#{!masterVesselProfileBean.visibleForm}">
+            <h:form id="formProfile">
+                <p:dialog header="Select Vessel"  widgetVar="dlgvessel" modal="true" minWidth="750">
+                    <p:dataTable var="item" value="#{masterVesselProfileBean.masterVessels}"
+                                 paginator="true" rows="10"
+                                 paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                        <f:facet name="header">
+                            <h:outputText value="&nbsp;"/>
+                        </f:facet>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{number+1}." />
+                        </p:column>
+                        <p:column filterMatchMode="contains" filterBy="#{item[0]}" sortBy="#{item[0]}">
+                            <f:facet name="header">
+                                <h:outputText value="Vessel Code" />
+                            </f:facet>
+                            <h:outputText value="#{item[0]}" />
+                        </p:column>
+
+                        <p:column filterMatchMode="contains" filterBy="#{item[1]}" sortBy="#{item[1]}">
+                            <f:facet name="header">
+                                <h:outputText value="Vessel Name" />
+                            </f:facet>
+                            <h:outputText value="#{item[1]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Call Sign" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Vessel Type" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Customer" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Action" />
+                            </f:facet>
+                            <p:commandButton actionListener="#{masterVesselProfileBean.handleSelectVesselCode}" value="select" update="formProfile:masterVesselDetail formProfile:vesselProfileTable" oncomplete="dlgvessel.hide();statusDialog.hide();">
+                                <f:attribute name="vesselCode" value="#{item[0]}"/>
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:dialog>
+                <p:fieldset legend="Vessel" style="width: 850px;">
+                    <h:panelGrid id="masterVesselDetail" columns="5">
+                        <h:panelGrid columns="4">
+                            <h:outputLabel value="Vessel Code" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[0]}" disabled="true" />
+                            <p:commandButton image="ui-icon-folder-open" value="..." type="button" onclick="dlgvessel.show();"/>
+                            <h:outputLabel value="Name" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[1]}" disabled="true" />
+                            <h:outputText />
+                            <h:outputLabel value="Call Sign" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[2]}" disabled="true" />
+                            <h:outputText />
+                            <h:outputLabel value="Flag" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[3]}" disabled="true" />
+                            <h:outputText />
+                            <h:outputLabel value="GRT" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[4]}" disabled="true" />
+                            <h:outputText />
+                            <h:outputLabel value="DWT" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[5]}" disabled="true" />
+                            <h:outputText />
+                            <h:outputLabel value="BRT" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[6]}" disabled="true" />
+                            <h:outputText />
+                            <h:outputLabel value="NRT" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[7]}" disabled="true" />
+                            <h:outputText />
+                        </h:panelGrid>
+                        <p:spacer width="30px" height="0px" />
+                        <h:panelGrid columns="3">
+                            <h:outputLabel value="LOA" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[8]}" disabled="true" />
+                            <h:outputLabel value="Jumlah Palka" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[9]}" disabled="true" />
+                            <h:outputLabel value="Jumlah Derek" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[10]}" disabled="true" />
+                            <h:outputLabel value="Liner Tramper" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[11]}" disabled="true" />
+                            <h:outputLabel value="Tahun Pembuatan" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[12]}" disabled="true" />
+                            <h:outputLabel value="Status" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[13]}" disabled="true" />
+                            <h:outputLabel value="Start Deck" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[14]}" disabled="true" />
+                            <h:outputLabel value="Vessel Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[15]}" disabled="true" />
+                        </h:panelGrid>
+                        <p:spacer width="80px" height="0px" />
+                        <h:panelGrid columns="3">
+                            <h:outputLabel value="Tonage" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[16]}" disabled="true" />
+                            <h:outputLabel value="Customer Name" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[17]}" disabled="true" />
+                            <h:outputLabel value="phone1" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[19]}" disabled="true" />
+                            <h:outputLabel value="phone2" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[20]}" disabled="true" />
+                            <h:outputLabel value="Fax" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[21]}" disabled="true" />
+                            <h:outputLabel value="City" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[22]}" disabled="true" />
+                            <h:outputLabel value="Country" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[24]}" disabled="true" />
+                            <h:outputLabel value="Customer Type" />
+                            <h:outputLabel value=" : " />
+                            <h:inputText value="#{masterVesselProfileBean.masterVessel[23]}" disabled="true" />
+                        </h:panelGrid>
+                    </h:panelGrid>
+                </p:fieldset>
+                <br />
+                <p:dataTable id="vesselProfileTable" var="item" value="#{masterVesselProfileBean.masterVesselProfiles}"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15" rowIndexVar="number">
+
+                    <f:facet name="header">
+                        <div class="header-panel-single-left">
+                            <p:commandButton image="ui-icon-plusthick" value="#{msg['application.operation.add']}" immediate="true" disabled="#{empty masterVesselProfileBean.masterVessel[0]}" actionListener="#{masterVesselProfileBean.addBay}" update="upFormAddEdit bottomFormAddEdit panelAddEdit panelEverything bayPreview"/>
+                            <p:commandButton image="ui-icon ui-icon-trash" value="#{msg['application.operation.delete_all']}" disabled="#{empty masterVesselProfileBean.masterVessel[0]}" actionListener="#{masterVesselProfileBean.handleDeleteAll}" oncomplete="confirmation.show();" />
+                            <p:commandButton image="ui-icon ui-icon-search" value="#{msg['application.operation.preview']}" disabled="#{empty masterVesselProfileBean.masterVessel[0]}" actionListener="#{masterVesselProfileBean.handleResetBayPlanPreview}" update="formProfile:bayPlanPreview-content" oncomplete="bayPlanPreviewDialog.show();"/>
+                        </div>
+                    </f:facet>
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="No." />
+                        </f:facet>
+                        <h:outputText value="#{number+1}." />
+                    </p:column>
+                    <p:column sortBy="#{item[1]}">
+                        <f:facet name="header">
+                            <h:outputText value="Bay No." />
+                        </f:facet>
+                        <h:outputText value="#{item[1]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[2]}">
+                        <f:facet name="header">
+                            <h:outputText value="Position" />
+                        </f:facet>
+                        <h:outputText value="#{item[2]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[3]}">
+                        <f:facet name="header">
+                            <h:outputText value="Start Row" />
+                        </f:facet>
+                        <h:outputText value="#{item[3]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[4]}">
+                        <f:facet name="header">
+                            <h:outputText value="Total Row" />
+                        </f:facet>
+                        <h:outputText value="#{item[4]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Preview" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{masterVesselProfileBean.handlePreviewDetails}" image="ui-icon ui-icon-search" title="Preview Profile Details" update="detailsView" oncomplete="dlgDetails.show();">
+                            <f:attribute name="profileCode" value="#{item[5]}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column sortBy="#{item[6]}">
+                        <f:facet name="header">
+                            <h:outputText value="Position" />
+                        </f:facet>
+                        <h:outputText value="#{item[6]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[7]}">
+                        <f:facet name="header">
+                            <h:outputText value="Start Row" />
+                        </f:facet>
+                        <h:outputText value="#{item[7]}" />
+                    </p:column>
+
+                    <p:column sortBy="#{item[8]}">
+                        <f:facet name="header">
+                            <h:outputText value="Total Row" />
+                        </f:facet>
+                        <h:outputText value="#{item[8]}" />
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Preview" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{masterVesselProfileBean.handlePreviewDetails}" image="ui-icon ui-icon-search" title="Preview Profile Details" update="detailsView" oncomplete="dlgDetails.show();">
+                            <f:attribute name="profileCode" value="#{item[9]}"/>
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:column>
+                        <f:facet name="header">
+                            <h:outputText value="Action" />
+                        </f:facet>
+                        <p:commandButton actionListener="#{masterVesselProfileBean.handleEditButton}" image="ui-icon ui-icon-pencil" title="Edit Vessel Profile" update="upFormAddEdit bottomFormAddEdit panelAddEdit panelEverything bayPreview">
+                            <f:attribute name="bayNo" value="#{item[1]}"/>
+                        </p:commandButton>
+                        <p:commandButton actionListener="#{masterVesselProfileBean.handleDeleteButton}" image="ui-icon ui-icon-trash" title="Delete Vessel Profile" oncomplete="confirmation.show();">
+                            <f:attribute name="bayNo" value="#{item[1]}"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <!--data for look vessel profile-->
+                <p:dialog id="bayPlanPreview-dialog" draggable="true" closable="true" resizable="false" modal="true" header="BayPlan" position="'center',50"  widgetVar="bayPlanPreviewDialog"  width="900">
+                    <br/>
+                    <br/>
+                    <p:remoteCommand name="updateAfterBayChanged" update="formProfile:bayPlanPreview-buttonsSubForm formProfile:bayPlanPreview-imageSubForm"/>
+
+                    <p:outputPanel id="bayPlanPreview-content">
+                        <p:panel rendered="#{not empty masterVesselProfileBean.bays}">
+                            <h:panelGrid columns="4">
+                                <h:outputText value="Bay"/>
+                                <h:outputText value=":"/>
+                                <p:outputPanel id="bayPlanPreview-baysSubForm">
+                                    <h:selectOneMenu value="#{masterVesselProfileBean.selectedBay}" onchange="updateAfterBayChanged();" label="Pilih Bay">
+                                        <f:selectItems value="#{masterVesselProfileBean.bays}"/>
+                                    </h:selectOneMenu>
+                                </p:outputPanel>
+                                <p:outputPanel id="bayPlanPreview-buttonsSubForm">
+                                    <p:commandButton actionListener="#{masterVesselProfileBean.handleClickPrevButton}" update="formProfile:bayPlanPreview-content" value="prev"/>
+                                    <p:commandButton actionListener="#{masterVesselProfileBean.handleClickNextButton}" update="formProfile:bayPlanPreview-content" value="next"/>
+                                </p:outputPanel>
+                            </h:panelGrid>
+                            <p:outputPanel id="bayPlanPreview-imageSubForm">
+                                <p:graphicImage value="#{masterVesselProfileBean.vesselProfileUrl}" cache="false"/>
+                            </p:outputPanel>
+                            <f:facet name="footer">
+                                <p:commandButton value="refresh" update="formProfile:bayPlanPreview-content"/>
+                            </f:facet>
+                        </p:panel>
+                        <p:panel rendered="#{empty masterVesselProfileBean.bays}">
+                            <br/>
+                            <br/>
+                            <br/>
+                            <center>
+                                <p>Vessel profile is not available for vessel <b><h:outputText value="#{masterVesselProfileBean.masterVessel[0]}"/></b><br/>
+                                    please fill out the data on the <b>Master Vessel Profile Menu</b>
+                                </p>
+                            </center>
+                            <br/>
+                            <br/>
+                            <br/>
+                        </p:panel>
+                    </p:outputPanel>
+                </p:dialog>
+            </h:form>
+        </p:panel>
+
+        <p:dialog  widgetVar="dlgDetails" modal="true" minWidth="450">
+            <h:form  id="detailsView">
+                <p:panel>                    
+                    <p:dataTable var="item" value="#{masterVesselProfileBean.profileDetails}"
+                                 paginator="true" rows="10" paginatorPosition="bottom"
+                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <h:outputText value="Details view" />
+                        </f:facet>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="No." />
+                            </f:facet>
+                            <h:outputText value="#{number+1}." />
+                        </p:column>
+                        <p:column sortBy="#{item[2]}">
+                            <f:facet name="header">
+                                <h:outputText value="Row Name" />
+                            </f:facet>
+                            <h:outputText value="#{item[2]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[3]}">
+                            <f:facet name="header">
+                                <h:outputText value="Tier Number" />
+                            </f:facet>
+                            <h:outputText value="#{item[3]}" />
+                        </p:column>
+
+                        <p:column sortBy="#{item[4]}">
+                            <f:facet name="header">
+                                <h:outputText value="Start Tier" />
+                            </f:facet>
+                            <h:outputText value="#{item[4]}" />
+                        </p:column>
+
+                    </p:dataTable>
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.close']}" onclick="dlgDetails.hide();" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+        <p:dialog  header="#{msg['application.header.confirm.delete']}"  widgetVar="confirmation">
+            <h:form>
+                <p:panel>
+                    <h:outputText value="Are you sure you want to delete this file?" />
+                    <f:facet name="footer">
+                        <div class="header-panel-single-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}"  actionListener="#{masterVesselProfileBean.delete}"  update="formProfile:vesselProfileTable growl" onclick="confirmation.hide();" />
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="confirmation.hide()" type="button" />
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+        <p:panel id="panelAddEdit" visible="#{masterVesselProfileBean.visibleForm}">
+            <p:fieldset id="bayPreview" legend="PREVIEW">
+                <div style="text-align: center;">
+                    <p:graphicImage value="#{masterVesselProfileBean.imageByBay}" cache="false"/>
+                </div>
+            </p:fieldset>
+            <h:panelGrid columns="2" rowClasses="first-tr">
+                <p:fieldset legend="UP">
+                    <h:form id="upFormAddEdit">
+                        <h:panelGrid columns="3">
+                            <p:panel id="upProfile" header="Vessel Profile" style="width: 275px; height: 220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputLabel value="Bay No." />
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterVesselProfileUp.bayNo}" disabled="true"/>
+                                    <h:outputLabel value="Start Row" />
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu value="#{masterVesselProfileBean.masterVesselProfileUp.startRow}" disabled="#{!empty masterVesselProfileBean.profileDetailsUp}">
+                                        <f:selectItem itemValue="0" itemLabel="0" />
+                                        <f:selectItem itemValue="1" itemLabel="1" />
+                                    </h:selectOneMenu>
+                                    <h:outputLabel value="Total Row" />
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterVesselProfileUp.rowNumber}" disabled="#{!empty masterVesselProfileBean.profileDetailsUp}" required="true" requiredMessage="The Total Row field is required." onkeyup="javascript:cekAlphabet(this);"/>
+                                    <h:outputLabel value="Global Start Tier" />
+                                    <h:outputLabel value=" : " />
+                                    <p:spinner value="#{masterVesselProfileBean.globalStartTierUp}" disabled="#{!empty masterVesselProfileBean.profileDetailsUp}" width="32" min="0" stepFactor="2"/>
+                                    <h:outputLabel value="Global Total Tier" />
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.globalTotalTierUp}" disabled="#{!empty masterVesselProfileBean.profileDetailsUp}" required="true" requiredMessage="The Global Total Tier field is required." onkeyup="javascript:cekAlphabet(this);" />
+                                </h:panelGrid>
+                                <f:facet name="footer">
+                                    <div class="header-panel-left">
+                                        <p:commandButton image="ui-icon-arrowrefresh-1-n" value="clear" title="clear" disabled="#{empty masterVesselProfileBean.profileDetailsUp}" action="#{masterVesselProfileBean.clearUp}" update="upFormAddEdit:upDetails upFormAddEdit:upProfile bayPreview growl"/>
+                                    </div>
+                                    <div class="header-panel-right">
+                                        <p:commandButton image="ui-icon-play" value="generate" title="generate" disabled="#{!empty masterVesselProfileBean.profileDetailsUp}" action="#{masterVesselProfileBean.generateUp}" update="upFormAddEdit:upDetails upFormAddEdit:upProfile bayPreview growl"/>
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                            <p:spacer height="0px" width="10px" />
+                            <p:panel id="upDetail" header="Profile Detail" style="width: 275px; height: 220px;">
+                                <p:spacer height="25px" width="0px" />
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="Row Name"/>
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterProfileDetail.rowName}" readonly="true" disabled="#{masterVesselProfileBean.disableEdit}"/>
+                                    <h:outputText value="Start Tier"/>
+                                    <h:outputLabel value=" : " />
+                                    <p:spinner value="#{masterVesselProfileBean.masterProfileDetail.startTier}" disabled="#{masterVesselProfileBean.disableEdit}" width="32" min="0" stepFactor="2" required="true" requiredMessage="The Start Tier field is required."/>
+                                    <h:outputText value="Total Tier"/>
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterProfileDetail.tierNumber}" disabled="#{masterVesselProfileBean.disableEdit}" onkeyup="javascript:cekAlphabet(this);" required="true" requiredMessage="The Total Tier field is required."/>
+                                </h:panelGrid>
+                                <p:spacer height="25px" width="0px" />
+                                <f:facet name="footer">
+                                    <div class="header-panel-single-right">
+                                        <p:commandButton image="ui-icon-disk" value="save" title="save detail up" disabled="#{masterVesselProfileBean.disableEdit}" action="#{masterVesselProfileBean.saveDetail}" update="upFormAddEdit:upDetail upFormAddEdit:upDetails bayPreview growl"/>
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                        </h:panelGrid>
+                        <br />
+                        <p:panel style="width: 580px;">
+                            <p:dataTable id="upDetails" rowIndexVar="number" value="#{masterVesselProfileBean.profileDetailsUp}" var="item">
+                                <f:facet name="header">
+                                    <h:outputText value="Profile Detail List" />
+                                </f:facet>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Row Name" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Start Tier" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[4]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Total Tier" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="&nbsp;" />
+                                    </f:facet>
+                                    <p:commandButton actionListener="#{masterVesselProfileBean.editDetail}" image="ui-icon-pencil" title="edit detail up" update="upFormAddEdit:upDetail">
+                                        <f:attribute name="idDetail" value="#{item[0]}"/>
+                                    </p:commandButton>
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <h:outputText value="&nbsp;" />
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </h:form>
+                </p:fieldset>
+                <p:fieldset legend="BOTTOM">
+                    <h:form id="bottomFormAddEdit">
+                        <h:panelGrid columns="3">
+                            <p:panel id="bottomProfile" header="Vessel Profile" style="width: 275px; height: 220px;">
+                                <h:panelGrid columns="3">
+                                    <h:outputLabel value="Bay No." />
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterVesselProfileBottom.bayNo}" disabled="true"/>
+                                    <h:outputLabel value="Start Row" />
+                                    <h:outputLabel value=" : " />
+                                    <h:selectOneMenu value="#{masterVesselProfileBean.masterVesselProfileBottom.startRow}" disabled="#{!empty masterVesselProfileBean.profileDetailsBottom}">
+                                        <f:selectItem itemValue="0" itemLabel="0" />
+                                        <f:selectItem itemValue="1" itemLabel="1" />
+                                    </h:selectOneMenu>
+                                    <h:outputLabel value="Total Row" />
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterVesselProfileBottom.rowNumber}" disabled="#{!empty masterVesselProfileBean.profileDetailsBottom}" required="true" requiredMessage="The Total Row field is required." onkeyup="javascript:cekAlphabet(this);"/>
+                                    <h:outputLabel value="Global Start Tier" />
+                                    <h:outputLabel value=" : " />
+                                    <p:spinner value="#{masterVesselProfileBean.globalStartTierBottom}" disabled="#{!empty masterVesselProfileBean.profileDetailsBottom}" width="32" min="0" stepFactor="2"/>
+                                    <h:outputLabel value="Global Total Tier" />
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.globalTotalTierBottom}" disabled="#{!empty masterVesselProfileBean.profileDetailsBottom}" required="true" requiredMessage="The Global Total Tier field is required." onkeyup="javascript:cekAlphabet(this);" />
+                                </h:panelGrid>
+                                <f:facet name="footer">
+                                    <div class="header-panel-left">
+                                        <p:commandButton image="ui-icon-arrowrefresh-1-n" value="clear" title="clear" disabled="#{empty masterVesselProfileBean.profileDetailsBottom}" action="#{masterVesselProfileBean.clearBottom}" update="bottomFormAddEdit:bottomDetails bottomFormAddEdit:bottomProfile bayPreview growl"/>
+                                    </div>
+                                    <div class="header-panel-right">
+                                        <p:commandButton image="ui-icon-play" value="generate" title="generate" disabled="#{!empty masterVesselProfileBean.profileDetailsBottom}" action="#{masterVesselProfileBean.generateBottom}" update="bottomFormAddEdit:bottomDetails bottomFormAddEdit:bottomProfile bayPreview growl"/>
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                            <p:spacer height="0px" width="10px" />
+                            <p:panel id="bottomDetail" header="Profile Detail" style="width: 275px; height: 220px;">
+                                <p:spacer height="25px" width="0px" />
+                                <h:panelGrid columns="3">
+                                    <h:outputText value="Row Name"/>
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterProfileDetail.rowName}" readonly="true" disabled="#{masterVesselProfileBean.disableEdit}"/>
+                                    <h:outputText value="Start Tier"/>
+                                    <h:outputLabel value=" : " />
+                                    <p:spinner value="#{masterVesselProfileBean.masterProfileDetail.startTier}" disabled="#{masterVesselProfileBean.disableEdit}" width="32" min="0" stepFactor="2" required="true" requiredMessage="The Start Tier field is required."/>
+                                    <h:outputText value="Total Tier"/>
+                                    <h:outputLabel value=" : " />
+                                    <p:inputText value="#{masterVesselProfileBean.masterProfileDetail.tierNumber}" disabled="#{masterVesselProfileBean.disableEdit}" onkeyup="javascript:cekAlphabet(this);" required="true" requiredMessage="The Total Tier field is required."/>
+                                </h:panelGrid>
+                                <p:spacer height="25px" width="0px" />
+                                <f:facet name="footer">
+                                    <div class="header-panel-single-right">
+                                        <p:commandButton image="ui-icon-disk" value="save" title="save detail bottom" disabled="#{masterVesselProfileBean.disableEdit}" action="#{masterVesselProfileBean.saveDetail}" update="bottomFormAddEdit:bottomDetail bottomFormAddEdit:bottomDetails bayPreview growl"/>
+                                    </div>
+                                </f:facet>
+                            </p:panel>
+                        </h:panelGrid>
+                        <br />
+                        <p:panel style="width: 580px;">
+                            <p:dataTable rowIndexVar="number" id="bottomDetails" value="#{masterVesselProfileBean.profileDetailsBottom}" var="item">
+                                <f:facet name="header">
+                                    <h:outputText value="Profile Detail List" />
+                                </f:facet>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="No." />
+                                    </f:facet>
+                                    <h:outputText value="#{number+1}." />
+                                </p:column>
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Row Name" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[2]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Start Tier" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[4]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="Total Tier" />
+                                    </f:facet>
+                                    <h:outputText value="#{item[3]}" />
+                                </p:column>
+
+                                <p:column>
+                                    <f:facet name="header">
+                                        <h:outputText value="&nbsp;" />
+                                    </f:facet>
+                                    <p:commandButton actionListener="#{masterVesselProfileBean.editDetail}" image="ui-icon-pencil" title="edit detail bottom" update="bottomFormAddEdit:bottomDetail">
+                                        <f:attribute name="idDetail" value="#{item[0]}"/>
+                                    </p:commandButton>
+                                </p:column>
+
+                                <f:facet name="footer">
+                                    <h:outputText value="&nbsp;" />
+                                </f:facet>
+                            </p:dataTable>
+                        </p:panel>
+                    </h:form>
+                </p:fieldset>
+            </h:panelGrid>
+            <f:facet name="footer">
+                <div class="header-panel-single-right">
+                    <h:form>
+                        <p:commandButton action="#{masterVesselProfileBean.handleButtonClose}" value="close" image="ui-icon-closethick" title="close form" update="formProfile:vesselProfileTable panelAddEdit panelEverything growl" />
+                    </h:form>
+                </div>
+            </f:facet>
+        </p:panel>
+    </ui:define>
+
+</ui:composition>

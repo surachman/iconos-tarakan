@@ -1,0 +1,169 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.data_master.port_utility.vessel.master_vessel_type']}"/>
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.data_master.port_utility.vessel.master_vessel_type']}"/>
+    </ui:define>
+
+    <ui:define name="content">
+
+
+        <p:dialog modal="true"  widgetVar="statusDialog" header="Loading..."
+                  draggable="false" closable="false">
+            <center><p:graphicImage value="/resources/images/loader.gif" /></center>
+        </p:dialog>
+        <h:form id="vessel">
+            <p:dataTable paginatorPosition="bottom" value="#{masterVesselTypeBean.masterTypeVessels}" var="item"
+                         paginator="true" rows="10" id="dataType"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" image="ui-icon-plusthick" onclick="dialogAddEdit.show()"/>
+                    </div>
+                </f:facet>
+                <p:column sortBy="#{item[0]}" filterMatchMode="contains" filterBy="#{item[0]}">
+                    <f:facet name="header">
+                        <h:outputText value="Vessel Type"/>
+                    </f:facet>
+                    <h:outputText value="#{item[0]}"/>
+                </p:column>
+                <p:column sortBy="#{item[1]}" filterMatchMode="contains" filterBy="#{item[1]}">
+                    <f:facet name="header">
+                        <h:outputText value="Name"/>
+                    </f:facet>
+                    <h:outputText value="#{item[1]}"/>
+                </p:column>
+                <p:column sortBy="#{item[2]}">
+                    <f:facet name="header">
+                        <h:outputText value="Tonage"/>
+                    </f:facet>
+                    <h:outputText value="#{item[2]}"/>
+                </p:column>
+
+                <p:column style="width: 60px;">
+                    <f:facet name="header">
+                        <h:outputText value="Action" />
+                    </f:facet>
+                    <p:commandButton image="ui-icon-pencil" actionListener="#{masterVesselTypeBean.handleEditDeleteButton}" update="addEdit2" oncomplete="dialogAddEdit2.show()">
+                        <f:attribute name="vessel_type" value="#{item[0]}"/>
+                    </p:commandButton>
+                    <p:commandButton image="ui-icon-trash" actionListener="#{masterVesselTypeBean.handleEditDeleteButton}" onclick="dialogDel.show()" update="delForm">
+                        <f:attribute name="vessel_type" value="#{item[0]}"/>
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+
+        <p:growl id="growl" showDetail="true" life="3000" globalOnly="true"/>
+
+        <p:dialog modal="true"  widgetVar="dialogAddEdit" minWidth="400" header="Master Vessel Type" id="dialog">
+            <h:form id="addEdit">
+                <p:panel>
+                    <h:panelGrid columns="5">
+                        <h:outputLabel value="Name *" for="name" />:
+                        <h:inputText id="name" value="#{masterVesselTypeBean.vesselType.name}" title="Name" required="true" requiredMessage="The Name field is required."/>
+                        <p:message for="name" display="icon"/>
+                        <h:outputText />
+
+                        <h:outputLabel value="Tonage *" for="tonage" />:
+                        <h:inputText id="tonage" value="#{masterVesselTypeBean.vesselType.tonage}" title="Tonage" required="true" requiredMessage="The Tonage field is required."/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                        <p:message for="tonage" display="icon"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" actionListener="#{masterVesselTypeBean.addVessel}" update="addEdit vessel:dataType growl" oncomplete="handleLoginRequest3(xhr, status, args)"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" onsuccess="dialogAddEdit.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <script type="text/javascript">
+        function handleLoginRequest3(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog').show();
+                } else {
+                        dialogAddEdit.hide();
+                }
+        }
+        </script>
+
+        <p:growl id="growl2" showDetail="true" life="3000"/>
+        <p:dialog modal="true"  widgetVar="dialogAddEdit2" minWidth="400" header="Master Vessel Type" id="dialog2">
+            <h:form id="addEdit2">
+                <p:panel>
+                    <h:inputHidden value="#{masterVesselTypeBean.vesselType.vesselTypeCode}"/>
+                    <h:panelGrid columns="5">
+                        <h:outputLabel value="Vessel Type" for="vesselTypeCode" />:
+                        <h:inputText disabled="true" id="vesselTypeCode" value="#{masterVesselTypeBean.vesselType.vesselTypeCode}" title="VesselTypeCode" required="true" requiredMessage="The VesselTypeCode field is required."/>
+                        <h:outputText/>
+                        <h:outputText/>
+
+                        <h:outputLabel value="Name " for="name *" />:
+                        <h:inputText id="name" value="#{masterVesselTypeBean.vesselType.name}" title="Name" required="true" requiredMessage="The Name field is required."/>
+                        <h:outputText />
+                        <p:message for="tonage" display="icon"/>
+
+                        <h:outputLabel value="Tonage" for="tonage *" />:
+                        <h:inputText id="tonage" value="#{masterVesselTypeBean.vesselType.tonage}" title="Tonage" required="true" requiredMessage="The Tonage field is required."/>
+                        <h:outputLabel value="must be numeric" style="font: italic smaller; color:red;"/>
+                        <p:message for="tonage" display="icon"/>
+                    </h:panelGrid>
+                    <br/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.save']}" actionListener="#{masterVesselTypeBean.saveEdit}" update="addEdit2 vessel:dataType growl" oncomplete="handleLoginRequest2(xhr, status, args)"/>
+                            <p:commandButton value="#{msg['application.operation.cancel']}" onsuccess="dialogAddEdit2.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+
+        <script type="text/javascript">
+        function handleLoginRequest2(xhr, status, args) {
+                if(args.validationFailed || !args.loggedIn) {
+                        jQuery('#dialog2').show();
+                } else {
+                        dialogAddEdit2.hide();
+                }
+        }
+        </script>
+
+        <p:growl id="growle" showDetail="true" life="3000"/>
+        <p:dialog  widgetVar="dialogDel" minWidth="400">
+            <h:form id="delForm">
+                <h:inputHidden value="#{masterVesselTypeBean.vesselType.vesselTypeCode}"/>
+                <h:inputHidden value="#{masterVesselTypeBean.vesselType.name}"/>
+                <p:panel>
+                    <h:outputLabel value="#{msg['application.operation.delete_dialog']}"/>
+                    <f:facet name="footer">
+                        <div class="header-panel-right">
+                            <p:commandButton value="#{msg['application.operation.yes']}" actionListener="#{masterVesselTypeBean.delete}" oncomplete="dialogDel.hide()" update="vessel:dataType growle"/>
+                            <p:commandButton value="#{msg['application.operation.no']}" onclick="dialogDel.hide()"/>
+                        </div>
+                    </f:facet>
+                </p:panel>
+            </h:form>
+        </p:dialog>
+
+    </ui:define>
+
+</ui:composition>

@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE composition PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<ui:composition xmlns:ui="http://java.sun.com/jsf/facelets"
+                template="./../../../resources/template/template.xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:p="http://primefaces.prime.com.tr/ui"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns="http://www.w3.org/1999/xhtml">
+
+    <ui:define name="title">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_change_status']}" />
+    </ui:define>
+
+    <ui:define name="header">
+        <h:outputText value="#{msg['menu.billing.service_process.entry_change_status']}" />
+    </ui:define>
+
+    <ui:define name="content">
+        <div style="text-align: center; width: 100%;">
+            <p:ajaxStatus style="width:100%;height:16px;">
+                <f:facet name="start">
+                    <h:graphicImage value="/resources/images/ajaxloader.gif" style="padding-top: 200px;"/>
+                </f:facet>
+
+                <f:facet name="complete">
+                    <h:outputText value="" />
+                </f:facet>
+            </p:ajaxStatus>
+        </div>
+
+        <h:form>
+            <h:panelGrid columns="3" >
+                <h:outputLabel value="No Registration" />
+                <h:outputLabel value=" : " />
+                <h:panelGrid columns="2">
+                    <h:inputText value="#{entryChangeStatusBean.registration.noReg}" />
+                    <p:commandButton value="..." />
+                </h:panelGrid>
+
+                <h:outputLabel value="Customer" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryChangeStatusBean.registration.masterCustomer.custCode}" />
+
+                <h:outputLabel value="No PPKB" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryChangeStatusBean.registration.planningVessel.noPpkb}" />
+
+                <h:outputLabel value="Vessel Name" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryChangeStatusBean.registration.planningVessel.vesselName}" />
+
+                <h:outputLabel value="Voy In" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryChangeStatusBean.registration.planningVessel.voyIn}" />
+
+                <h:outputLabel value="Voy Out" />
+                <h:outputLabel value=" : " />
+                <h:inputText value="#{entryChangeStatusBean.registration.planningVessel.voyOut}" />
+            </h:panelGrid>
+            <div style="text-align: right;">
+                <h:outputLabel value="Status" />
+                <h:outputLabel value=" : ................." />
+                <h:outputText value="#{entryChangeStatusBean.registration.statusService}" />
+            </div>
+            <br />
+            <p:dataTable paginatorPosition="bottom" var="item" value="#{entryChangeStatusBean.changeStatusServices}"
+                         paginator="true" rows="10"
+                         paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+
+                <p:column selectionMode="multiple" />
+                <f:facet name="header">
+                    <div class="header-panel-single-left">
+                        <p:commandButton value="#{msg['application.operation.add']}" immediate="true" onclick="dlg.show();" type="button" />
+                        <p:commandButton value="#{msg['application.operation.edit']}" onclick="dlg.show();" type="button" />
+                        <p:commandButton value="#{msg['application.operation.delete']}" onclick="confirmation.show();" type="button"/>
+                    </div>
+                </f:facet>
+                <p:column sortBy="#{item.jobSlip}">
+                    <f:facet name="header">
+                        <h:outputText value="Job Slip" />
+                    </f:facet>
+                    <h:outputText value="#{item.jobSlip}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contNo}">
+                    <f:facet name="header">
+                        <h:outputText value="Container No" />
+                    </f:facet>
+                    <h:outputText value="#{item.contNo}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contSize}">
+                    <f:facet name="header">
+                        <h:outputText value="Size" />
+                    </f:facet>
+                    <h:outputText value="#{item.contSize}" />
+                </p:column>
+
+                <p:column sortBy="#{item.masterContainerType.contType}">
+                    <f:facet name="header">
+                        <h:outputText value="Type" />
+                    </f:facet>
+                    <h:outputText value="#{item.masterContainerType.contType}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contStatus}">
+                    <f:facet name="header">
+                        <h:outputText value="Status" />
+                    </f:facet>
+                    <h:outputText value="#{item.contStatus}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contGross}">
+                    <f:facet name="header">
+                        <h:outputText value="Gross" />
+                    </f:facet>
+                    <h:outputText value="#{item.contGross}" />
+                </p:column>
+
+                <p:column sortBy="#{item.overSize}">
+                    <f:facet name="header">
+                        <h:outputText value="OH/OW/OL" />
+                    </f:facet>
+                    <h:outputText value="#{item.overSize}" />
+                </p:column>
+
+                <p:column sortBy="#{item.contPosition}">
+                    <f:facet name="header">
+                        <h:outputText value="Position" />
+                    </f:facet>
+                    <h:outputText value="#{item.contPosition}" />
+                </p:column>
+
+                <p:column sortBy="#{item.changeTo}">
+                    <f:facet name="header">
+                        <h:outputText value="Change To" />
+                    </f:facet>
+                    <h:outputText value="#{item.changeTo}" />
+                </p:column>
+            </p:dataTable>
+
+            <p:confirmDialog message="Are you sure you want to delete this file?"
+                             showEffect="bounce" 
+                             header="#{msg['application.header.confirm.delete']}" severity="alert"  widgetVar="confirmation">
+                <div class="header-panel-single-right">
+                    <p:commandButton value="Yes Sure"/>
+                    <p:commandButton value="Not Yet" onclick="confirmation.hide()" type="button" />
+                </div>
+            </p:confirmDialog>
+
+            <p:dialog header="Entry Data Change Status"  widgetVar="dlg" modal="true" minWidth="400" >
+                <p:panel>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Job Slip" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.jobSlip}" />
+
+                        <h:outputLabel value="Container No" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.contNo}" />
+
+                        <h:outputLabel value="size" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.contSize}" />
+
+                        <h:outputLabel value="Type" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.masterContainerType.contType}" />
+
+                        <h:outputLabel value="Status" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.contStatus}" />
+
+                        <h:outputLabel value="Gross" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.contGross}" />
+
+                        <h:outputLabel value="OH/OW/OL" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.overSize}" />
+
+                        <h:outputLabel value="Position" />
+                        <h:outputLabel value=" : " />
+                        <h:inputText value="#{entryChangeStatusBean.changeStatusService.contPosition}" />
+
+                        <h:outputLabel value="Change To" />
+                        <h:outputLabel value=" : " />
+                        <h:selectOneMenu value="#{entryChangeStatusBean.changeStatusService.changeTo}">
+                            <!--                            <f:selectItems value="" var="item" itemValue="" itemLabel="" />-->
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <br />
+                    <br />
+                    <f:facet name="footer">
+                        <h:panelGroup>
+                            <div class="header-panel-single-right">
+                                <p:commandButton value="#{msg['application.operation.submit']}" />
+                                <p:commandButton value="#{msg['application.operation.cancel']}" onclick="dlg.hide();" type="button"/>
+                            </div>
+                        </h:panelGroup>
+                    </f:facet>
+                </p:panel>
+            </p:dialog>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
